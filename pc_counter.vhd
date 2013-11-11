@@ -25,7 +25,6 @@ begin
 			pc <= (others => '0');
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
-				pc <= std_logic_vector( unsigned(pc) + 4 );
 				if PCSrc_i = '0' then
 					pc <= std_logic_vector( unsigned(pc) + 4 );
 				else
