@@ -21,23 +21,24 @@ entity Control is
 		
 		ALUSrcA : out std_logic;
 		RegWrite : out std_logic;
-		RegDat : out std_logic
+		RegDst : out std_logic
 	);
 end entity Control;
 
 architecture behaviour of Control is
+	signal op : std_logic_vector(5 downto 0);
 begin
-	
-	
-	ALUOp <= "01" when op_i = "000000" else
+	ALUOp <= "10" when op = "000000" else
 					(others => '0');
-	ALUSrcB <= "00" when op_i = "000000" else
+	ALUSrcB <= "00" when op = "000000" else
 					(others => '0');	
-	ALUSrcA <= '1' when op_i = "000000" else
+	ALUSrcA <= '1' when op = "000000" else
+					'0';
+	MemWrite <= '0' when op = "000000" else
+					'0';
+	PCSource <= "10" when op = "000000" else
 					(others => '0');
-	MemWrite <= '0' when op_i = "000000" else
-					(others => '0');
-	PCSource <= "10" when op_i = "000000" else
-					(others => '0');
+	RegDst <= '1' when op = "000000" else
+					'0';
 					
 end architecture;
