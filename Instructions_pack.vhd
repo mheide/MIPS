@@ -17,19 +17,22 @@ package Instructions_pack is
 	constant c_add : R_Type_Constant := (
 		opcode => (others => '0'), funct => "10" & x"0"
 	);
-	constant c_addu  : R_Type_Constant := (
+	constant c_addu : R_Type_Constant := (
 		opcode => (others => '0'), funct => "10" & x"1"
 	);
-	constant c_and   : R_Type_Constant := (
-		opcode => "000000", funct => "10" & x"4"
+	constant c_and : R_Type_Constant := (
+		opcode => "000000",
+		funct  => "10" & x"4"
 	);
 	-- count leading ones
-	constant c_clo   : R_Type_Constant := ( 
-		opcode => "01" & x"C", funct => "10" & x"1"
+	constant c_clo : R_Type_Constant := (
+		opcode => "01" & x"C",
+		funct  => "10" & x"1"
 	);
 	-- count leading zeros
-	constant c_clz : R_Type_Constant := ( 
-		opcode => "01" & x"C", funct => "10" & x"0"
+	constant c_clz : R_Type_Constant := (
+		opcode => "01" & x"C",
+		funct  => "10" & x"0"
 	);
 	constant c_div : R_Type_Constant := (
 		opcode => (others => '0'), funct => "01" & x"A"
@@ -47,31 +50,36 @@ package Instructions_pack is
 	);
 	--multiply without overflow
 	constant c_mul : R_Type_Constant := (
-		opcode => "01" & x"C", funct => "00" & x"2" 
+		opcode => "01" & x"C",
+		funct  => "00" & x"2"
 	);
 	--multiply and add
 	constant c_madd : R_Type_Constant := (
-		opcode => "01"&x"C", funct => (others => '0')
+		opcode => "01" & x"C",
+		funct  => (others => '0')
 	);
 	--unsigned multiply add
 	constant c_maddu : R_Type_Constant := (
-		opcode => "01"&x"C", funct => "00"&x"1"
+		opcode => "01" & x"C",
+		funct  => "00" & x"1"
 	);
 	--multiply subtract
 	constant c_msub : R_Type_Constant := (
-		opcode => "01"&x"C", funct => "00"&x"4"
+		opcode => "01" & x"C",
+		funct  => "00" & x"4"
 	);
 	--unsigned multiply subtract
 	constant c_msubu : R_Type_Constant := (
-		opcode => "01"&x"C", funct => "00"&x"5"
+		opcode => "01" & x"C",
+		funct  => "00" & x"5"
 	);
-	
+
 	constant c_nor : R_Type_Constant := (
-		opcode => (others => '0'), funct => "10"&x"7"
+		opcode => (others => '0'), funct => "10" & x"7"
 	);
-	
+
 	constant c_or : R_Type_Constant := (
-		opcode => (others => '0'), funct => "10"&x"5"
+		opcode => (others => '0'), funct => "10" & x"5"
 	);
 	--logical shift left
 	constant c_sll : R_Type_Constant := (
@@ -79,11 +87,11 @@ package Instructions_pack is
 	);
 	--shift left logical variable
 	constant c_sllv : R_Type_Constant := (
-		opcode => (others => '0'), funct => "00"&x"4"
+		opcode => (others => '0'), funct => "00" & x"4"
 	);
 	--shift right arithmetic
 	constant c_sra : R_Type_Constant := (
-		opcode => (others => '0'), funct => "00"&x"3"
+		opcode => (others => '0'), funct => "00" & x"3"
 	);
 	--shift right arithmetic variable
 	constant c_srav : R_Type_Constant := (
@@ -91,25 +99,34 @@ package Instructions_pack is
 	);
 	--shift right logical
 	constant c_srl : R_Type_Constant := (
-		opcode => (others => '0'), funct => "00"&x"2"
+		opcode => (others => '0'), funct => "00" & x"2"
 	);
 	--shift right logical variable
 	constant c_srlv : R_Type_Constant := (
-		opcode => (others => '0'), funct => "00"&x"6"
+		opcode => (others => '0'), funct => "00" & x"6"
 	);
 	--subtract with overflow
 	constant c_sub : R_Type_Constant := (
-		opcode => (others => '0'), funct => "10"&x"2"
+		opcode => (others => '0'), funct => "10" & x"2"
 	);
 	--subtract without overflow
 	constant c_subu : R_Type_Constant := (
-		opcode => (others => '0'), funct => "10"&x"3"
+		opcode => (others => '0'), funct => "10" & x"3"
 	);
-	
+
 	constant c_xor : R_Type_Constant := (
-		opcode => (others => '0'), funct => "10"&x"6"
+		opcode => (others => '0'), funct => "10" & x"6"
 	);
-	
+	--comparison instructions
+	--set less than
+	constant c_slt : R_Type_Constant := (
+		opcode => (others => '0'), funct => "10" & x"A"
+	);
+	--set less than unsigned
+	constant c_sltu : R_Type_Constant := (
+		opcode => (others => '0'), funct => "10" & x"B"
+	);
+
 	------------------------------------------------------
 	-----i type constants --------------------------------
 	------------------------------------------------------
@@ -119,8 +136,29 @@ package Instructions_pack is
 	constant c_andi  : I_Type_Const := "00" & x"C";
 	constant c_ori   : I_Type_Const := "00" & x"D"; --immediate or
 	constant c_xori  : I_Type_Const := "00" & x"E";
+	--constant manipulation: load upper immediate
+	constant c_lui   : I_Type_Const := "00" & x"F";
+	--set less than
+	constant c_slti  : I_Type_Const := "00" & x"A";
+	constant c_sltiu : I_Type_Const := "00" & x"B";
+	--load instructions
+	--load byte
+	constant c_lb    : I_Type_Const := "10" & x"0";
+	--load unsigned byte
+	constant c_lbu   : I_Type_Const := "10" & x"4";
+	--load halfword
+	constant c_lh    : I_Type_Const := "10" & x"1";
+	--load halfword unsigned
+	constant c_lhu   : I_Type_Const := "10" & x"5";
+	--load word
+	constant c_lw    : I_Type_Const := "10" & x"3";
+	--lw left
+	constant c_lwl   : I_Type_Const := "10" & x"2";
+	--lw right
+	constant c_lwr   : I_Type_Const := "10" & x"6";
+
 	------------------------------------------------------
-	
+
 	--type for r type registers
 	type R_Type is record
 		opcode : std_logic_vector(c_op_bits - 1 downto 0);
