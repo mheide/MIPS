@@ -128,38 +128,88 @@ package Instructions_pack is
 	);
 
 	------------------------------------------------------
+	----Branch constants
+	------------------------------------------------------
+	type Branch_Type_Const is record
+		opcode : std_logic_vector(c_op_bits - 1 downto 0);
+		rt     : std_logic_vector(4 downto 0);
+	end record;
+
+	-- branch on greater than equal zero
+	constant c_bgez : Branch_Type_Const := (
+		opcode => "00" & x"1",
+		rt     => "0" & x"1"
+	);
+
+	--branch on greater than equal zero and link
+	constant c_bgezal : Branch_Type_Const := (
+		opcode => "00" & x"1",
+		rt     => "1" & x"1"
+	);
+
+	--branch on greater than zero
+	constant c_bgtz : Branch_Type_Const := (
+		opcode => "00" & x"7",
+		rt     => (others => '0')
+	);
+
+	--branch on less than equal zero
+	constant c_blez : Branch_Type_Const := (
+		opcode => "00" & x"6",
+		rt     => (others => '0')
+	);
+
+	--branch on less than zero and link
+	constant c_bltzal : Branch_Type_Const := (
+		opcode => "00" & x"1",
+		rt     => "1" & x"0"
+	);
+
+	--branch on less than zero
+	constant c_bltz : Branch_Type_Const := (
+		opcode => "00" & x"1",
+		rt     => (others => '0')
+	);
+
+	------------------------------------------------------
 	-----i type constants --------------------------------
 	------------------------------------------------------
-	subtype I_Type_Const is std_logic_vector(c_op_bits - 1 downto 0);
-	constant c_addi  : I_Type_Const := "00" & x"8";
-	constant c_addiu : I_Type_Const := "00" & x"9";
-	constant c_andi  : I_Type_Const := "00" & x"C";
-	constant c_ori   : I_Type_Const := "00" & x"D"; --immediate or
-	constant c_xori  : I_Type_Const := "00" & x"E";
+	subtype OP_Type_Const is std_logic_vector(c_op_bits - 1 downto 0);
+
+	constant c_addi  : OP_Type_Const := "00" & x"8";
+	constant c_addiu : OP_Type_Const := "00" & x"9";
+	constant c_andi  : OP_Type_Const := "00" & x"C";
+	constant c_ori   : OP_Type_Const := "00" & x"D"; --immediate or
+	constant c_xori  : OP_Type_Const := "00" & x"E";
 	--constant manipulation: load upper immediate
-	constant c_lui   : I_Type_Const := "00" & x"F";
+	constant c_lui   : OP_Type_Const := "00" & x"F";
 	--set less than
-	constant c_slti  : I_Type_Const := "00" & x"A";
-	constant c_sltiu : I_Type_Const := "00" & x"B";
+	constant c_slti  : OP_Type_Const := "00" & x"A";
+	constant c_sltiu : OP_Type_Const := "00" & x"B";
 	--load instructions
 	--load byte
-	constant c_lb    : I_Type_Const := "10" & x"0";
+	constant c_lb    : OP_Type_Const := "10" & x"0";
 	--load unsigned byte
-	constant c_lbu   : I_Type_Const := "10" & x"4";
+	constant c_lbu   : OP_Type_Const := "10" & x"4";
 	--load halfword
-	constant c_lh    : I_Type_Const := "10" & x"1";
+	constant c_lh    : OP_Type_Const := "10" & x"1";
 	--load halfword unsigned
-	constant c_lhu   : I_Type_Const := "10" & x"5";
+	constant c_lhu   : OP_Type_Const := "10" & x"5";
 	--load word
-	constant c_lw    : I_Type_Const := "10" & x"3";
+	constant c_lw    : OP_Type_Const := "10" & x"3";
 	--lw left
-	constant c_lwl   : I_Type_Const := "10" & x"2";
+	constant c_lwl   : OP_Type_Const := "10" & x"2";
 	--lw right
-	constant c_lwr   : I_Type_Const := "10" & x"6";
+	constant c_lwr   : OP_Type_Const := "10" & x"6";
+	--branching
+	--branch on equal
+	constant c_beq   : OP_Type_Const := "00" & x"4";
+	--branch on not equal
+	constant c_bne   : OP_Type_Const := "00" & x"5";
 
 	------------------------------------------------------
 
-	--type for r type registers
+	--type for r type instructions
 	type R_Type is record
 		opcode : std_logic_vector(c_op_bits - 1 downto 0);
 		rs     : std_logic_vector(c_instr_bits - 1 downto 0);
@@ -168,14 +218,16 @@ package Instructions_pack is
 		shamt  : std_logic_vector(c_instr_bits - 1 downto 0);
 		funct  : std_logic_vector(c_op_bits - 1 downto 0);
 	end record;
-	-- i type registers
+
+	-- i type instructions
 	type I_Type is record
 		opcode    : std_logic_vector(c_op_bits - 1 downto 0);
 		rs        : std_logic_vector(c_instr_bits - 1 downto 0);
 		rt        : std_logic_vector(c_instr_bits - 1 downto 0);
-		immediate : std_logic_vector(c_immed_bits - 1 downto 0);
+		immediate : std_logic_vector(c_immed_bits - 1 downto 0); --can used as offset value
 	end record;
-	--j type registers
+
+	--j type instructions
 	type J_Type is record
 		opcode  : std_logic_vector(c_op_bits - 1 downto 0);
 		address : std_logic_vector(c_address_bits - 1 downto 0);
