@@ -13,7 +13,7 @@ package Instructions_pack is
 		opcode : std_logic_vector(c_op_bits - 1 downto 0);
 		funct  : std_logic_vector(c_op_bits - 1 downto 0);
 	end record;
-
+	--reg <= c_add.opcode & rs & rt & rd & shamt & c_add.funct;
 	constant c_add : R_Type_Constant := (
 		opcode => (others => '0'), funct => "10" & x"0"
 	);

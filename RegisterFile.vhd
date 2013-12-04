@@ -18,8 +18,8 @@ entity RegisterFile is
 end entity RegisterFile;
 
 architecture behaviour of RegisterFile is
-	type regFileType is array (0 to 31) of std_logic_vector (31 downto 0) ; 
-	signal registers : regFileType;
+	type regFileType is array (0 to 31) of std_logic_vector(31 downto 0);
+	signal registers     : regFileType;
 	signal writeDataAddr : std_logic_vector(4 DOWNTO 0);
 begin
 	registers(0) <= (others => '0');    --register $0
