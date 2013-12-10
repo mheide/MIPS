@@ -6,14 +6,17 @@ entity RegisterFile is
 	port(
 		clk_i        : in  std_logic;
 		rst_i        : in  std_logic;
-		dataAddr_i   : in  std_logic_vector(4 downto 0);
+
 		data_i       : in  std_logic_vector(31 downto 0);
-		dataA_Addr_i : in  std_logic_vector(4 downto 0);
-		dataA_o      : out std_logic_vector(31 downto 0);
-		dataB_Addr_i : in  std_logic_vector(4 downto 0);
-		dataB_o      : out std_logic_vector(31 downto 0);
+		dataAddr_i   : in  std_logic_vector(4 downto 0);
+		dataA_Addr_i : in  std_logic_vector(4 downto 0); --rs
+		dataB_Addr_i : in  std_logic_vector(4 downto 0); --rt
+
 		ALUSrcA_i    : in  std_logic;   --1 for arithmetic op
-		ALUSrcB_i    : in  std_logic_vector(1 DOWNTO 0) --00 for arithmetic op
+		ALUSrcB_i    : in  std_logic_vector(1 DOWNTO 0); --00 for arithmetic op	
+
+		dataA_o      : out std_logic_vector(31 downto 0);
+		dataB_o      : out std_logic_vector(31 downto 0)
 	);
 end entity RegisterFile;
 
