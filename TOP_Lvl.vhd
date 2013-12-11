@@ -331,73 +331,152 @@ architecture RTL of TOP_Lvl is
 	begin
 	--pc: PCSource unnötig, da jumpaddressselect?
 	pc : pc_counter 
-	port map(clk_i => clock, rst_i => reset, enable_i => enable, PCSrc_i => "00", jump_flag_i => '0',
-			jump_addr_i => jumpAddress_jas_pc, PC_o => address_pc_ifid);
-	
-	jas : jumpAddressSelect 
-	port map(PCSource_i => PCSource_memwb_jas, ALU_result => ALU_result_memwb_jas, ALU_result_modified => ALU_result_memwb_jas,
-			PC_modified => PC_memwb_jas, jumpAddress_o => jumpAddress_jas_pc);
+	port map(clk_i       => clock,
+			     rst_i       => reset,
+			     enable_i    => enable,
+			     PCSrc_i     => "00",
+			     jump_flag_i => '0',
+			     jump_addr_i => jumpAddress_jas_pc,
+			     PC_o        => address_pc_ifid);
+
+	jas : jumpAddressSelect
+		port map(PCSource_i          => PCSource_memwb_jas,
+			     ALU_result          => ALU_result_memwb_jas,
+			     ALU_result_modified => ALU_result_memwb_jas,
+			     PC_modified         => PC_memwb_jas,
+			     jumpAddress_o       => jumpAddress_jas_pc);
 	
 	memwb : MEM_WB
-	port map(clk_i => clock, rst_i => reset, enable_i => enable, 
-			PC_memwb_i => PC_exmem_memwb, memoryReadData_memwb_i => memoryReadData_mem_memwb,
-			PCSource_memwb_i => PC_Src_exmem_memwb, ALU_result_memwb_i => ALU_result_exmem_memwb, dataAddr_memwb_i => dataAddr_exmem_rds, 
-			memToReg_memwb_i => memToReg_exmem_memwb, regWrite_memwb_i => regWrite_exmem_memwb,
-			PC_memwb_o => PC_memwb_jas, memoryReadData_memwb_o => memoryReadData_memwb_rf, 
-			ALU_result_memwb_o => ALU_result_memwb_jas, dataAddr_memwb_o => dataAddr_memwb_rf,
-			PCSource_memwb_o => PCSource_memwb_jas, memToReg_memwb_o => memToReg_memwb_ifidmem, regWrite_memwb_o => regWrite_memwb_ifidmem);
+	port map(clk_i                             => clock,
+			rst_i                  => reset,
+			enable_i               => enable,
+			PC_memwb_i             => PC_exmem_memwb,
+			memoryReadData_memwb_i => memoryReadData_mem_memwb,
+			PCSource_memwb_i       => PC_Src_exmem_memwb,
+			ALU_result_memwb_i     => ALU_result_exmem_memwb,
+			dataAddr_memwb_i       => dataAddr_exmem_rds,
+			memToReg_memwb_i       => memToReg_exmem_memwb,
+			regWrite_memwb_i       => regWrite_exmem_memwb,
+			PC_memwb_o             => PC_memwb_jas,
+			memoryReadData_memwb_o => memoryReadData_memwb_rf,
+			ALU_result_memwb_o     => ALU_result_memwb_jas,
+			dataAddr_memwb_o       => dataAddr_memwb_rf,
+			PCSource_memwb_o       => PCSource_memwb_jas,
+			memToReg_memwb_o       => memToReg_memwb_ifidmem,
+			regWrite_memwb_o       => regWrite_memwb_ifidmem);
 	
 	ifid : IF_ID
-	port map(clk_i => clock, rst_i => reset, enable_i => enable,
-			PC_ifid_i => address_pc_ifid, Instruction_o => data_ifid_rf, PC_ifid_o => PC_ifid_idex);
-	
+		port map(clk_i         => clock,
+			     rst_i         => reset,
+			     enable_i      => enable,
+			     PC_ifid_i     => address_pc_ifid,
+			     Instruction_o => data_ifid_rf,
+			     PC_ifid_o     => PC_ifid_idex);
+
 	idex : ID_EX
-	port map(clk_i => clock, rst_i => reset, enable_i => enable,
-			PCSource_idex_i => PCSource_ctrl_idex, PC_idex_i => PC_ifid_idex, dataAddr_idex_i => data_ifid_rf(15 downto 11),
-			ALUSrcB_idex_i => ALUSrcB_ctrl_idex, ALUSrcA_idex_i => ALUSrcA_ctrl_idex, ALU_op_idex_i => ALUop_ctrl_idex, 
-			function_code_idex_i => data_ifid_rf(5 downto 0), 
-			branch_idex_i => branch_ctrl_idex, memRead_idex_i => memRead_ctrl_idex, memWrite_idex_i => memWrite_ctrl_idex,
-			memToReg_idex_i => memToReg_ctrl_idex, regWrite_idex_i => regWrite_ctrl_idex, 
-			PCSource_idex_o => PCSrc_idex_exmem, PC_Idex_o => PC_idex_exmem, dataAddr_idex_o => dataAddr_idex_exmem,
-			ALUSrcB_idex_o => ALUSrcB_idex_rf, ALUSrcA_idex_o => ALUSrcA_idex_rf, ALU_op_idex_o => alu_op_idex_ac,
-			function_code_idex_o => functioncode_idex_ac, branch_idex_o => branch_idex_exmem, memRead_idex_o => memRead_idex_exmem,
-			memWrite_idex_o => memWrite_idex_exmem, memToReg_idex_o => memToReg_idex_exmem, regWrite_idex_o => regWrite_idex_exmem);
-	
-	
+		port map(clk_i                => clock,
+			     rst_i                => reset,
+			     enable_i             => enable,
+			     PCSource_idex_i      => PCSource_ctrl_idex,
+			     PC_idex_i            => PC_ifid_idex,
+			     dataAddr_idex_i      => data_ifid_rf(15 downto 11),
+			     ALUSrcB_idex_i       => ALUSrcB_ctrl_idex,
+			     ALUSrcA_idex_i       => ALUSrcA_ctrl_idex,
+			     ALU_op_idex_i        => ALUop_ctrl_idex,
+			     function_code_idex_i => data_ifid_rf(5 downto 0),
+			     branch_idex_i        => branch_ctrl_idex,
+			     memRead_idex_i       => memRead_ctrl_idex,
+			     memWrite_idex_i      => memWrite_ctrl_idex,
+			     memToReg_idex_i      => memToReg_ctrl_idex,
+			     regWrite_idex_i      => regWrite_ctrl_idex,
+			     PCSource_idex_o      => PCSrc_idex_exmem,
+			     PC_Idex_o            => PC_idex_exmem,
+			     dataAddr_idex_o      => dataAddr_idex_exmem,
+			     ALUSrcB_idex_o       => ALUSrcB_idex_rf,
+			     ALUSrcA_idex_o       => ALUSrcA_idex_rf,
+			     ALU_op_idex_o        => alu_op_idex_ac,
+			     function_code_idex_o => functioncode_idex_ac,
+			     branch_idex_o        => branch_idex_exmem,
+			     memRead_idex_o       => memRead_idex_exmem,
+			     memWrite_idex_o      => memWrite_idex_exmem,
+			     memToReg_idex_o      => memToReg_idex_exmem,
+			     regWrite_idex_o      => regWrite_idex_exmem);
+
 	rds : regDstSelect
-	port map(regDst_i => regDst_ctrl_rds, instruction_20_16_i => data_ifid_rf(20 downto 16), instruction_15_11_i => data_ifid_rf(15 downto 11),
-			instruction_o => dst_Addr_rds_rf);
+		port map(regDst_i            => regDst_ctrl_rds,
+			     instruction_20_16_i => data_ifid_rf(20 downto 16),
+			     instruction_15_11_i => data_ifid_rf(15 downto 11),
+			     instruction_o       => dst_Addr_rds_rf);
 
 	ctrl : Control
-	port map(rst_i => reset, op_i => data_ifid_rf(31 downto 26), 
-			PCWriteCond_o => PCWriteCond_ctrl_pc, PCWrite_o => PCWrite_ctrl_pc, IorD_o => IorD_ctrl_pc,
-			branch_o => branch_ctrl_idex, MemRead_o => memRead_ctrl_idex, MemWrite_o => memWrite_ctrl_idex, 
-			MemToReg_o => memToReg_ctrl_idex, regWrite_o => memToReg_ctrl_idex, ALUOp_o => ALUop_ctrl_idex,
-			IRWrite_o => IRWrite_ctrl_ir,
-			PCSource_o => PCSource_ctrl_idex, ALUSrcB_o => ALUSrcB_ctrl_idex, ALUSrcA_o => ALUSrcA_ctrl_idex, RegDst_o => regDst_ctrl_rds);
-			
+		port map(rst_i         => reset,
+			     op_i          => data_ifid_rf(31 downto 26),
+			     PCWriteCond_o => PCWriteCond_ctrl_pc,
+			     PCWrite_o     => PCWrite_ctrl_pc,
+			     IorD_o        => IorD_ctrl_pc,
+			     branch_o      => branch_ctrl_idex,
+			     MemRead_o     => memRead_ctrl_idex,
+			     MemWrite_o    => memWrite_ctrl_idex,
+			     MemToReg_o    => memToReg_ctrl_idex,
+			     regWrite_o    => memToReg_ctrl_idex,
+			     ALUOp_o       => ALUop_ctrl_idex,
+			     IRWrite_o     => IRWrite_ctrl_ir,
+			     PCSource_o    => PCSource_ctrl_idex,
+			     ALUSrcB_o     => ALUSrcB_ctrl_idex,
+			     ALUSrcA_o     => ALUSrcA_ctrl_idex,
+			     RegDst_o      => regDst_ctrl_rds);
+
 	rf : RegisterFile
-	port map(clk_i => clock, rst_i => reset, data_i => memoryReadData_memwb_rf, 
-			dataAddr_i => dst_Addr_rds_rf, dataA_Addr_i => data_ifid_rf(25 downto 21), dataB_Addr_i => data_ifid_rf(20 downto 16),			
-			ALUSrcA_i => ALUSrcA_idex_rf, ALUSrcB_i => ALUSrcB_idex_rf,
-			dataA_o => dataA_rf_alu, dataB_o => dataB_rf_alu);
-	
+		port map(clk_i        => clock,
+			     rst_i        => reset,
+			     data_i       => memoryReadData_memwb_rf,
+			     dataAddr_i   => dst_Addr_rds_rf,
+			     dataA_Addr_i => data_ifid_rf(25 downto 21),
+			     dataB_Addr_i => data_ifid_rf(20 downto 16),
+			     ALUSrcA_i    => ALUSrcA_idex_rf,
+			     ALUSrcB_i    => ALUSrcB_idex_rf,
+			     dataA_o      => dataA_rf_alu,
+			     dataB_o      => dataB_rf_alu);
+
 	exmem : EX_MEM
-	port map(clk_i => clock, rst_i => reset, enable_i => enable, PC_exmem_i => PC_idex_exmem, PCSource_exmem_i => PCSrc_idex_exmem,
-			ALU_result_exmem_i => C_alu_exmem, zero_flag_exmem_i => zero_alu_exmem, dataAddr_exmem_i => dataAddr_idex_exmem,
-			branch_exmem_i => branch_idex_exmem, memRead_exmem_i => memRead_idex_exmem, memWrite_exmem_i => memWrite_idex_exmem,
-			memToReg_exmem_i => memToReg_idex_exmem, regWrite_exmem_i => regWrite_idex_exmem,
-			PC_exmem_o => PC_exmem_memwb, ALU_result_exmem_o => ALU_result_exmem_memwb, zero_flag_exmem_o => zero_exmem_pc, 
-			dataAddr_exmem_o => dataAddr_exmem_rds, PCSource_exmem_o => PC_Src_exmem_memwb,
-			branch_exmem_o => branch_exmem_pc, memRead_exmem_o => memRead_exmem_mem, memWrite_exmem_o => memWrite_exmem_mem,
-			memToReg_exmem_o => memToReg_exmem_memwb, regWrite_exmem_o => regWrite_exmem_memwb);
-	
-	ac : ALU_Control				
-	port map(rst_i => reset, ALU_Op_i => alu_op_idex_ac, functioncode_i => functioncode_idex_ac, alu_code_o => alu_code_ac_alu);
-	
+		port map(clk_i              => clock,
+			     rst_i              => reset,
+			     enable_i           => enable,
+			     PC_exmem_i         => PC_idex_exmem,
+			     PCSource_exmem_i   => PCSrc_idex_exmem,
+			     ALU_result_exmem_i => C_alu_exmem,
+			     zero_flag_exmem_i  => zero_alu_exmem,
+			     dataAddr_exmem_i   => dataAddr_idex_exmem,
+			     branch_exmem_i     => branch_idex_exmem,
+			     memRead_exmem_i    => memRead_idex_exmem,
+			     memWrite_exmem_i   => memWrite_idex_exmem,
+			     memToReg_exmem_i   => memToReg_idex_exmem,
+			     regWrite_exmem_i   => regWrite_idex_exmem,
+			     PC_exmem_o         => PC_exmem_memwb,
+			     ALU_result_exmem_o => ALU_result_exmem_memwb,
+			     zero_flag_exmem_o  => zero_exmem_pc,
+			     dataAddr_exmem_o   => dataAddr_exmem_rds,
+			     PCSource_exmem_o   => PC_Src_exmem_memwb,
+			     branch_exmem_o     => branch_exmem_pc,
+			     memRead_exmem_o    => memRead_exmem_mem,
+			     memWrite_exmem_o   => memWrite_exmem_mem,
+			     memToReg_exmem_o   => memToReg_exmem_memwb,
+			     regWrite_exmem_o   => regWrite_exmem_memwb);
+
+	ac : ALU_Control
+		port map(rst_i              => reset,
+				ALU_Op_i            => alu_op_idex_ac,
+				functioncode_i      => functioncode_idex_ac,
+				alu_code_o          => alu_code_ac_alu
+			);
+
 	alu_unit : ALU
-	port map(rst_i => reset, A_i => dataA_rf_alu, B_i => dataB_rf_alu, ALU_ctrl_i => alu_code_ac_alu,
-			C_o => C_alu_exmem, zero_o => zero_alu_exmem);
+		port map(rst_i      => reset,
+			     A_i        => dataA_rf_alu,
+			     B_i        => dataB_rf_alu,
+			     ALU_ctrl_i => alu_code_ac_alu,
+			     C_o        => C_alu_exmem,
+			     zero_o     => zero_alu_exmem);
 
 
 end architecture RTL;
