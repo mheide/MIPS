@@ -1,14 +1,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
---test
-
 entity ALU_Control is
 	port(
-		rst_i          : in  std_logic;
-		ALU_Op_i       : in  std_logic_vector(1 downto 0);
-		functioncode_i : in  std_logic_vector(5 downto 0);
-		alu_code_o     : out std_logic_vector(3 downto 0)
+		rst_i      : in  std_logic;
+		ALU_Op_i   : in  std_logic_vector(1 downto 0);
+		functioncode_i   : in  std_logic_vector(5 downto 0);
+		alu_code_o : out std_logic_vector(3 downto 0)
 	);
 end entity ALU_Control;
 
