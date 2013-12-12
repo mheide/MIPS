@@ -4,7 +4,8 @@ use ieee.std_logic_1164.all;
 entity TOP_Lvl is
 	port(
 		clk_i : in std_logic;
-		rst_i : in std_logic
+		rst_i : in std_logic;
+		enable_i : in std_logic
 	);
 end entity TOP_Lvl;
 
@@ -231,7 +232,7 @@ architecture RTL of TOP_Lvl is
 	signal PC_Src_exmem_memwb : std_logic_vector(1 downto 0);
 	signal memToReg_exmem_memwb : std_logic;
 	signal regWrite_exmem_memwb : std_logic;
-	signal ALU_result_exmem_memwb : std_logic_vector(31 downto 0); --TODO: zum Speicher für andere befehle
+	signal ALU_result_exmem_memwb : std_logic_vector(31 downto 0); --TODO: zum Speicher fuer andere befehle
 	
 	--exmem --> memory
 	signal memRead_exmem_mem : std_logic;
@@ -296,7 +297,7 @@ architecture RTL of TOP_Lvl is
 	signal regDst_ctrl_rds : std_logic;
 
 	
-	--crtl --> pc --TODO: pc überlegen für andere befehlstypen
+	--crtl --> pc --TODO: pc ueberlegen fuer andere befehlstypen
 	signal PCWriteCond_ctrl_pc : std_logic;
 	signal PCWrite_ctrl_pc : std_logic;
 	signal IorD_ctrl_pc : std_logic;
@@ -329,7 +330,13 @@ architecture RTL of TOP_Lvl is
 	signal jumpAddress_jas_pc : std_logic_vector(31 downto 0);
 	
 	begin
-	--pc: PCSource unnötig, da jumpaddressselect?
+	--pc: PCSource unnoetig, da jumpaddressselect?
+	
+	clock <= clk_i;
+	reset <= rst_i;
+	enable <= enable_i;
+	
+	
 	pc : pc_counter 
 	port map(clk_i       => clock,
 			     rst_i       => reset,

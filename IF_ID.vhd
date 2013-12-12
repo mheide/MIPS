@@ -6,7 +6,7 @@ entity IF_ID is                         --first pipeline stage with instruction_
 		clk_i         : in  std_logic;
 		rst_i         : in  std_logic;
 		enable_i      : in  std_logic;
-		PC_ifid_i     : in  std_logic_vector(31 downto 0);		
+		PC_ifid_i     : in  std_logic_vector(31 downto 0);
 
 		Instruction_o : out std_logic_vector(31 DOWNTO 0);
 		PC_ifid_o     : out std_logic_vector(31 downto 0)

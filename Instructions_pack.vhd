@@ -10,37 +10,37 @@ package Instructions_pack is
 	--- MIPS registers ---------------------------------
 	----------------------------------------------------
 	constant R0             : std_logic_vector(4 downto 0) := (others => '0');
-	constant Rat            : std_logic_vector(4 downto 0) := '0' & "1"; 
-	constant Rv0            : std_logic_vector(4 downto 0) := '0' & "2"; 
-	constant Rv1            : std_logic_vector(4 downto 0) := '0' & "3"; 
-	constant Ra0            : std_logic_vector(4 downto 0) := '0' & "4";
-	constant Ra1            : std_logic_vector(4 downto 0) := '0' & "5";
-	constant Ra2            : std_logic_vector(4 downto 0) := '0' & "6";
-	constant Ra3            : std_logic_vector(4 downto 0) := '0' & "7";
-	constant Rt0            : std_logic_vector(4 downto 0) := '0' & "8";
-	constant Rt1            : std_logic_vector(4 downto 0) := '0' & "9";
-	constant Rt2            : std_logic_vector(4 downto 0) := '0' & "A";
-	constant Rt3            : std_logic_vector(4 downto 0) := '0' & "B";
-	constant Rt4            : std_logic_vector(4 downto 0) := '0' & "C";
-	constant Rt5            : std_logic_vector(4 downto 0) := '0' & "D";
-	constant Rt6            : std_logic_vector(4 downto 0) := '0' & "E";
-	constant Rt7            : std_logic_vector(4 downto 0) := '0' & "F"; --15
-	constant Rt8            : std_logic_vector(4 downto 0) := '1' & "8"; --24
-	constant Rt9            : std_logic_vector(4 downto 0) := '1' & "9"; --25
-	constant Rs0            : std_logic_vector(4 downto 0) := '1' & "0"; --16
-	constant Rs1            : std_logic_vector(4 downto 0) := '1' & "1"; --17
-	constant Rs2            : std_logic_vector(4 downto 0) := '1' & "2"; --18
-	constant Rs3            : std_logic_vector(4 downto 0) := '1' & "3"; --19
-	constant Rs4            : std_logic_vector(4 downto 0) := '1' & "4"; --20
-	constant Rs5            : std_logic_vector(4 downto 0) := '1' & "5"; --21
-	constant Rs6            : std_logic_vector(4 downto 0) := '1' & "6"; --22
-	constant Rs7            : std_logic_vector(4 downto 0) := '1' & "7"; --23
-	constant Rk0            : std_logic_vector(4 downto 0) := '1' & "A"; --26
-	constant Rk1            : std_logic_vector(4 downto 0) := '1' & "B"; --27
-	constant Rgp            : std_logic_vector(4 downto 0) := '1' & "C"; --28
-	constant Rsp            : std_logic_vector(4 downto 0) := '1' & "D"; --29
-	constant Rfp            : std_logic_vector(4 downto 0) := '1' & "E"; --30
-	constant Rra            : std_logic_vector(4 downto 0) := '1' & "F"; --31
+	constant Rat            : std_logic_vector(4 downto 0) := '0' & x"1"; 
+	constant Rv0            : std_logic_vector(4 downto 0) := '0' & x"2"; 
+	constant Rv1            : std_logic_vector(4 downto 0) := '0' & x"3"; 
+	constant Ra0            : std_logic_vector(4 downto 0) := '0' & x"4";
+	constant Ra1            : std_logic_vector(4 downto 0) := '0' & x"5";
+	constant Ra2            : std_logic_vector(4 downto 0) := '0' & x"6";
+	constant Ra3            : std_logic_vector(4 downto 0) := '0' & x"7";
+	constant Rt0            : std_logic_vector(4 downto 0) := '0' & x"8";
+	constant Rt1            : std_logic_vector(4 downto 0) := '0' & x"9";
+	constant Rt2            : std_logic_vector(4 downto 0) := '0' & x"A";
+	constant Rt3            : std_logic_vector(4 downto 0) := '0' & x"B";
+	constant Rt4            : std_logic_vector(4 downto 0) := '0' & x"C";
+	constant Rt5            : std_logic_vector(4 downto 0) := '0' & x"D";
+	constant Rt6            : std_logic_vector(4 downto 0) := '0' & x"E";
+	constant Rt7            : std_logic_vector(4 downto 0) := '0' & x"F"; --15
+	constant Rt8            : std_logic_vector(4 downto 0) := '1' & x"8"; --24
+	constant Rt9            : std_logic_vector(4 downto 0) := '1' & x"9"; --25
+	constant Rs0            : std_logic_vector(4 downto 0) := '1' & x"0"; --16
+	constant Rs1            : std_logic_vector(4 downto 0) := '1' & x"1"; --17
+	constant Rs2            : std_logic_vector(4 downto 0) := '1' & x"2"; --18
+	constant Rs3            : std_logic_vector(4 downto 0) := '1' & x"3"; --19
+	constant Rs4            : std_logic_vector(4 downto 0) := '1' & x"4"; --20
+	constant Rs5            : std_logic_vector(4 downto 0) := '1' & x"5"; --21
+	constant Rs6            : std_logic_vector(4 downto 0) := '1' & x"6"; --22
+	constant Rs7            : std_logic_vector(4 downto 0) := '1' & x"7"; --23
+	constant Rk0            : std_logic_vector(4 downto 0) := '1' & x"A"; --26
+	constant Rk1            : std_logic_vector(4 downto 0) := '1' & x"B"; --27
+	constant Rgp            : std_logic_vector(4 downto 0) := '1' & x"C"; --28
+	constant Rsp            : std_logic_vector(4 downto 0) := '1' & x"D"; --29
+	constant Rfp            : std_logic_vector(4 downto 0) := '1' & x"E"; --30
+	constant Rra            : std_logic_vector(4 downto 0) := '1' & x"F"; --31
 
 	----------------------------------------------------
 	------- r type constants ---------------------------

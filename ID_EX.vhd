@@ -11,8 +11,8 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		dataAddr_idex_i      : in  std_logic_vector(4 downto 0); --for r-type: destination address (register)
 
 
-		ALUSrcB_idex_i       : in std_logic_vector(1 DOWNTO 0); --EX
-		ALUSrcA_idex_i       : in std_logic;
+		ALUSrcB_idex_i       : in  std_logic_vector(1 DOWNTO 0); --EX
+		ALUSrcA_idex_i       : in  std_logic;
 		ALU_op_idex_i        : in  std_logic_vector(1 DOWNTO 0);
 		function_code_idex_i : in  std_logic_vector(5 DOWNTO 0);
 
@@ -26,7 +26,6 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		PCSource_idex_o      : out std_logic_vector(1 DOWNTO 0);
 		PC_idex_o            : out std_logic_vector(31 downto 0);
 		dataAddr_idex_o      : out std_logic_vector(4 downto 0);
-
 
 		ALUSrcB_idex_o       : out std_logic_vector(1 DOWNTO 0);
 		ALUSrcA_idex_o       : out std_logic;
@@ -48,7 +47,6 @@ architecture behaviour of ID_EX is
 	signal pc           : std_logic_vector(31 downto 0);
 	signal dataAddr     : std_logic_vector(4 downto 0);
 	signal functioncode : std_logic_vector(5 downto 0);
-
 
 	signal aluSrcA  : std_logic;
 	signal aluSrcB  : std_logic_vector(1 DOWNTO 0);
