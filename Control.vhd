@@ -36,5 +36,6 @@ begin
 	MemWrite_o <= '0' when op = "000000" else '0';
 	PCSource_o <= "10" when op = "000000" else (others => '0');
 	RegDst_o   <= '1' when op = "000000" else '0';
+	regWrite_o <= '1' when op = "000000" else '0';
 
 end architecture;

@@ -14,6 +14,8 @@ entity RegisterFile is
 			
 		ALUSrcA_i    : in  std_logic; --1 for arithmetic op
 		ALUSrcB_i    : in  std_logic_vector(1 DOWNTO 0); --00 for arithmetic op	
+		
+		regWrite_i   : in std_logic;
 			
 		dataA_o      : out std_logic_vector(31 downto 0);
 		dataB_o      : out std_logic_vector(31 downto 0)
@@ -61,6 +63,7 @@ architecture behaviour of RegisterFile is
 		"00000000"&"00000000"&"01001100"&"00000010"		
 		
 	);
+	signal regWrite : std_logic;
 	signal writeDataAddr : std_logic_vector(4 DOWNTO 0);
 begin
 	registers(0) <= (others => '0');    --register $0
@@ -69,13 +72,17 @@ begin
 
 	dataB_o <= registers(TO_INTEGER(UNSIGNED(dataB_Addr_i))) when ALUSrcB_i = "00" ELSE (others => '0');
 
+	regWrite <= regWrite_i;
+	
 	register_process : process(clk_i, rst_i) is
 	begin
 		if rst_i = '1' then
-			registers <= (others => (others => '0'));
+			regWrite <= '0';
 		elsif rising_edge(clk_i) then
 			if dataAddr_i /= "00000" then --no write op's to $0
-				registers(TO_INTEGER(UNSIGNED(dataAddr_i))) <= data_i;
+				if regWrite = '1' then
+					registers(TO_INTEGER(UNSIGNED(dataAddr_i))) <= data_i;
+				end if;
 			end if;
 		end if;
 	end process register_process;

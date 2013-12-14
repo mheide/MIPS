@@ -43,6 +43,8 @@ architecture RTL of TOP_Lvl is
 			ALUSrcA_i    : in  std_logic; --1 for arithmetic op
 			ALUSrcB_i    : in  std_logic_vector(1 DOWNTO 0); --00 for arithmetic op	
 			
+			regWrite_i   : in std_logic;
+			
 			dataA_o      : out std_logic_vector(31 downto 0);
 			dataB_o      : out std_logic_vector(31 downto 0)
 
@@ -323,8 +325,10 @@ architecture RTL of TOP_Lvl is
 
 	
 	--memwb --> ifid_memory		--noch nicht implementiert
-	signal memToReg_memwb_ifidmem : std_logic;		
-	signal regWrite_memwb_ifidmem : std_logic;
+	signal memToReg_memwb_ifidmem : std_logic;
+	
+	--memwb --> rf
+	signal regWrite_memwb_rf : std_logic;
 	
 	--jas --> PC
 	signal jumpAddress_jas_pc : std_logic_vector(31 downto 0);
@@ -370,7 +374,7 @@ architecture RTL of TOP_Lvl is
 			dataAddr_memwb_o       => dataAddr_memwb_rf,
 			PCSource_memwb_o       => PCSource_memwb_jas,
 			memToReg_memwb_o       => memToReg_memwb_ifidmem,
-			regWrite_memwb_o       => regWrite_memwb_ifidmem);
+			regWrite_memwb_o       => regWrite_memwb_rf);
 	
 	ifid : IF_ID
 		port map(clk_i         => clock,
@@ -425,7 +429,7 @@ architecture RTL of TOP_Lvl is
 			     MemRead_o     => memRead_ctrl_idex,
 			     MemWrite_o    => memWrite_ctrl_idex,
 			     MemToReg_o    => memToReg_ctrl_idex,
-			     regWrite_o    => memToReg_ctrl_idex,
+			     regWrite_o    => regWrite_ctrl_idex,
 			     ALUOp_o       => ALUop_ctrl_idex,
 			     IRWrite_o     => IRWrite_ctrl_ir,
 			     PCSource_o    => PCSource_ctrl_idex,
@@ -442,6 +446,7 @@ architecture RTL of TOP_Lvl is
 			     dataB_Addr_i => data_ifid_rf(20 downto 16),
 			     ALUSrcA_i    => ALUSrcA_idex_rf,
 			     ALUSrcB_i    => ALUSrcB_idex_rf,
+				 regWrite_i   => regWrite_memwb_rf,
 			     dataA_o      => dataA_rf_alu,
 			     dataB_o      => dataB_rf_alu);
 
