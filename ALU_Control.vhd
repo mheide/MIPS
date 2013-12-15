@@ -11,26 +11,16 @@ entity ALU_Control is
 end entity ALU_Control;
 
 architecture RTL of ALU_Control is
+	signal rtype_alu_code : std_logic_vector(3 downto 0);
+
 begin
-	decode : process(rst_i) is
-	begin
-		if rst_i = '1' then
-			-- alu code for and
-			alu_code_o <= (others => '0');
-		else
-			case ALU_Op_i(1) is
-				when '1' =>
-					case functioncode_i is
-						when "100000" => alu_code_o <= "0010"; --add
-						when "100010" => alu_code_o <= "0110"; -- sub
-						when "100100" => alu_code_o <= "0000"; --and
-						when "100101" => alu_code_o <= "0001"; --or
-						when others   => alu_code_o <= (others => 'X'); --error code
-					end case;
-				when '0'    => alu_code_o <= (others => 'Z'); -- TODO do not care
-				when others => alu_code_o <= (others => 'X'); -- error code
-			end case;
-		end if;
-	end process decode;
+	alu_code_o <= rtype_alu_code when ALU_Op_i(1) = '1' else "ZZZZ";
+
+	with functioncode_i select rtype_alu_code <=
+		"0010" when "100000",
+		"0110" when "100010",
+		"0000" when "100100",
+		"0001" when "100101",
+		"XXXX" when others;
 
 end architecture RTL;

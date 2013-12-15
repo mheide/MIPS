@@ -27,10 +27,10 @@ begin
 	zero_o <= '1' when C_temp = c_zero else '0';
 	C_o    <= C_temp;
 
-	ALU : process(rst_i) is
+	ALU : process(rst_i, ALU_ctrl_i, A_i, B_i) is
 	begin
 		if rst_i = '1' then
-			C_o <= (others => '0');
+			C_temp <= (others => '0');
 		else
 			case ALU_ctrl_i is
 				when c_add  => C_temp <= std_logic_vector(signed(A_i) + signed(B_i));
