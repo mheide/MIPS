@@ -37,5 +37,6 @@ begin
 	PCSource_o <= "10" when op = "000000" else (others => '0');
 	RegDst_o   <= '1' when op = "000000" else '0';
 	regWrite_o <= '1' when op = "000000" else '0';
+	MemToReg_o <= '0'; --rtype, mem noch nicht implementiert.
 
 end architecture;

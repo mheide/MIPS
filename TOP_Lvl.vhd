@@ -220,6 +220,16 @@ architecture RTL of TOP_Lvl is
 		);
 	end component;	
 	
+	component dataSelect is
+		port(
+				ALU_result_i : in std_logic_vector(31 downto 0);
+				memoryReadData_i : in std_logic_vector(31 downto 0);
+				memToReg_i : in std_logic;			
+				
+				data_o : out std_logic_vector(31 downto 0)
+		);
+	end component;	
+	
 	
 	signal reset : std_logic;
 	signal clock : std_logic;
@@ -278,8 +288,7 @@ architecture RTL of TOP_Lvl is
 	signal ALUSrcA_idex_rf : std_logic;
 	signal ALUSrcB_idex_rf : std_logic_vector(1 downto 0);
 	
-	--memwb --> rf, jas
-	signal memoryReadData_memwb_rf : std_logic_vector(31 downto 0);
+
 	--TODO: dataAddr_memwb_o: sinnvoll machen, oder vielleicht nicht gebraucht? DOCH	
 	signal dataAddr_memwb_rf : std_logic_vector(4 downto 0);
 	
@@ -313,7 +322,7 @@ architecture RTL of TOP_Lvl is
 	--pc --> ifid --writedata fehlt
 	signal address_pc_ifid : std_logic_vector(31 downto 0);
 	
-	--memwb --> jumpAddressSelct
+	--memwb --> jumpAddressSelct, ds
 	signal PC_memwb_jas : std_logic_vector(31 downto 0);
 	signal PCSource_memwb_jas : std_logic_vector(1 downto 0);
 	signal ALU_result_memwb_jas : std_logic_vector(31 downto 0); --gebraucht?
@@ -321,11 +330,12 @@ architecture RTL of TOP_Lvl is
 	--memory --> memwb
 	signal memoryReadData_mem_memwb : std_logic_vector(31 downto 0); --noch nicht komplett verdrahtet
 	
-	--memwb --> registerFile --eigentlich regDst
 
 	
-	--memwb --> ifid_memory		--noch nicht implementiert
-	signal memToReg_memwb_ifidmem : std_logic;
+	--memwb --> ds		
+	signal memToReg_memwb_ds : std_logic;
+	signal memoryReadData_memwb_ds : std_logic_vector(31 downto 0);
+	
 	
 	--memwb --> rf
 	signal regWrite_memwb_rf : std_logic;
@@ -333,12 +343,24 @@ architecture RTL of TOP_Lvl is
 	--jas --> PC
 	signal jumpAddress_jas_pc : std_logic_vector(31 downto 0);
 	
+	--ds --> rf
+	signal data_ds_rf : std_logic_vector(31 downto 0);
+	
 	begin
 	--pc: PCSource unnoetig, da jumpaddressselect?
 	
 	clock <= clk_i;
 	reset <= rst_i;
 	enable <= enable_i;
+	
+	
+	ds : dataSelect
+	port map(	ALU_result_i => ALU_result_memwb_jas,
+				memoryReadData_i => memoryReadData_memwb_ds,
+				memToReg_i => memToReg_memwb_ds,
+				data_o => data_ds_rf
+				);
+	
 	
 	
 	pc : pc_counter 
@@ -369,11 +391,11 @@ architecture RTL of TOP_Lvl is
 			memToReg_memwb_i       => memToReg_exmem_memwb,
 			regWrite_memwb_i       => regWrite_exmem_memwb,
 			PC_memwb_o             => PC_memwb_jas,
-			memoryReadData_memwb_o => memoryReadData_memwb_rf,
+			memoryReadData_memwb_o => memoryReadData_memwb_ds,
 			ALU_result_memwb_o     => ALU_result_memwb_jas,
 			dataAddr_memwb_o       => dataAddr_memwb_rf,
 			PCSource_memwb_o       => PCSource_memwb_jas,
-			memToReg_memwb_o       => memToReg_memwb_ifidmem,
+			memToReg_memwb_o       => memToReg_memwb_ds,
 			regWrite_memwb_o       => regWrite_memwb_rf);
 	
 	ifid : IF_ID
@@ -390,7 +412,7 @@ architecture RTL of TOP_Lvl is
 			     enable_i             => enable,
 			     PCSource_idex_i      => PCSource_ctrl_idex,
 			     PC_idex_i            => PC_ifid_idex,
-			     dataAddr_idex_i      => data_ifid_rf(15 downto 11),
+			     dataAddr_idex_i      => dst_Addr_rds_rf,
 			     ALUSrcB_idex_i       => ALUSrcB_ctrl_idex,
 			     ALUSrcA_idex_i       => ALUSrcA_ctrl_idex,
 			     ALU_op_idex_i        => ALUop_ctrl_idex,
@@ -440,8 +462,8 @@ architecture RTL of TOP_Lvl is
 	rf : RegisterFile
 		port map(clk_i        => clock,
 			     rst_i        => reset,
-			     data_i       => memoryReadData_memwb_rf,
-			     dataAddr_i   => dst_Addr_rds_rf,
+			     data_i       => data_ds_rf,
+			     dataAddr_i   => dataAddr_memwb_rf,
 			     dataA_Addr_i => data_ifid_rf(25 downto 21),
 			     dataB_Addr_i => data_ifid_rf(20 downto 16),
 			     ALUSrcA_i    => ALUSrcA_idex_rf,

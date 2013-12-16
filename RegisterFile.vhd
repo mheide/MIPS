@@ -77,7 +77,7 @@ begin
 	register_process : process(clk_i, rst_i) is
 	begin
 		if rst_i = '1' then
-			regWrite <= '0';
+			-- reset state
 		elsif rising_edge(clk_i) then
 			if dataAddr_i /= "00000" then --no write op's to $0
 				if regWrite = '1' then
