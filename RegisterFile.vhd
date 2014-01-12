@@ -1,6 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+library work;
+use work.Instructions_pack.all;
 
 entity RegisterFile is
 	port(
@@ -33,6 +35,9 @@ architecture behaviour of RegisterFile is
 		"00000000"&"00000000"&"01001100"&"00000010",
 		"00000000"&"00000000"&"01001100"&"00000010",
 		"00000000"&"00000000"&"01001100"&"00000010",
+		
+		--example for constant based register coding
+		c_add.opcode & Rt0 & Rt1 & Rt2 & c_instr_bits & c_add.funct,
 		
 		"00000000"&"00000000"&"01001100"&"00000010",
 		"00000000"&"00000000"&"01001100"&"00000010",
