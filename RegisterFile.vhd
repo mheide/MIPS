@@ -37,7 +37,7 @@ architecture behaviour of RegisterFile is
 		"00000000"&"00000000"&"01001100"&"00000010",
 		
 		--example for constant based register coding
-		c_add.opcode & Rt0 & Rt1 & Rt2 & c_instr_bits & c_add.funct,
+		c_add.opcode & Rt0 & Rt1 & Rt2 & "00000" & c_add.funct,
 		
 		"00000000"&"00000000"&"01001100"&"00000010",
 		"00000000"&"00000000"&"01001100"&"00000010",
