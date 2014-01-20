@@ -100,6 +100,7 @@ architecture RTL of TOP_Lvl is
 			ALUSrcA_idex_i       : in std_logic;
 			ALU_op_idex_i        : in  std_logic_vector(1 DOWNTO 0);
 			function_code_idex_i : in  std_logic_vector(5 DOWNTO 0);
+			signExtAddr_idex_i	 : in  std_logic_vector(9 DOWNTO 0);			
 
 			branch_idex_i        : in  std_logic; --M
 			memRead_idex_i       : in  std_logic;
@@ -117,6 +118,7 @@ architecture RTL of TOP_Lvl is
 			ALUSrcA_idex_o       : out std_logic;
 			ALU_op_idex_o        : out std_logic_vector(1 DOWNTO 0);
 			function_code_idex_o : out std_logic_vector(5 DOWNTO 0);
+			signExtAddr_idex_o	 : in  std_logic_vector(9 DOWNTO 0);			
 
 			branch_idex_o        : out std_logic;
 			memRead_idex_o       : out std_logic;
@@ -230,6 +232,15 @@ architecture RTL of TOP_Lvl is
 		);
 	end component;	
 	
+	component signExtend is
+		port(
+				address_i : in std_logic_vector(15 downto 0);
+
+				address_o : out std_logic_vector(31 downto 0)
+				
+		);
+	end component;	
+	
 	
 	signal reset : std_logic;
 	signal clock : std_logic;
@@ -330,7 +341,9 @@ architecture RTL of TOP_Lvl is
 	--memory --> memwb
 	signal memoryReadData_mem_memwb : std_logic_vector(31 downto 0); --noch nicht komplett verdrahtet
 	
-
+	--idex --> signExtend
+	signal signExtAddr_idex_se : std_logic_vector(9 downto 0);
+	signal signExtAddr_complete_idex_se : std_logic_vector(15 downto 0);
 	
 	--memwb --> ds		
 	signal memToReg_memwb_ds : std_logic;
@@ -346,12 +359,17 @@ architecture RTL of TOP_Lvl is
 	--ds --> rf
 	signal data_ds_rf : std_logic_vector(31 downto 0);
 	
+	--se --> alusourcebselect
+	signal signExtend_se_asbs : std_logic_vector(31 downto 0);
+	
 	begin
 	--pc: PCSource unnoetig, da jumpaddressselect?
 	
 	clock <= clk_i;
 	reset <= rst_i;
 	enable <= enable_i;
+	
+	signExtAddr_complete_idex_se <= signExtAddr_idex_se & functioncode_idex_ac;
 	
 	
 	ds : dataSelect
@@ -417,6 +435,7 @@ architecture RTL of TOP_Lvl is
 			     ALUSrcA_idex_i       => ALUSrcA_ctrl_idex,
 			     ALU_op_idex_i        => ALUop_ctrl_idex,
 			     function_code_idex_i => data_ifid_rf(5 downto 0),
+				 signExtAddr_idex_i   => data_ifid_rf(15 downto 6),
 			     branch_idex_i        => branch_ctrl_idex,
 			     memRead_idex_i       => memRead_ctrl_idex,
 			     memWrite_idex_i      => memWrite_ctrl_idex,
@@ -429,6 +448,7 @@ architecture RTL of TOP_Lvl is
 			     ALUSrcA_idex_o       => ALUSrcA_idex_rf,
 			     ALU_op_idex_o        => alu_op_idex_ac,
 			     function_code_idex_o => functioncode_idex_ac,
+				 signExtAddr_idex_o   => signExtAddr_idex_se,
 			     branch_idex_o        => branch_idex_exmem,
 			     memRead_idex_o       => memRead_idex_exmem,
 			     memWrite_idex_o      => memWrite_idex_exmem,
@@ -511,6 +531,10 @@ architecture RTL of TOP_Lvl is
 			     ALU_ctrl_i => alu_code_ac_alu,
 			     C_o        => C_alu_exmem,
 			     zero_o     => zero_alu_exmem);
+				 
+	se : signExtend
+		port map(address_i  => signExtAddr_complete_idex_se,
+				 address_o  => signExtend_se_asbs);
 
 
 end architecture RTL;

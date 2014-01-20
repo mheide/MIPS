@@ -15,6 +15,7 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		ALUSrcA_idex_i       : in  std_logic;
 		ALU_op_idex_i        : in  std_logic_vector(1 DOWNTO 0);
 		function_code_idex_i : in  std_logic_vector(5 DOWNTO 0);
+		signExtAddr_idex_i	 : in  std_logic_vector(9 DOWNTO 0);
 
 		branch_idex_i        : in  std_logic; --M
 		memRead_idex_i       : in  std_logic;
@@ -31,6 +32,8 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		ALUSrcA_idex_o       : out std_logic;
 		ALU_op_idex_o        : out std_logic_vector(1 DOWNTO 0);
 		function_code_idex_o : out std_logic_vector(5 DOWNTO 0);
+		signExtAddr_idex_o   : out std_logic_vector(9 DOWNTO 0);
+		
 
 		branch_idex_o        : out std_logic;
 		memRead_idex_o       : out std_logic;
@@ -47,6 +50,8 @@ architecture behaviour of ID_EX is
 	signal pc           : std_logic_vector(31 downto 0);
 	signal dataAddr     : std_logic_vector(4 downto 0);
 	signal functioncode : std_logic_vector(5 downto 0);
+	signal signExtAddr	: std_logic_vector(9 downto 0);
+	
 
 	signal aluSrcA  : std_logic;
 	signal aluSrcB  : std_logic_vector(1 DOWNTO 0);
@@ -65,6 +70,7 @@ begin
 			pc           <= (others => '0');
 			dataAddr     <= (others => '0');
 			functioncode <= (others => '0');
+			signExtAddr  <= (others => '0');
 
 			aluSrcB  <= (others => '0');
 			aluSrcA  <= '0';
@@ -81,6 +87,7 @@ begin
 				pc           <= PC_idex_i;
 				dataAddr     <= dataAddr_idex_i;
 				functioncode <= function_code_idex_i;
+				signExtAddr  <= signExtAddr_idex_i;
 
 				aluSrcB  <= ALUSrcB_idex_i;
 				aluSrcA  <= ALUSrcA_idex_i;
@@ -102,6 +109,7 @@ begin
 	ALUSrcA_idex_o       <= aluSrcA;
 	ALU_op_idex_o        <= aluop;
 	function_code_idex_o <= functioncode;
+	signExtAddr_idex_o   <= signExtAddr;
 
 	branch_idex_o   <= branch;
 	memRead_idex_o  <= memRead;
