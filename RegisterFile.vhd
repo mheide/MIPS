@@ -14,8 +14,7 @@ entity RegisterFile is
 		dataA_Addr_i : in  std_logic_vector(4 downto 0); --rs
 		dataB_Addr_i : in  std_logic_vector(4 downto 0); --rt
 			
-		ALUSrcA_i    : in  std_logic; --1 for arithmetic op
-		ALUSrcB_i    : in  std_logic_vector(1 DOWNTO 0); --00 for arithmetic op	
+
 		
 		regWrite_i   : in std_logic;
 			
@@ -37,7 +36,7 @@ architecture behaviour of RegisterFile is
 		"00000000"&"00000000"&"01001100"&"00000010",
 		
 		--example for constant based register coding
-		c_add.opcode & Rt0 & Rt1 & Rt2 & "00000" & c_add.funct,
+		--c_add.opcode & Rt0 & Rt1 & Rt2 & "00000" & c_add.funct,
 		
 		"00000000"&"00000000"&"01001100"&"00000010",
 		"00000000"&"00000000"&"01001100"&"00000010",
@@ -73,9 +72,9 @@ architecture behaviour of RegisterFile is
 begin
 	registers(0) <= (others => '0');    --register $0
 
-	dataA_o <= registers(TO_INTEGER(UNSIGNED(dataA_Addr_i))) when ALUSrcA_i = '1' ELSE (others => '0');
+	dataA_o <= registers(TO_INTEGER(UNSIGNED(dataA_Addr_i)));
 
-	dataB_o <= registers(TO_INTEGER(UNSIGNED(dataB_Addr_i))) when ALUSrcB_i = "00" ELSE (others => '0');
+	dataB_o <= registers(TO_INTEGER(UNSIGNED(dataB_Addr_i)));
 
 	regWrite <= regWrite_i;
 	

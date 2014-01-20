@@ -40,8 +40,7 @@ architecture RTL of TOP_Lvl is
 			dataA_Addr_i : in  std_logic_vector(4 downto 0); --rs
 			dataB_Addr_i : in  std_logic_vector(4 downto 0); --rt
 			
-			ALUSrcA_i    : in  std_logic; --1 for arithmetic op
-			ALUSrcB_i    : in  std_logic_vector(1 DOWNTO 0); --00 for arithmetic op	
+
 			
 			regWrite_i   : in std_logic;
 			
@@ -241,6 +240,22 @@ architecture RTL of TOP_Lvl is
 		);
 	end component;	
 	
+	component operandSelect is
+		port(
+			ALUSrcA_i            : in  std_logic;
+			ALUSrcB_i 			: in  std_logic_vector(1 DOWNTO 0);
+			
+			PC_A_i : in  std_logic_vector(31 DOWNTO 0);
+			RF_A_i : in std_logic_vector(31 DOWNTO 0);
+			
+			RF_B_i : in std_logic_vector(31 DOWNTO 0);
+			SignExt_B_i : in std_logic_vector(31 DOWNTO 0);
+
+			A_o : out std_logic_vector(31 DOWNTO 0);
+			B_o : out std_logic_vector(31 DOWNTO 0)
+		);
+	end component;
+
 	
 	signal reset : std_logic;
 	signal clock : std_logic;
@@ -295,9 +310,9 @@ architecture RTL of TOP_Lvl is
 	--ifid --> rf, ctrl, regDstSelect, idex
 	signal data_ifid_rf : std_logic_vector(31 downto 0); 
 	
-	--idex --> rf
-	signal ALUSrcA_idex_rf : std_logic;
-	signal ALUSrcB_idex_rf : std_logic_vector(1 downto 0);
+	--idex --> operandselect
+	signal ALUSrcA_idex_os : std_logic;
+	signal ALUSrcB_idex_os : std_logic_vector(1 downto 0);
 	
 
 	--TODO: dataAddr_memwb_o: sinnvoll machen, oder vielleicht nicht gebraucht? DOCH	
@@ -360,7 +375,11 @@ architecture RTL of TOP_Lvl is
 	signal data_ds_rf : std_logic_vector(31 downto 0);
 	
 	--se --> alusourcebselect
-	signal signExtend_se_asbs : std_logic_vector(31 downto 0);
+	signal signExtend_se_os : std_logic_vector(31 downto 0);
+	
+	--os --> alu
+	signal dataA_os_alu : std_logic_vector(31 downto 0);
+	signal dataB_os_alu : std_logic_vector(31 downto 0);
 	
 	begin
 	--pc: PCSource unnoetig, da jumpaddressselect?
@@ -435,7 +454,7 @@ architecture RTL of TOP_Lvl is
 			     ALUSrcA_idex_i       => ALUSrcA_ctrl_idex,
 			     ALU_op_idex_i        => ALUop_ctrl_idex,
 			     function_code_idex_i => data_ifid_rf(5 downto 0),
-				 signExtAddr_idex_i   => data_ifid_rf(15 downto 6),
+				   signExtAddr_idex_i   => data_ifid_rf(15 downto 6),
 			     branch_idex_i        => branch_ctrl_idex,
 			     memRead_idex_i       => memRead_ctrl_idex,
 			     memWrite_idex_i      => memWrite_ctrl_idex,
@@ -444,11 +463,11 @@ architecture RTL of TOP_Lvl is
 			     PCSource_idex_o      => PCSrc_idex_exmem,
 			     PC_Idex_o            => PC_idex_exmem,
 			     dataAddr_idex_o      => dataAddr_idex_exmem,
-			     ALUSrcB_idex_o       => ALUSrcB_idex_rf,
-			     ALUSrcA_idex_o       => ALUSrcA_idex_rf,
+			     ALUSrcB_idex_o       => ALUSrcB_idex_os,
+			     ALUSrcA_idex_o       => ALUSrcA_idex_os,
 			     ALU_op_idex_o        => alu_op_idex_ac,
 			     function_code_idex_o => functioncode_idex_ac,
-				 signExtAddr_idex_o   => signExtAddr_idex_se,
+				   signExtAddr_idex_o   => signExtAddr_idex_se,
 			     branch_idex_o        => branch_idex_exmem,
 			     memRead_idex_o       => memRead_idex_exmem,
 			     memWrite_idex_o      => memWrite_idex_exmem,
@@ -486,9 +505,7 @@ architecture RTL of TOP_Lvl is
 			     dataAddr_i   => dataAddr_memwb_rf,
 			     dataA_Addr_i => data_ifid_rf(25 downto 21),
 			     dataB_Addr_i => data_ifid_rf(20 downto 16),
-			     ALUSrcA_i    => ALUSrcA_idex_rf,
-			     ALUSrcB_i    => ALUSrcB_idex_rf,
-				 regWrite_i   => regWrite_memwb_rf,
+				   regWrite_i   => regWrite_memwb_rf,
 			     dataA_o      => dataA_rf_alu,
 			     dataB_o      => dataB_rf_alu);
 
@@ -526,15 +543,24 @@ architecture RTL of TOP_Lvl is
 
 	alu_unit : ALU
 		port map(rst_i      => reset,
-			     A_i        => dataA_rf_alu,
-			     B_i        => dataB_rf_alu,
+			     A_i        => dataA_os_alu,
+			     B_i        => dataB_os_alu,
 			     ALU_ctrl_i => alu_code_ac_alu,
 			     C_o        => C_alu_exmem,
 			     zero_o     => zero_alu_exmem);
 				 
 	se : signExtend
 		port map(address_i  => signExtAddr_complete_idex_se,
-				 address_o  => signExtend_se_asbs);
+				 address_o  => signExtend_se_os);
 
+	os : operandSelect
+		port map(ALUSrcA_i 	=> ALUSrcA_idex_os,
+				ALUSrcB_i 	=> ALUSrcB_idex_os,
+				PC_A_i 		=> PC_idex_exmem,
+				RF_A_i		=> dataA_rf_alu,
+				RF_B_i		=> dataB_rf_alu,
+				SignExt_B_i => signExtend_se_os,
+				A_o 		=> dataA_os_alu,
+				B_o			=> dataB_os_alu);
 
 end architecture RTL;
