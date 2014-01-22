@@ -10,9 +10,9 @@ package Instructions_pack is
 	--- MIPS registers ---------------------------------
 	----------------------------------------------------
 	constant R0             : std_logic_vector(4 downto 0) := (others => '0');
-	constant Rat            : std_logic_vector(4 downto 0) := '0' & x"1"; 
-	constant Rv0            : std_logic_vector(4 downto 0) := '0' & x"2"; 
-	constant Rv1            : std_logic_vector(4 downto 0) := '0' & x"3"; 
+	constant Rat            : std_logic_vector(4 downto 0) := '0' & x"1";
+	constant Rv0            : std_logic_vector(4 downto 0) := '0' & x"2";
+	constant Rv1            : std_logic_vector(4 downto 0) := '0' & x"3";
 	constant Ra0            : std_logic_vector(4 downto 0) := '0' & x"4";
 	constant Ra1            : std_logic_vector(4 downto 0) := '0' & x"5";
 	constant Ra2            : std_logic_vector(4 downto 0) := '0' & x"6";
@@ -170,17 +170,17 @@ package Instructions_pack is
 		opcode : std_logic_vector(c_op_bits - 1 downto 0);
 		rt     : std_logic_vector(4 downto 0);
 	end record;
-	
+
 	type Branch_Type_2regs_Const is record
-		opcode : std_logic_vector(c_op_bits-1 downto 0);
+		opcode : std_logic_vector(c_op_bits - 1 downto 0);
 	end record;
-	
+
 	--branch on equal, use 2 registers
-	constant c_beq : Branch_Type_2regs_Const := ( opcode => "00" & x"4");
-	
+	constant c_beq : Branch_Type_2regs_Const := (opcode => "00" & x"4");
+
 	--branch on not equal, use 2 registers
 	constant c_bne : Branch_Type_2regs_Const := (opcode => "00" & x"5");
-	
+
 	-- branch on greater than equal zero
 	constant c_bgez : Branch_Type_Const := (
 		opcode => "00" & x"1",
@@ -218,7 +218,6 @@ package Instructions_pack is
 		opcode => "00" & x"1",
 		rt     => (others => '0')
 	);
-	
 
 	------------------------------------------------------
 	-----i type instructions, load store
@@ -250,42 +249,42 @@ package Instructions_pack is
 	constant c_lwl   : OP_Type_Const := "10" & x"2";
 	--lw right
 	constant c_lwr   : OP_Type_Const := "10" & x"6";
-	
+
 	------------------------------------------------------
 	--Jump Instructions
 	------------------------------------------------------
 	type J_Type_Const is record
-		opcode : std_logic_vector(c_op_bits-1 downto 0);
-		rt : std_logic_vector(c_instr_bits-1 downto 0);
-		funct : std_logic_vector(c_op_bits-1 downto 0);
+		opcode : std_logic_vector(c_op_bits - 1 downto 0);
+		rt     : std_logic_vector(c_instr_bits - 1 downto 0);
+		funct  : std_logic_vector(c_op_bits - 1 downto 0);
 	end record;
-	
+
 	--jump unconditionally to instruction at target
 	-- PC(31 downto 28) & target(26 downto 0) & "00"
 	constant c_j : OP_Type_Const := "00" & x"2";
-	
+
 	--Jump and link: unconditionally jump to instruction
 	--at target address, save the address of next
 	--instruction in register $ra (register 31)
 	--PC(31 downto 28) & target(26 downto 0) & "00"
 	constant c_jal : OP_Type_Const := "00" & x"3";
-	
+
 	--jump and link register:
 	--unconditionally jump to instruction whose address
 	--is in register rs. Save address of next instruct.
 	--in register rd (default reg $ra)
 	constant c_jalr : J_Type_Const := (
 		opcode => "00" & x"0",
-		rt => "00000",
-		funct => "00" & x"9"
+		rt     => "00000",
+		funct  => "00" & x"9"
 	);
-	
+
 	--jump register:
 	--unconditionally jump to instruction whose address is in register rs
 	constant c_jr : J_Type_Const := (
 		opcode => "000000",
-		rt => "00000",
-		funct => "00" & x"8"
+		rt     => "00000",
+		funct  => "00" & x"8"
 	);
 
 	------------------------------------------------------
