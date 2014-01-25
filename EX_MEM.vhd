@@ -8,6 +8,7 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 		enable_i           : in  std_logic;
 		PC_exmem_i         : in  std_logic_vector(31 downto 0);
 		ALU_result_exmem_i : in  std_logic_vector(31 downto 0);
+		B_data_exmem_i	   : in  std_logic_vector(31 downto 0);
 		zero_flag_exmem_i  : in  std_logic;
 		dataAddr_exmem_i   : in  std_logic_vector(4 downto 0);
 		PCSource_exmem_i   : in  std_logic_vector(1 DOWNTO 0);
@@ -21,6 +22,7 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 
 		PC_exmem_o         : out std_logic_vector(31 downto 0);
 		ALU_result_exmem_o : out std_logic_vector(31 downto 0);
+		B_data_exmem_o	   : out std_logic_vector(31 downto 0);		
 		zero_flag_exmem_o  : out std_logic;
 		dataAddr_exmem_o   : out std_logic_vector(4 downto 0);
 		PCSource_exmem_o   : out std_logic_vector(1 DOWNTO 0);
@@ -38,6 +40,7 @@ architecture behaviour of EX_MEM is
 	signal pc         : std_logic_vector(31 DOWNTO 0);
 	signal alu_result : std_logic_vector(31 DOWNTO 0);
 	signal dataAddr   : std_logic_vector(4 downto 0);
+	signal bdata	  : std_logic_vector(31 downto 0);
 	signal zero_flag  : std_logic;
 	signal branch     : std_logic;
 	signal memRead    : std_logic;
@@ -53,6 +56,7 @@ begin
 			pc         <= (others => '0');
 			alu_result <= (others => '0');
 			dataAddr   <= (others => '0');
+			bdata	   <= (others => '0');
 			zero_flag  <= '0';
 			branch     <= '0';
 			memRead    <= '0';
@@ -65,6 +69,7 @@ begin
 			if enable_i = '1' then
 				pc         <= PC_exmem_i;
 				alu_result <= ALU_result_exmem_i;
+				bdata	   <= B_data_exmem_i;
 				zero_flag  <= zero_flag_exmem_i;
 				dataAddr   <= dataAddr_exmem_i;
 				branch     <= branch_exmem_i;
@@ -79,6 +84,7 @@ begin
 
 	PC_exmem_o         <= pc;
 	ALU_result_exmem_o <= alu_result;
+	B_data_exmem_o	   <= bdata;
 	zero_flag_exmem_o  <= zero_flag;
 	branch_exmem_o     <= branch;
 	memRead_exmem_o    <= memRead;

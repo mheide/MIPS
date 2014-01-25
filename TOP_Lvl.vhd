@@ -132,6 +132,7 @@ architecture RTL of TOP_Lvl is
 			enable_i           : in  std_logic;
 			PC_exmem_i         : in  std_logic_vector(31 downto 0);
 			ALU_result_exmem_i : in  std_logic_vector(31 downto 0);
+			B_data_exmem_i	   : in  std_logic_vector(31 downto 0);
 			zero_flag_exmem_i  : in  std_logic;
 			dataAddr_exmem_i   : in  std_logic_vector(4 downto 0);
 			PCSource_exmem_i   : in  std_logic_vector(1 DOWNTO 0);
@@ -145,6 +146,7 @@ architecture RTL of TOP_Lvl is
 
 			PC_exmem_o         : out std_logic_vector(31 downto 0);
 			ALU_result_exmem_o : out std_logic_vector(31 downto 0);
+			B_data_exmem_o	   : out std_logic_vector(31 downto 0);		
 			zero_flag_exmem_o  : out std_logic;
 			dataAddr_exmem_o   : out std_logic_vector(4 downto 0);
 			PCSource_exmem_o   : out std_logic_vector(1 DOWNTO 0);
@@ -165,7 +167,6 @@ architecture RTL of TOP_Lvl is
 			enable_i               : in  std_logic;
 			PC_memwb_i             : in  std_logic_vector(31 downto 0);
 			memoryReadData_memwb_i : in  std_logic_vector(31 downto 0);
-			ALU_result_memwb_i     : in  std_logic_vector(31 downto 0);
 			dataAddr_memwb_i       : in  std_logic_vector(4 downto 0);
 			PCSource_memwb_i       : in  std_logic_vector(1 DOWNTO 0);
 
@@ -174,7 +175,6 @@ architecture RTL of TOP_Lvl is
 
 			PC_memwb_o             : out std_logic_vector(31 downto 0);
 			memoryReadData_memwb_o : out std_logic_vector(31 downto 0);
-			ALU_result_memwb_o     : out std_logic_vector(31 downto 0);
 			dataAddr_memwb_o       : out std_logic_vector(4 downto 0);
 			PCSource_memwb_o       : out std_logic_vector(1 DOWNTO 0);
 
@@ -252,24 +252,48 @@ architecture RTL of TOP_Lvl is
 		);
 	end component;
 
-	signal reset  : std_logic;
-	signal clock  : std_logic;
+
+	component DataMemory is		
+		generic(
+			size : natural := 8 --number of instructions
+		);	
+		port(
+			clk_i        : in  std_logic;
+			rst_i        : in  std_logic;
+			alu_result_i : in  std_logic_vector(31 DOWNTO 0);
+			writeData_i  : in  std_logic_vector(31 DOWNTO 0);
+			memWrite_i   : in  std_logic;   --0 for arithmetic op's
+			memRead_i 	 : in  std_logic;
+			
+			readData_o   : out std_logic_vector(31 DOWNTO 0)
+		);
+	end component;	
+	
+	signal reset : std_logic;
+	signal clock : std_logic;
 	signal enable : std_logic;
 
 	--exmem --> pc --beide nicht angekommen
 	signal zero_exmem_pc   : std_logic;
 	signal branch_exmem_pc : std_logic; -- noch mal sichergehen wie genau (PCSource?)
+	signal B_data_exmem_dm : std_logic_vector(31 downto 0);	
+
+
 
 	--exmem --> memwb
 	signal PC_exmem_memwb         : std_logic_vector(31 downto 0);
 	signal PC_Src_exmem_memwb     : std_logic_vector(1 downto 0);
 	signal memToReg_exmem_memwb   : std_logic;
 	signal regWrite_exmem_memwb   : std_logic;
-	signal ALU_result_exmem_memwb : std_logic_vector(31 downto 0); --TODO: zum Speicher fuer andere befehle
 
-	--exmem --> memory
-	signal memRead_exmem_mem  : std_logic;
-	signal memWrite_exmem_mem : std_logic;
+
+
+	--exmem --> dataMemory
+	signal memRead_exmem_dm : std_logic;
+	signal memWrite_exmem_dm : std_logic;
+	signal ALU_result_exmem_dm : std_logic_vector(31 downto 0); 
+
+
 
 	--exmem --> regDstSelect, memwb
 	signal dataAddr_exmem_rds : std_logic_vector(4 downto 0);
@@ -343,7 +367,7 @@ architecture RTL of TOP_Lvl is
 	--memwb --> jumpAddressSelct, ds
 	signal PC_memwb_jas         : std_logic_vector(31 downto 0);
 	signal PCSource_memwb_jas   : std_logic_vector(1 downto 0);
-	signal ALU_result_memwb_jas : std_logic_vector(31 downto 0); --gebraucht?
+	signal ALU_result_dm_jas : std_logic_vector(31 downto 0); --gebraucht?
 
 	--memory --> memwb
 	signal memoryReadData_mem_memwb : std_logic_vector(31 downto 0); --noch nicht komplett verdrahtet
@@ -382,11 +406,15 @@ begin
 	signExtAddr_complete_idex_se <= signExtAddr_idex_se & functioncode_idex_ac;
 
 	ds : dataSelect
-		port map(ALU_result_i     => ALU_result_memwb_jas,
-			     memoryReadData_i => memoryReadData_memwb_ds,
-			     memToReg_i       => memToReg_memwb_ds,
-			     data_o           => data_ds_rf
-		);
+	port map(	ALU_result_i => ALU_result_dm_jas,
+				memoryReadData_i => memoryReadData_memwb_ds,
+				memToReg_i => memToReg_memwb_ds,
+				data_o => data_ds_rf
+				);
+	
+	
+	
+
 
 	pc : pc_counter
 		port map(clk_i       => clock,
@@ -399,29 +427,28 @@ begin
 
 	jas : jumpAddressSelect
 		port map(PCSource_i          => PCSource_memwb_jas,
-			     ALU_result          => ALU_result_memwb_jas,
-			     ALU_result_modified => ALU_result_memwb_jas,
+			     ALU_result          => ALU_result_dm_jas,
+			     ALU_result_modified => ALU_result_dm_jas,
 			     PC_modified         => PC_memwb_jas,
 			     jumpAddress_o       => jumpAddress_jas_pc);
 
 	memwb : MEM_WB
-		port map(clk_i                  => clock,
-			     rst_i                  => reset,
-			     enable_i               => enable,
-			     PC_memwb_i             => PC_exmem_memwb,
-			     memoryReadData_memwb_i => memoryReadData_mem_memwb,
-			     PCSource_memwb_i       => PC_Src_exmem_memwb,
-			     ALU_result_memwb_i     => ALU_result_exmem_memwb,
-			     dataAddr_memwb_i       => dataAddr_exmem_rds,
-			     memToReg_memwb_i       => memToReg_exmem_memwb,
-			     regWrite_memwb_i       => regWrite_exmem_memwb,
-			     PC_memwb_o             => PC_memwb_jas,
-			     memoryReadData_memwb_o => memoryReadData_memwb_ds,
-			     ALU_result_memwb_o     => ALU_result_memwb_jas,
-			     dataAddr_memwb_o       => dataAddr_memwb_rf,
-			     PCSource_memwb_o       => PCSource_memwb_jas,
-			     memToReg_memwb_o       => memToReg_memwb_ds,
-			     regWrite_memwb_o       => regWrite_memwb_rf);
+	port map(clk_i                             => clock,
+			rst_i                  => reset,
+			enable_i               => enable,
+			PC_memwb_i             => PC_exmem_memwb,
+			memoryReadData_memwb_i => memoryReadData_mem_memwb,
+			PCSource_memwb_i       => PC_Src_exmem_memwb,
+			dataAddr_memwb_i       => dataAddr_exmem_rds,
+			memToReg_memwb_i       => memToReg_exmem_memwb,
+			regWrite_memwb_i       => regWrite_exmem_memwb,
+			PC_memwb_o             => PC_memwb_jas,
+			memoryReadData_memwb_o => memoryReadData_memwb_ds,
+			dataAddr_memwb_o       => dataAddr_memwb_rf,
+			PCSource_memwb_o       => PCSource_memwb_jas,
+			memToReg_memwb_o       => memToReg_memwb_ds,
+			regWrite_memwb_o       => regWrite_memwb_rf);
+	
 
 	ifid : IF_ID
 		port map(clk_i         => clock,
@@ -504,6 +531,7 @@ begin
 			     PC_exmem_i         => PC_idex_exmem,
 			     PCSource_exmem_i   => PCSrc_idex_exmem,
 			     ALU_result_exmem_i => C_alu_exmem,
+				 B_data_exmem_i		=> dataB_rf_alu,
 			     zero_flag_exmem_i  => zero_alu_exmem,
 			     dataAddr_exmem_i   => dataAddr_idex_exmem,
 			     branch_exmem_i     => branch_idex_exmem,
@@ -512,13 +540,14 @@ begin
 			     memToReg_exmem_i   => memToReg_idex_exmem,
 			     regWrite_exmem_i   => regWrite_idex_exmem,
 			     PC_exmem_o         => PC_exmem_memwb,
-			     ALU_result_exmem_o => ALU_result_exmem_memwb,
+			     ALU_result_exmem_o => ALU_result_exmem_dm,
+				 B_data_exmem_o		=> B_data_exmem_dm,
 			     zero_flag_exmem_o  => zero_exmem_pc,
 			     dataAddr_exmem_o   => dataAddr_exmem_rds,
 			     PCSource_exmem_o   => PC_Src_exmem_memwb,
 			     branch_exmem_o     => branch_exmem_pc,
-			     memRead_exmem_o    => memRead_exmem_mem,
-			     memWrite_exmem_o   => memWrite_exmem_mem,
+			     memRead_exmem_o    => memRead_exmem_dm,
+			     memWrite_exmem_o   => memWrite_exmem_dm,
 			     memToReg_exmem_o   => memToReg_exmem_memwb,
 			     regWrite_exmem_o   => regWrite_exmem_memwb);
 
@@ -550,5 +579,15 @@ begin
 			     SignExt_B_i => signExtend_se_os,
 			     A_o         => dataA_os_alu,
 			     B_o         => dataB_os_alu);
+	
+	dm : dataMemory
+		port map(clk_i		=> clock,
+				rst_i		=> reset,
+				alu_result_i=> ALU_result_exmem_dm,
+				writeData_i	=> B_data_exmem_dm,
+				memWrite_i	=> memWrite_exmem_dm,
+				memRead_i	=> memRead_exmem_dm,
+				readData_o  => ALU_result_dm_jas);
+	
 
 end architecture RTL;

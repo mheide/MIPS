@@ -8,7 +8,6 @@ entity MEM_WB is                        --first pipeline stage with instruction_
 		enable_i               : in  std_logic;
 		PC_memwb_i             : in  std_logic_vector(31 downto 0);
 		memoryReadData_memwb_i : in  std_logic_vector(31 downto 0);
-		ALU_result_memwb_i     : in  std_logic_vector(31 downto 0);
 		dataAddr_memwb_i       : in  std_logic_vector(4 downto 0);
 		PCSource_memwb_i       : in  std_logic_vector(1 DOWNTO 0);
 
@@ -17,7 +16,6 @@ entity MEM_WB is                        --first pipeline stage with instruction_
 
 		PC_memwb_o             : out std_logic_vector(31 downto 0);
 		memoryReadData_memwb_o : out std_logic_vector(31 downto 0);
-		ALU_result_memwb_o     : out std_logic_vector(31 downto 0);
 		dataAddr_memwb_o       : out std_logic_vector(4 downto 0);
 		PCSource_memwb_o       : out std_logic_vector(1 DOWNTO 0);
 
@@ -29,7 +27,6 @@ end entity MEM_WB;
 architecture behaviour of MEM_WB is
 	signal pc             : std_logic_vector(31 DOWNTO 0);
 	signal memoryReadData : std_logic_vector(31 downto 0);
-	signal aluResult      : std_logic_vector(31 downto 0);
 	signal dataAddr       : std_logic_vector(4 downto 0);
 	signal pcsource       : std_logic_vector(1 DOWNTO 0);
 
@@ -42,7 +39,6 @@ begin
 		if rst_i = '1' then
 			pc             <= (others => '0');
 			memoryReadData <= (others => '0');
-			aluResult      <= (others => '0');
 			dataAddr       <= (others => '0');
 			pcsource       <= (others => '0');
 
@@ -53,7 +49,6 @@ begin
 			if enable_i = '1' then
 				pc             <= PC_memwb_i;
 				memoryReadData <= memoryReadData_memwb_i;
-				aluResult      <= ALU_result_memwb_i;
 				dataAddr       <= dataAddr_memwb_i;
 				pcsource       <= PCSource_memwb_i;
 
@@ -65,7 +60,6 @@ begin
 
 	PC_memwb_o             <= pc;
 	memoryReadData_memwb_o <= memoryReadData;
-	ALU_result_memwb_o     <= aluResult;
 	dataAddr_memwb_o       <= dataAddr;
 	PCSource_memwb_o       <= pcsource;
 

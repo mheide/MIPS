@@ -14,7 +14,9 @@ architecture RTL of ALU_Control is
 	signal rtype_alu_code : std_logic_vector(3 downto 0);
 
 begin
-	alu_code_o <= rtype_alu_code when ALU_Op_i(1) = '1' else "ZZZZ";
+	alu_code_o <= rtype_alu_code when ALU_Op_i(1) = '1' else
+					"0010" when ALU_Op_i = "00" else
+					"ZZZZ";
 
 	with functioncode_i select rtype_alu_code <=
 		"0010" when "100000",

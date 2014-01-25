@@ -30,13 +30,41 @@ architecture behaviour of Control is
 	signal op : std_logic_vector(5 downto 0);
 begin
 	op         <= op_i;
-	ALUOp_o    <= "10" when op = "000000" else (others => '0');
-	ALUSrcB_o  <= "00" when op = "000000" else (others => '0');
-	ALUSrcA_o  <= '1' when op = "000000" else '0';
-	MemWrite_o <= '0' when op = "000000" else '0';
-	PCSource_o <= "10" when op = "000000" else (others => '0');
-	RegDst_o   <= '1' when op = "000000" else '0';
-	regWrite_o <= '1' when op = "000000" else '0';
-	MemToReg_o <= '0'; --rtype, mem noch nicht implementiert.
+	ALUOp_o    <= "10" when op = "000000" else
+						"00" when op = "100011" else
+						"00" when op = "101011" else
+						(others => '0');
+	ALUSrcB_o  <= "00" when op = "000000" else 
+						"10" when op = "100011" else
+						"10" when op = "101011" else
+						(others => '0');
+	ALUSrcA_o  <= '1' when op = "000000" else
+						'1' when op = "100011" else
+						'1' when op = "101011" else
+						'0';
+	MemWrite_o <= '0' when op = "000000" else 
+						'0' when op = "100011" else
+						'1' when op = "101011" else
+						'0';
+	MemRead_o <= '0'  when op = "000000" else
+						'1' when op = "100011" else
+						'0' when op = "101011" else
+						'0';
+	PCSource_o <= "10" when op = "000000" else 
+						"10" when op = "100011" else
+						"10" when op = "101011" else
+						(others => '0');
+	RegDst_o   <= '1' when op = "000000" else 
+						'0' when op = "100011" else
+						'-' when op = "101011" else
+						'0';
+	regWrite_o <= '1' when op = "000000" else 
+						'1' when op = "100011" else
+						'0' when op = "101011" else
+						'0';
+	MemToReg_o <= '0' when op = "000000" else
+						'1' when op = "100011" else
+						'-' when op = "101011" else
+						'0'; 
 
 end architecture;
