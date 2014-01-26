@@ -60,20 +60,26 @@ architecture behaviour of RegisterFile is
 	);
 	signal regWrite      : std_logic;
 	signal writeDataAddr : std_logic_vector(4 DOWNTO 0);
+	signal dataA 		 : std_logic_vector(31 downto 0);
+	signal dataB 		 : std_logic_vector(31 downto 0);
 begin
 	registers(0) <= (others => '0');    --register $0
 
-	dataA_o <= registers(TO_INTEGER(UNSIGNED(dataA_Addr_i)));
+	dataA <= registers(TO_INTEGER(UNSIGNED(dataA_Addr_i)));
 
-	dataB_o <= registers(TO_INTEGER(UNSIGNED(dataB_Addr_i)));
+	dataB <= registers(TO_INTEGER(UNSIGNED(dataB_Addr_i)));
 
 	regWrite <= regWrite_i;
 
 	register_process : process(clk_i, rst_i) is
 	begin
 		if rst_i = '1' then
+			dataA_o <= (others => '0');
+			dataB_o <= (others => '0');
 		-- reset state
 		elsif rising_edge(clk_i) then
+			dataA_o <= dataA;
+			dataB_o <= dataB;
 			if dataAddr_i /= "00000" then --no write op's to $0
 				if regWrite = '1' then
 					registers(TO_INTEGER(UNSIGNED(dataAddr_i))) <= data_i;

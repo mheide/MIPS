@@ -34,10 +34,10 @@ architecture behaviour of DataMemory is
 	);
 	signal aluresult : std_logic_vector(31 downto 0);
 	signal tempread : std_logic_vector(31 downto 0);
-	
-begin
+	signal readout : std_logic_vector(31 downto 0);
+	begin
 
-	readData_o <= tempread when memRead_i = '1' else 
+	readout <= tempread when memRead_i = '1' else 
 				aluresult when memRead_i = '0' else
 				(others => 'X');
 	
@@ -49,8 +49,9 @@ begin
 	dataMem_process : process(clk_i, rst_i) is
 	begin
 		if rst_i = '1' then
-			-- reset state
-		elsif rising_edge(clk_i) then			
+			readData_o <= (others => '0');
+		elsif rising_edge(clk_i) then
+			readData_o <= readout;
 			if memWrite_i = '1' then
 				dataMem(TO_INTEGER(UNSIGNED(alu_result_i))) <= writeData_i(31 DOWNTO 24);
 				dataMem(TO_INTEGER(UNSIGNED(alu_result_i)) + 1) <= writeData_i(23 DOWNTO 16);

@@ -114,7 +114,7 @@ architecture RTL of TOP_Lvl is
 			ALUSrcA_idex_o       : out std_logic;
 			ALU_op_idex_o        : out std_logic_vector(1 DOWNTO 0);
 			function_code_idex_o : out std_logic_vector(5 DOWNTO 0);
-			signExtAddr_idex_o   : in  std_logic_vector(9 DOWNTO 0);
+			signExtAddr_idex_o   : out  std_logic_vector(9 DOWNTO 0);
 
 			branch_idex_o        : out std_logic;
 			memRead_idex_o       : out std_logic;

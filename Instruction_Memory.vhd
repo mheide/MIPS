@@ -7,7 +7,7 @@ use work.Instructions_pack.all;
 
 entity Instruction_Memory is
 	generic(
-		size : natural := 4 --number of instructions
+		size : natural := 6 --number of instructions
 	);
 	port(
 		pc_i  : in  std_logic_vector(31 DOWNTO 0);
@@ -19,6 +19,19 @@ architecture behaviour of Instruction_Memory is
 	constant size2 : integer := size * 4;
 	type memRegType is array (0 to size2 - 1) of std_logic_vector(7 downto 0);
 	signal memReg : memRegType := (
+		
+		"00000000",		--pseudo-nop
+		"00000000",
+		"00000000",
+		"00100000",
+		
+		"10101100",		--store
+		"00000001",
+		"00000000",
+		"00000000",
+		
+		
+		
 		"00000000",		--add normal
 		"00100010",
 		"00011000",

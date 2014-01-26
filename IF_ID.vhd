@@ -23,17 +23,20 @@ architecture behaviour of IF_ID is
 	end component;
 
 	signal pc : std_logic_vector(31 DOWNTO 0);
+	signal instruction : std_logic_vector(31 downto 0);
 
 begin
 	mem : Instruction_Memory
-		port map(pc_i => PC_ifid_i, out_o => Instruction_o);
+		port map(pc_i => PC_ifid_i, out_o => instruction);
 
 	IF_ID_reg : process(clk_i, rst_i, enable_i) is
 	begin
 		if rst_i = '1' then
+			Instruction_o <= (others => '0');
 			pc <= (others => '0');
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
+				Instruction_o <= instruction;
 				pc <= PC_ifid_i;
 			end if;
 		end if;
