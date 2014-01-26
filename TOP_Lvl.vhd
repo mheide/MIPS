@@ -267,7 +267,13 @@ architecture RTL of TOP_Lvl is
 			
 			readData_o   : out std_logic_vector(31 DOWNTO 0)
 		);
-	end component;	
+	end component;
+	
+	component JumpAddrCompute
+		port(jumpAddr_i : in  std_logic(25 downto 0);
+			 pc_i       : in  std_logic(31 downto 0);
+			 pc_o       : out std_logic(31 downto 0));
+	end component JumpAddrCompute;
 	
 	signal reset : std_logic;
 	signal clock : std_logic;
@@ -363,7 +369,9 @@ architecture RTL of TOP_Lvl is
 
 	--pc --> ifid --writedata fehlt
 	signal address_pc_ifid : std_logic_vector(31 downto 0);
-
+	
+	--memwb --> jumpAddressCompute
+	signal PC_memwb_jac : std_logic_vector(31 downto 0);
 	--memwb --> jumpAddressSelct, ds
 	signal PC_memwb_jas         : std_logic_vector(31 downto 0);
 	signal PCSource_memwb_jas   : std_logic_vector(1 downto 0);
@@ -442,13 +450,17 @@ begin
 			dataAddr_memwb_i       => dataAddr_exmem_rds,
 			memToReg_memwb_i       => memToReg_exmem_memwb,
 			regWrite_memwb_i       => regWrite_exmem_memwb,
-			PC_memwb_o             => PC_memwb_jas,
+			PC_memwb_o             => PC_memwb_jac,
 			memoryReadData_memwb_o => memoryReadData_memwb_ds,
 			dataAddr_memwb_o       => dataAddr_memwb_rf,
 			PCSource_memwb_o       => PCSource_memwb_jas,
 			memToReg_memwb_o       => memToReg_memwb_ds,
 			regWrite_memwb_o       => regWrite_memwb_rf);
 	
+	jac : JumpAddrCompute
+		port map(jumpAddr_i => data_ifid_rf(25 downto 0),
+			     pc_i       => PC_memwb_jac,
+			     pc_o       => PC_memwb_jas);
 
 	ifid : IF_ID
 		port map(clk_i         => clock,

@@ -10,7 +10,7 @@ entity Control is
 		PCWrite_o     : out std_logic;
 		IorD_o        : out std_logic;
 
-		branch_o      : out std_logic;
+       --PCSource replace jump and branch in multicycle implementation (Page 324)
 		MemRead_o     : out std_logic;
 		MemWrite_o    : out std_logic;
 		MemToReg_o    : out std_logic;
@@ -31,6 +31,7 @@ architecture behaviour of Control is
 begin
 	op         <= op_i;
 	ALUOp_o    <= "10" when op = "000000" else
+	                    "10" when op = "000010" else
 						"00" when op = "100011" else
 						"00" when op = "101011" else
 						(others => '0');
@@ -50,9 +51,11 @@ begin
 						'1' when op = "100011" else
 						'0' when op = "101011" else
 						'0';
+	--TODO: PCSource_o values not sane
 	PCSource_o <= "10" when op = "000000" else 
 						"10" when op = "100011" else
 						"10" when op = "101011" else
+						"10" when op = "000010" else
 						(others => '0');
 	RegDst_o   <= '1' when op = "000000" else 
 						'0' when op = "100011" else
@@ -65,6 +68,6 @@ begin
 	MemToReg_o <= '0' when op = "000000" else
 						'1' when op = "100011" else
 						'-' when op = "101011" else
-						'0'; 
+						'0';
 
 end architecture;
