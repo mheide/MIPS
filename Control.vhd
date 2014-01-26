@@ -52,10 +52,11 @@ begin
 						'0' when op = "101011" else
 						'0';
 	--TODO: PCSource_o values not sane
-	PCSource_o <= "10" when op = "000000" else 
+	PCSource_o <= "01" when op = "000000" else 
 						"10" when op = "100011" else
 						"10" when op = "101011" else
-						"10" when op = "000010" else
+						"10" when op = "000010" else --jump
+						"10" when op = "000011" else --jump and link
 						(others => '0');
 	RegDst_o   <= '1' when op = "000000" else 
 						'0' when op = "100011" else
