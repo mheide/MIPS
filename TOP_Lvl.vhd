@@ -270,9 +270,9 @@ architecture RTL of TOP_Lvl is
 	end component;
 	
 	component JumpAddrCompute
-		port(jumpAddr_i : in  std_logic(25 downto 0);
-			 pc_i       : in  std_logic(31 downto 0);
-			 pc_o       : out std_logic(31 downto 0));
+		port(jumpAddr_i : in  std_logic_vector(25 downto 0);
+			 pc_i       : in  std_logic_vector(31 downto 0);
+			 pc_o       : out std_logic_vector(31 downto 0));
 	end component JumpAddrCompute;
 	
 	signal reset : std_logic;
