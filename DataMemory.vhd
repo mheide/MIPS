@@ -38,7 +38,7 @@ architecture behaviour of DataMemory is
 	begin
 
 	readout <= tempread when memRead_i = '1' else 
-				aluresult when memRead_i = '0' else
+				(others => '-') when memRead_i = '0' else
 				(others => 'X');
 	
 	tempread(31 downto 24) <= dataMem(TO_INTEGER(UNSIGNED(alu_result_i))) when memRead_i = '1';

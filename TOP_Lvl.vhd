@@ -167,6 +167,7 @@ architecture RTL of TOP_Lvl is
 			enable_i               : in  std_logic;
 			PC_memwb_i             : in  std_logic_vector(31 downto 0);
 			memoryReadData_memwb_i : in  std_logic_vector(31 downto 0);
+			ALU_result_memwb_i     : in  std_logic_vector(31 downto 0);
 			dataAddr_memwb_i       : in  std_logic_vector(4 downto 0);
 			PCSource_memwb_i       : in  std_logic_vector(1 DOWNTO 0);
 
@@ -175,6 +176,7 @@ architecture RTL of TOP_Lvl is
 
 			PC_memwb_o             : out std_logic_vector(31 downto 0);
 			memoryReadData_memwb_o : out std_logic_vector(31 downto 0);
+			ALU_result_memwb_o     : out std_logic_vector(31 downto 0);
 			dataAddr_memwb_o       : out std_logic_vector(4 downto 0);
 			PCSource_memwb_o       : out std_logic_vector(1 DOWNTO 0);
 
@@ -294,6 +296,7 @@ architecture RTL of TOP_Lvl is
 
 
 
+
 	--exmem --> dataMemory
 	signal memRead_exmem_dm : std_logic;
 	signal memWrite_exmem_dm : std_logic;
@@ -375,7 +378,10 @@ architecture RTL of TOP_Lvl is
 	--memwb --> jumpAddressSelct, ds
 	signal PC_memwb_jas         : std_logic_vector(31 downto 0);
 	signal PCSource_memwb_jas   : std_logic_vector(1 downto 0);
-	signal ALU_result_dm_jas : std_logic_vector(31 downto 0); --gebraucht?
+	signal ALU_result_memwb_ds  : std_logic_vector(31 downto 0);
+	
+	--dm --> jumpadressselect? ds, 
+	signal memData_dm_jas : std_logic_vector(31 downto 0); 
 
 	--memory --> memwb
 	signal memoryReadData_mem_memwb : std_logic_vector(31 downto 0); --noch nicht komplett verdrahtet
@@ -414,8 +420,8 @@ begin
 	signExtAddr_complete_idex_se <= signExtAddr_idex_se & functioncode_idex_ac;
 
 	ds : dataSelect
-	port map(	ALU_result_i => ALU_result_dm_jas,
-				memoryReadData_i => ALU_result_dm_jas,
+	port map(	ALU_result_i => ALU_result_memwb_ds,
+				memoryReadData_i => memData_dm_jas,
 				memToReg_i => memToReg_memwb_ds,
 				data_o => data_ds_rf
 				);
@@ -435,8 +441,8 @@ begin
 
 	jas : jumpAddressSelect
 		port map(PCSource_i          => PCSource_memwb_jas,
-			     ALU_result          => ALU_result_dm_jas,
-			     ALU_result_modified => ALU_result_dm_jas,
+			     ALU_result          => ALU_result_memwb_ds,
+			     ALU_result_modified => ALU_result_memwb_ds,
 			     PC_modified         => PC_memwb_jas,
 			     jumpAddress_o       => jumpAddress_jas_pc);
 
@@ -446,12 +452,14 @@ begin
 			enable_i               => enable,
 			PC_memwb_i             => PC_exmem_memwb,
 			memoryReadData_memwb_i => memoryReadData_mem_memwb,
+			ALU_result_memwb_i 	   => ALU_result_exmem_dm,
 			PCSource_memwb_i       => PC_Src_exmem_memwb,
 			dataAddr_memwb_i       => dataAddr_exmem_rds,
 			memToReg_memwb_i       => memToReg_exmem_memwb,
 			regWrite_memwb_i       => regWrite_exmem_memwb,
 			PC_memwb_o             => PC_memwb_jac,
 			memoryReadData_memwb_o => memoryReadData_memwb_ds,
+			ALU_result_memwb_o	   => ALU_result_memwb_ds,
 			dataAddr_memwb_o       => dataAddr_memwb_rf,
 			PCSource_memwb_o       => PCSource_memwb_jas,
 			memToReg_memwb_o       => memToReg_memwb_ds,
@@ -599,7 +607,7 @@ begin
 				writeData_i	=> B_data_exmem_dm,
 				memWrite_i	=> memWrite_exmem_dm,
 				memRead_i	=> memRead_exmem_dm,
-				readData_o  => ALU_result_dm_jas);
+				readData_o  => memData_dm_jas);
 	
 
 end architecture RTL;
