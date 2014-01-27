@@ -386,7 +386,7 @@ architecture RTL of TOP_Lvl is
 
 	--memwb --> ds		
 	signal memToReg_memwb_ds       : std_logic;
-	signal memoryReadData_memwb_ds : std_logic_vector(31 downto 0);
+	signal memoryReadData_memwb_ds : std_logic_vector(31 downto 0);  --temporaer nicht angeschlossen
 
 	--memwb --> rf
 	signal regWrite_memwb_rf : std_logic;
@@ -415,7 +415,7 @@ begin
 
 	ds : dataSelect
 	port map(	ALU_result_i => ALU_result_dm_jas,
-				memoryReadData_i => memoryReadData_memwb_ds,
+				memoryReadData_i => ALU_result_dm_jas,
 				memToReg_i => memToReg_memwb_ds,
 				data_o => data_ds_rf
 				);
