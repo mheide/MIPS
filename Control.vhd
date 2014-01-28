@@ -55,12 +55,12 @@ begin
 	--TODO: some PCSource_o values not sane
 	PCSource_o <=       "01" when op = c_beq.opcode  else
 	                    "01" when op = c_bgez.opcode else
-	                    "01" when op = c_bgezal else
-	                    "01" when op = c_bgtz else
-	                    "01" when op = c_blez else
-	                    "01" when op = c_bltzal else
-	                    "01" when op = c_bne else
-	                    "01" when op = c_bltz else
+	                    "01" when op = c_bgezal.opcode else
+	                    "01" when op = c_bgtz.opcode else
+	                    "01" when op = c_blez.opcode else
+	                    "01" when op = c_bltzal.opcode else
+	                    "01" when op = c_bne.opcode else
+	                    "01" when op = c_bltz.opcode else
 						"01" when op = c_lw else
 						"01" when op = c_lwl else
 						"01" when op = c_lwr else
