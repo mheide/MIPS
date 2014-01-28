@@ -16,6 +16,8 @@ architecture RTL of TOP_Lvl is
 			A_i        : in  std_logic_vector(31 downto 0);
 			B_i        : in  std_logic_vector(31 downto 0);
 			ALU_ctrl_i : in  std_logic_vector(3 downto 0);
+			shamt_i	   : in  std_logic_vector(4 downto 0);
+			
 			C_o        : out std_logic_vector(31 downto 0);
 			zero_o     : out std_logic
 		);
@@ -166,7 +168,6 @@ architecture RTL of TOP_Lvl is
 			rst_i                  : in  std_logic;
 			enable_i               : in  std_logic;
 			PC_memwb_i             : in  std_logic_vector(31 downto 0);
-			memoryReadData_memwb_i : in  std_logic_vector(31 downto 0);
 			ALU_result_memwb_i     : in  std_logic_vector(31 downto 0);
 			dataAddr_memwb_i       : in  std_logic_vector(4 downto 0);
 			PCSource_memwb_i       : in  std_logic_vector(1 DOWNTO 0);
@@ -383,8 +384,6 @@ architecture RTL of TOP_Lvl is
 	--dm --> jumpadressselect? ds, 
 	signal memData_dm_jas : std_logic_vector(31 downto 0); 
 
-	--memory --> memwb
-	signal memoryReadData_mem_memwb : std_logic_vector(31 downto 0); --noch nicht komplett verdrahtet
 
 	--idex --> signExtend
 	signal signExtAddr_idex_se          : std_logic_vector(9 downto 0);
@@ -424,11 +423,7 @@ begin
 				memoryReadData_i => memData_dm_jas,
 				memToReg_i => memToReg_memwb_ds,
 				data_o => data_ds_rf
-				);
-	
-	
-	
-
+				);	
 
 	pc : pc_counter
 		port map(clk_i       => clock,
@@ -451,7 +446,6 @@ begin
 			rst_i                  => reset,
 			enable_i               => enable,
 			PC_memwb_i             => PC_exmem_memwb,
-			memoryReadData_memwb_i => memoryReadData_mem_memwb,
 			ALU_result_memwb_i 	   => ALU_result_exmem_dm,
 			PCSource_memwb_i       => PC_Src_exmem_memwb,
 			dataAddr_memwb_i       => dataAddr_exmem_rds,
@@ -583,6 +577,7 @@ begin
 			     A_i        => dataA_os_alu,
 			     B_i        => dataB_os_alu,
 			     ALU_ctrl_i => alu_code_ac_alu,
+				 shamt_i 	=> signExtAddr_idex_se(4 downto 0),
 			     C_o        => C_alu_exmem,
 			     zero_o     => zero_alu_exmem);
 

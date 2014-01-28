@@ -8,6 +8,7 @@ entity ALU is
 		A_i        : in  std_logic_vector(31 downto 0);
 		B_i        : in  std_logic_vector(31 downto 0);
 		ALU_ctrl_i : in  std_logic_vector(3 downto 0);
+		shamt_i	   : in  std_logic_vector(4 downto 0);  	--needed for bitshifts
 		C_o        : out std_logic_vector(31 downto 0);
 		zero_o     : out std_logic
 	);

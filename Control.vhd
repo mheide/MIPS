@@ -33,24 +33,24 @@ begin
 	op         <= op_i;
 	ALUOp_o    <= "10" when op = "000000" else
 	                    "10" when op = "000010" else
-						"00" when op = "100011" else
-						"00" when op = "101011" else
+						"00" when op = c_lw else
+						"00" when op = c_sw else
 						(others => '0');
 	ALUSrcB_o  <= "00" when op = "000000" else 
-						"10" when op = "100011" else
-						"10" when op = "101011" else
+						"10" when op = c_lw else
+						"10" when op = c_sw else
 						(others => '0');
 	ALUSrcA_o  <= '1' when op = "000000" else
-						'1' when op = "100011" else
-						'1' when op = "101011" else
+						'1' when op = c_lw else
+						'1' when op = c_sw else
 						'0';
 	MemWrite_o <= '0' when op = "000000" else 
-						'0' when op = "100011" else
-						'1' when op = "101011" else
+						'0' when op = c_lw else
+						'1' when op = c_sw else
 						'0';
 	MemRead_o <= '0'  when op = "000000" else
-						'1' when op = "100011" else
-						'0' when op = "101011" else
+						'1' when op = c_lw else
+						'0' when op = c_sw else
 						'0';
 	--TODO: some PCSource_o values not sane
 	PCSource_o <=       "01" when op = c_beq.opcode  else
@@ -79,16 +79,16 @@ begin
 						"10" when op = c_jal else --jump and link
 						(others => '0');
 	RegDst_o   <= '1' when op = "000000" else 
-						'0' when op = "100011" else
-						'-' when op = "101011" else
+						'0' when op = c_lw else
+						'-' when op = c_lw else
 						'0';
 	regWrite_o <= '1' when op = "000000" else 
-						'1' when op = "100011" else
-						'0' when op = "101011" else
+						'1' when op = c_lw else
+						'0' when op = c_lw else
 						'0';
 	MemToReg_o <= '0' when op = "000000" else
-						'1' when op = "100011" else
-						'-' when op = "101011" else
+						'1' when op = c_lw else
+						'-' when op = c_lw else
 						'0';
 
 end architecture;
