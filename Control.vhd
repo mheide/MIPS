@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use work.Instructions_pack.all;
 
 entity Control is
 	port(
@@ -51,12 +52,31 @@ begin
 						'1' when op = "100011" else
 						'0' when op = "101011" else
 						'0';
-	--TODO: PCSource_o values not sane
-	PCSource_o <= "01" when op = "000000" else 
-						"10" when op = "100011" else
-						"10" when op = "101011" else
-						"10" when op = "000010" else --jump
-						"10" when op = "000011" else --jump and link
+	--TODO: some PCSource_o values not sane
+	PCSource_o <=       "01" when op = c_beq.opcode  else
+	                    "01" when op = c_bgez.opcode else
+	                    "01" when op = c_bgezal else
+	                    "01" when op = c_bgtz else
+	                    "01" when op = c_blez else
+	                    "01" when op = c_bltzal else
+	                    "01" when op = c_bne else
+	                    "01" when op = c_bltz else
+						"01" when op = c_lw else
+						"01" when op = c_lwl else
+						"01" when op = c_lwr else
+						"01" when op = c_lb else
+						"01" when op = c_lbu else
+						"01" when op = c_lh else
+						"01" when op = c_lhu else
+						"01" when op = c_ll else
+						"01" when op = c_sw else
+						"01" when op = c_sb else
+						"01" when op = c_sc else
+						"01" when op = c_sh else
+						"01" when op = c_swl else
+						"01" when op = c_swr else
+						"10" when op = c_j else --jump
+						"10" when op = c_jal else --jump and link
 						(others => '0');
 	RegDst_o   <= '1' when op = "000000" else 
 						'0' when op = "100011" else

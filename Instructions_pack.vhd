@@ -249,6 +249,20 @@ package Instructions_pack is
 	constant c_lwl   : OP_Type_Const := "10" & x"2";
 	--lw right
 	constant c_lwr   : OP_Type_Const := "10" & x"6";
+	--load linked
+	constant c_ll    : OP_Type_Const := "11" & x"0";
+	--store word (sw)
+	constant c_sw    : OP_Type_Const := "10" & x"B";
+	--store byte
+	constant c_sb    : OP_Type_Const := "10" & x"8";
+	--store halfword
+	constant c_sh    : OP_Type_Const := "10" & x"9";
+	--store word left
+	constant c_swl   : OP_Type_Const := "10" & x"A";
+	--store word right
+	constant c_swr   : OP_Type_Const := "10" & x"E";
+	--store conditional: olways succeeds on SPIM (stores 1 to rt)
+	constant c_sc    : OP_Type_Const := "11" & x"8";
 
 	------------------------------------------------------
 	--Jump Instructions
