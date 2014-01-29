@@ -30,15 +30,24 @@ begin
 					c_alu_add when ALU_Op_i = "00" else
 					c_alu_error;
 
-	with functioncode_i select rtype_alu_code <=
-		c_alu_add when c_add.funct,		--add
-		c_alu_addu when c_addu.funct,	--addu
-		c_alu_sub when c_sub.funct,		--sub
-		c_alu_subu when c_subu.funct,	--subu
-		c_alu_and when c_and.funct,		--and
-		c_alu_or  when c_or.funct,		--or
-		c_alu_nor when c_nor.funct,		--nor
-		c_alu_xor when c_xor.funct,		--xor
-		c_alu_error when others;
-
+	--with functioncode_i select rtype_alu_code <=
+	--	c_alu_add when c_add.funct,		--add
+	--	c_alu_addu when c_addu.funct,	--addu
+	--	c_alu_sub when c_sub.funct,		--sub
+	--	c_alu_subu when c_subu.funct,	--subu
+	--	c_alu_and when c_and.funct,		--and
+	--	c_alu_or  when c_or.funct,		--or
+	--	c_alu_nor when c_nor.funct,		--nor
+	--	c_alu_xor when c_xor.funct,		--xor
+	--	c_alu_error when others;
+	
+	rtype_alu_code <= c_alu_add  when functioncode_i = c_add.funct  else
+		              c_alu_addu when functioncode_i = c_addu.funct else
+		              c_alu_sub  when functioncode_i = c_sub.funct  else
+		              c_alu_subu when functioncode_i = c_subu.funct else
+		              c_alu_and  when functioncode_i = c_and.funct  else
+		              c_alu_or   when functioncode_i = c_or.funct   else
+		              c_alu_nor  when functioncode_i = c_nor.funct  else
+		              c_alu_xor  when functioncode_i = c_xor.funct  else
+		              c_alu_error;
 end architecture RTL;
