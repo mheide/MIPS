@@ -15,21 +15,27 @@ entity ALU is
 end entity ALU;
 
 architecture Behavioral of ALU is
-	constant c_add   : std_logic_vector(3 downto 0)  := "0010";
-	constant c_addu  : std_logic_vector(3 downto 0)  := "1010";
-	constant c_sub   : std_logic_vector(3 downto 0)  := "0110";
-	constant c_subu  : std_logic_vector(3 downto 0)  := "1110";
-	constant c_and   : std_logic_vector(3 downto 0)  := "0000";
-	constant c_or    : std_logic_vector(3 downto 0)  := "0001";
-	constant c_nor   : std_logic_vector(3 downto 0)  := "0011";
-	constant c_xor   : std_logic_vector(3 downto 0)  := "0100";
-	constant c_error : std_logic_vector(31 downto 0) := (others => 'X');
-	constant c_zero  : std_logic_vector(31 downto 0) := (others => '0');
+	constant c_alu_add   : std_logic_vector(3 downto 0)  := "0010";
+	constant c_alu_addu  : std_logic_vector(3 downto 0)  := "1010";
+	constant c_alu_sub   : std_logic_vector(3 downto 0)  := "0110";
+	constant c_alu_subu  : std_logic_vector(3 downto 0)  := "1110";
+	constant c_alu_and   : std_logic_vector(3 downto 0)  := "0000";
+	constant c_alu_or    : std_logic_vector(3 downto 0)  := "0001";
+	constant c_alu_nor   : std_logic_vector(3 downto 0)  := "0011";
+	constant c_alu_xor   : std_logic_vector(3 downto 0)  := "0100";
+	constant c_alu_sllv  : std_logic_vector(3 downto 0)  := "0101";
+	constant c_alu_srlv  : std_logic_vector(3 downto 0)  := "1101";
+	constant c_alu_sll   : std_logic_vector(3 downto 0)  := "0111";
+	constant c_alu_srl   : std_logic_vector(3 downto 0)  := "1111";
+	constant c_alu_sra   : std_logic_vector(3 downto 0)  := "1000";
+	constant c_alu_srav  : std_logic_vector(3 downto 0)  := "1001";
+	constant c_alu_error : std_logic_vector(31 downto 0) := (others => 'X');
+	constant c_alu_zero  : std_logic_vector(31 downto 0) := (others => '0');
 
 	signal C_temp : std_logic_vector(31 downto 0);
 
 begin
-	zero_o <= '1' when C_temp = c_zero else '0';
+	zero_o <= '1' when C_temp = c_alu_zero else '0';
 	C_o    <= C_temp;
 
 	ALU : process(rst_i, ALU_ctrl_i, A_i, B_i) is
@@ -38,15 +44,21 @@ begin
 			C_temp <= (others => '0');
 		else
 			case ALU_ctrl_i is
-				when c_add  => C_temp <= std_logic_vector(signed(A_i) + signed(B_i));
-				when c_addu => C_temp <= std_logic_vector(unsigned(A_i) + unsigned(B_i));
-				when c_sub  => C_temp <= std_logic_vector(signed(A_i) - signed(B_i));
-				when c_subu => C_temp <= std_logic_vector(unsigned(A_i) - unsigned(B_i));				
-				when c_and  => C_temp <= A_i and B_i;
-				when c_or   => C_temp <= A_i or B_i;
-				when c_nor  => C_temp <= A_i nor B_i;
-				when c_xor  => C_temp <= A_i xor B_i;				
-				when others => C_temp <= c_error;
+				when c_alu_add  => C_temp <= std_logic_vector(signed(A_i) + signed(B_i));
+				when c_alu_addu => C_temp <= std_logic_vector(unsigned(A_i) + unsigned(B_i));
+				when c_alu_sub  => C_temp <= std_logic_vector(signed(A_i) - signed(B_i));
+				when c_alu_subu => C_temp <= std_logic_vector(unsigned(A_i) - unsigned(B_i));
+				when c_alu_and  => C_temp <= A_i and B_i;
+				when c_alu_or   => C_temp <= A_i or B_i;
+				when c_alu_nor  => C_temp <= A_i nor B_i;
+				when c_alu_xor  => C_temp <= A_i xor B_i;	
+				when c_alu_sllv => C_temp <= std_logic_vector(shift_left(unsigned(A_i), to_integer(unsigned(B_i(4 downto 0)))));
+				when c_alu_srlv => C_temp <= std_logic_vector(shift_right(unsigned(A_i), to_integer(unsigned(B_i(4 downto 0)))));
+				when c_alu_sll  => C_temp <= std_logic_vector(shift_left(unsigned(B_i), to_integer(unsigned(shamt_i))));
+				when c_alu_srl  => C_temp <= std_logic_vector(shift_right(unsigned(B_i), to_integer(unsigned(shamt_i))));
+				when c_alu_sra  => C_temp <= std_logic_vector(shift_right(signed(A_i), to_integer(unsigned(B_i(4 downto 0)))));
+				when c_alu_srav => C_temp <= std_logic_vector(shift_right(signed(B_i), to_integer(unsigned(shamt_i))));
+				when others => C_temp <= c_alu_error;
 			end case;
 		end if;
 	end process ALU;

@@ -28,6 +28,7 @@ architecture RTL of TOP_Lvl is
 			rst_i          : in  std_logic;
 			ALU_Op_i       : in  std_logic_vector(1 downto 0);
 			functioncode_i : in  std_logic_vector(5 downto 0);
+			op_i		   : in  std_logic_vector(5 downto 0);
 			alu_code_o     : out std_logic_vector(3 downto 0)
 		);
 	end component ALU_Control;
@@ -100,6 +101,7 @@ architecture RTL of TOP_Lvl is
 			ALU_op_idex_i        : in  std_logic_vector(1 DOWNTO 0);
 			function_code_idex_i : in  std_logic_vector(5 DOWNTO 0);
 			signExtAddr_idex_i   : in  std_logic_vector(9 DOWNTO 0);
+			op_idex_i			 : in  std_logic_vector(5 downto 0);	
 
 			branch_idex_i        : in  std_logic; --M
 			memRead_idex_i       : in  std_logic;
@@ -117,6 +119,7 @@ architecture RTL of TOP_Lvl is
 			ALU_op_idex_o        : out std_logic_vector(1 DOWNTO 0);
 			function_code_idex_o : out std_logic_vector(5 DOWNTO 0);
 			signExtAddr_idex_o   : out  std_logic_vector(9 DOWNTO 0);
+			op_idex_o			 : out  std_logic_vector(5 downto 0);
 
 			branch_idex_o        : out std_logic;
 			memRead_idex_o       : out std_logic;
@@ -332,6 +335,7 @@ architecture RTL of TOP_Lvl is
 	-- idex --> ac
 	signal alu_op_idex_ac       : std_logic_vector(1 downto 0);
 	signal functioncode_idex_ac : std_logic_vector(5 downto 0);
+	signal op_idex_ac 			: std_logic_vector(5 downto 0);
 
 	-- regDstSelect --> rf
 	signal dst_Addr_rds_rf : std_logic_vector(4 downto 0);
@@ -484,6 +488,7 @@ begin
 			     ALU_op_idex_i        => ALUop_ctrl_idex,
 			     function_code_idex_i => data_ifid_rf(5 downto 0),
 			     signExtAddr_idex_i   => data_ifid_rf(15 downto 6),
+				 op_idex_i			  => data_ifid_rf(31 downto 26),
 			     branch_idex_i        => branch_ctrl_idex,
 			     memRead_idex_i       => memRead_ctrl_idex,
 			     memWrite_idex_i      => memWrite_ctrl_idex,
@@ -497,6 +502,7 @@ begin
 			     ALU_op_idex_o        => alu_op_idex_ac,
 			     function_code_idex_o => functioncode_idex_ac,
 			     signExtAddr_idex_o   => signExtAddr_idex_se,
+				 op_idex_o 			  => op_idex_ac,
 			     branch_idex_o        => branch_idex_exmem,
 			     memRead_idex_o       => memRead_idex_exmem,
 			     memWrite_idex_o      => memWrite_idex_exmem,
@@ -569,6 +575,7 @@ begin
 		port map(rst_i          => reset,
 			     ALU_Op_i       => alu_op_idex_ac,
 			     functioncode_i => functioncode_idex_ac,
+				 op_i			=> op_idex_ac,
 			     alu_code_o     => alu_code_ac_alu
 		);
 

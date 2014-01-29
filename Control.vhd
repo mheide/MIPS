@@ -33,22 +33,47 @@ begin
 	op         <= op_i;
 	ALUOp_o    <= "10" when op = "000000" else
 	                    "10" when op = "000010" else
+						"10" when op = c_addi else
+						"10" when op = c_addiu else
+						"10" when op = c_andi else
+						"10" when op = c_ori else
+						"10" when op = c_xori else
 						"00" when op = c_lw else
 						"00" when op = c_sw else
 						(others => '0');
 	ALUSrcB_o  <= "00" when op = "000000" else 
+						"10" when op = c_addi else
+						"10" when op = c_addiu else
+						"10" when op = c_andi else
+						"10" when op = c_ori else
+						"10" when op = c_xori else	
 						"10" when op = c_lw else
 						"10" when op = c_sw else
 						(others => '0');
 	ALUSrcA_o  <= '1' when op = "000000" else
+						'1' when op = c_addi else
+						'1' when op = c_addiu else
+						'1' when op = c_andi else
+						'1' when op = c_ori else
+						'1' when op = c_xori else						
 						'1' when op = c_lw else
 						'1' when op = c_sw else
 						'0';
 	MemWrite_o <= '0' when op = "000000" else 
+						'0' when op = c_addi else
+						'0' when op = c_addiu else
+						'0' when op = c_andi else
+						'0' when op = c_ori else
+						'0' when op = c_xori else	
 						'0' when op = c_lw else
 						'1' when op = c_sw else
 						'0';
 	MemRead_o <= '0'  when op = "000000" else
+						'0' when op = c_addi else
+						'0' when op = c_addiu else
+						'0' when op = c_andi else
+						'0' when op = c_ori else
+						'0' when op = c_xori else	
 						'1' when op = c_lw else
 						'0' when op = c_sw else
 						'0';
@@ -61,6 +86,11 @@ begin
 	                    "01" when op = c_bltzal.opcode else
 	                    "01" when op = c_bne.opcode else
 	                    "01" when op = c_bltz.opcode else
+						"01" when op = c_addi else
+						"01" when op = c_addiu else
+						"01" when op = c_andi else
+						"01" when op = c_ori else
+						"01" when op = c_xori else						
 						"01" when op = c_lw else
 						"01" when op = c_lwl else
 						"01" when op = c_lwr else
@@ -79,16 +109,31 @@ begin
 						"10" when op = c_jal else --jump and link
 						(others => '0');
 	RegDst_o   <= '1' when op = "000000" else 
+						'1' when op = c_addi else
+						'1' when op = c_addiu else
+						'1' when op = c_andi else
+						'1' when op = c_ori else
+						'1' when op = c_xori else	
 						'0' when op = c_lw else
-						'-' when op = c_lw else
+						'-' when op = c_sw else
 						'0';
 	regWrite_o <= '1' when op = "000000" else 
+						'1' when op = c_addi else
+						'1' when op = c_addiu else
+						'1' when op = c_andi else
+						'1' when op = c_ori else
+						'1' when op = c_xori else		
 						'1' when op = c_lw else
-						'0' when op = c_lw else
+						'0' when op = c_sw else
 						'0';
 	MemToReg_o <= '0' when op = "000000" else
+						'0' when op = c_addi else
+						'0' when op = c_addiu else
+						'0' when op = c_andi else
+						'0' when op = c_ori else
+						'0' when op = c_xori else		
 						'1' when op = c_lw else
-						'-' when op = c_lw else
+						'-' when op = c_sw else
 						'0';
 
 end architecture;
