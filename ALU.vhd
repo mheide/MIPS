@@ -47,7 +47,7 @@ begin
 				when c_alu_add  => C_temp <= std_logic_vector(signed(A_i) + signed(B_i));
 				when c_alu_addu => C_temp <= std_logic_vector(unsigned(A_i) + unsigned(B_i));
 				when c_alu_sub  => C_temp <= std_logic_vector(signed(A_i) - signed(B_i));
-				when c_alu_subu => C_temp <= std_logic_vector(unsigned(A_i) - unsigned(B_i));
+				when c_alu_subu => C_temp <= std_logic_vector(unsigned(A_i) - unsigned(B_i));				
 				when c_alu_and  => C_temp <= A_i and B_i;
 				when c_alu_or   => C_temp <= A_i or B_i;
 				when c_alu_nor  => C_temp <= A_i nor B_i;

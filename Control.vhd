@@ -12,6 +12,7 @@ entity Control is
 		IorD_o        : out std_logic;
 
        --PCSource replace jump and branch in multicycle implementation (Page 324)
+		branch_o      : out std_logic;	
 		MemRead_o     : out std_logic;
 		MemWrite_o    : out std_logic;
 		MemToReg_o    : out std_logic;
@@ -135,5 +136,6 @@ begin
 						'1' when op = c_lw else
 						'-' when op = c_sw else
 						'0';
+	branch_o <= '0';
 
 end architecture;
