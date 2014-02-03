@@ -1,13 +1,15 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.Instructions_pack.all;
+
 
 entity ALU is
 	port(
 		rst_i      : in  std_logic;
 		A_i        : in  std_logic_vector(31 downto 0);
 		B_i        : in  std_logic_vector(31 downto 0);
-		ALU_ctrl_i : in  std_logic_vector(3 downto 0);
+		ALU_ctrl_i : in  alu_code;
 		shamt_i	   : in  std_logic_vector(4 downto 0);  	--needed for bitshifts
 		C_o        : out std_logic_vector(31 downto 0);
 		zero_o     : out std_logic
@@ -15,20 +17,7 @@ entity ALU is
 end entity ALU;
 
 architecture Behavioral of ALU is
-	constant c_alu_add   : std_logic_vector(3 downto 0)  := "0010";
-	constant c_alu_addu  : std_logic_vector(3 downto 0)  := "1010";
-	constant c_alu_sub   : std_logic_vector(3 downto 0)  := "0110";
-	constant c_alu_subu  : std_logic_vector(3 downto 0)  := "1110";
-	constant c_alu_and   : std_logic_vector(3 downto 0)  := "0000";
-	constant c_alu_or    : std_logic_vector(3 downto 0)  := "0001";
-	constant c_alu_nor   : std_logic_vector(3 downto 0)  := "0011";
-	constant c_alu_xor   : std_logic_vector(3 downto 0)  := "0100";
-	constant c_alu_sllv  : std_logic_vector(3 downto 0)  := "0101";
-	constant c_alu_srlv  : std_logic_vector(3 downto 0)  := "1101";
-	constant c_alu_sll   : std_logic_vector(3 downto 0)  := "0111";
-	constant c_alu_srl   : std_logic_vector(3 downto 0)  := "1111";
-	constant c_alu_sra   : std_logic_vector(3 downto 0)  := "1000";
-	constant c_alu_srav  : std_logic_vector(3 downto 0)  := "1001";
+
 	constant c_alu_error : std_logic_vector(31 downto 0) := (others => 'X');
 	constant c_alu_zero  : std_logic_vector(31 downto 0) := (others => '0');
 

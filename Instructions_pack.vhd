@@ -326,6 +326,15 @@ package Instructions_pack is
 		opcode  : std_logic_vector(c_op_bits - 1 downto 0);
 		address : std_logic_vector(c_address_bits - 1 downto 0);
 	end record;
+	
+	
+	--alu code definition
+	type alu_code is (	c_alu_add, c_alu_addu, c_alu_sub, c_alu_subu,
+						c_alu_and, c_alu_or, c_alu_nor, c_alu_xor,
+						c_alu_sllv, c_alu_srlv, c_alu_sll, c_alu_srl,
+						c_alu_sra, c_alu_srav, c_alu_zero,
+						c_alu_error --needed?
+						);
 
 end package Instructions_pack;
 

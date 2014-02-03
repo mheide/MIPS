@@ -1,5 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use work.Instructions_pack.all;
+
 
 entity TOP_Lvl is
 	port(
@@ -15,7 +17,7 @@ architecture RTL of TOP_Lvl is
 			rst_i      : in  std_logic;
 			A_i        : in  std_logic_vector(31 downto 0);
 			B_i        : in  std_logic_vector(31 downto 0);
-			ALU_ctrl_i : in  std_logic_vector(3 downto 0);
+			ALU_ctrl_i : in  alu_code;
 			shamt_i	   : in  std_logic_vector(4 downto 0);
 			
 			C_o        : out std_logic_vector(31 downto 0);
@@ -29,7 +31,7 @@ architecture RTL of TOP_Lvl is
 			ALU_Op_i       : in  std_logic_vector(1 downto 0);
 			functioncode_i : in  std_logic_vector(5 downto 0);
 			op_i		   : in  std_logic_vector(5 downto 0);
-			alu_code_o     : out std_logic_vector(3 downto 0)
+			alu_code_o     : out alu_code
 		);
 	end component ALU_Control;
 
@@ -330,7 +332,7 @@ architecture RTL of TOP_Lvl is
 	signal dataB_rf_alu : std_logic_vector(31 downto 0);
 
 	--ac --> alu
-	signal alu_code_ac_alu : std_logic_vector(3 downto 0);
+	signal alu_code_ac_alu : alu_code;
 
 	-- idex --> ac
 	signal alu_op_idex_ac       : std_logic_vector(1 downto 0);
