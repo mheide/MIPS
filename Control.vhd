@@ -110,11 +110,11 @@ begin
 						"10" when op = c_jal else --jump and link
 						(others => '0');
 	RegDst_o   <= '1' when op = "000000" else 
-						'1' when op = c_addi else
-						'1' when op = c_addiu else
-						'1' when op = c_andi else
-						'1' when op = c_ori else
-						'1' when op = c_xori else	
+						'0' when op = c_addi else
+						'0' when op = c_addiu else
+						'0' when op = c_andi else
+						'0' when op = c_ori else
+						'0' when op = c_xori else	
 						'0' when op = c_lw else
 						'-' when op = c_sw else
 						'0';
