@@ -9,7 +9,6 @@ entity MEM_WB is                        --first pipeline stage with instruction_
 		PC_memwb_i             : in  std_logic_vector(31 downto 0);
 		ALU_result_memwb_i     : in  std_logic_vector(31 downto 0);
 		dataAddr_memwb_i       : in  std_logic_vector(4 downto 0);
-		PCSource_memwb_i       : in  std_logic_vector(1 DOWNTO 0);
 
 		memToReg_memwb_i       : in  std_logic; --WB
 		regWrite_memwb_i       : in  std_logic;
@@ -18,7 +17,6 @@ entity MEM_WB is                        --first pipeline stage with instruction_
 		memoryReadData_memwb_o : out std_logic_vector(31 downto 0);
 		ALU_result_memwb_o     : out std_logic_vector(31 downto 0);
 		dataAddr_memwb_o       : out std_logic_vector(4 downto 0);
-		PCSource_memwb_o       : out std_logic_vector(1 DOWNTO 0);
 
 		memToReg_memwb_o       : out std_logic;
 		regWrite_memwb_o       : out std_logic
@@ -29,7 +27,6 @@ architecture behaviour of MEM_WB is
 	signal pc             : std_logic_vector(31 DOWNTO 0);
 	signal aluResult      : std_logic_vector(31 downto 0);
 	signal dataAddr       : std_logic_vector(4 downto 0);
-	signal pcsource       : std_logic_vector(1 DOWNTO 0);
 
 	signal memToReg : std_logic;
 	signal regWrite : std_logic;
@@ -40,7 +37,6 @@ begin
 		if rst_i = '1' then
 			pc             <= (others => '0');
 			dataAddr       <= (others => '0');
-			pcsource       <= (others => '0');
 			aluResult      <= (others => '0');
 
 			memToReg <= '0';
@@ -51,7 +47,6 @@ begin
 				pc             <= PC_memwb_i;
 				aluResult      <= ALU_result_memwb_i;
 				dataAddr       <= dataAddr_memwb_i;
-				pcsource       <= PCSource_memwb_i;
 
 				memToReg <= memToReg_memwb_i;
 				regWrite <= regWrite_memwb_i;
@@ -62,7 +57,6 @@ begin
 	PC_memwb_o             <= pc;
 	ALU_result_memwb_o     <= aluResult;
 	dataAddr_memwb_o       <= dataAddr;
-	PCSource_memwb_o       <= pcsource;
 
 	memToReg_memwb_o <= memToReg;
 	regWrite_memwb_o <= regWrite;

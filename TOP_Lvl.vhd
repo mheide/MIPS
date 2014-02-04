@@ -104,6 +104,7 @@ architecture RTL of TOP_Lvl is
 			function_code_idex_i : in  std_logic_vector(5 DOWNTO 0);
 			signExtAddr_idex_i   : in  std_logic_vector(9 DOWNTO 0);
 			op_idex_i			 : in  std_logic_vector(5 downto 0);	
+			instruction_25_16_idex_i : in std_logic_vector(9 downto 0);			
 
 			branch_idex_i        : in  std_logic; --M
 			memRead_idex_i       : in  std_logic;
@@ -122,6 +123,7 @@ architecture RTL of TOP_Lvl is
 			function_code_idex_o : out std_logic_vector(5 DOWNTO 0);
 			signExtAddr_idex_o   : out  std_logic_vector(9 DOWNTO 0);
 			op_idex_o			 : out  std_logic_vector(5 downto 0);
+			instruction_25_16_idex_o : out std_logic_vector(9 downto 0);
 
 			branch_idex_o        : out std_logic;
 			memRead_idex_o       : out std_logic;
@@ -143,6 +145,7 @@ architecture RTL of TOP_Lvl is
 			zero_flag_exmem_i  : in  std_logic;
 			dataAddr_exmem_i   : in  std_logic_vector(4 downto 0);
 			PCSource_exmem_i   : in  std_logic_vector(1 DOWNTO 0);
+			offset_exmem_i 	   : in  std_logic_vector(25 downto 0);
 
 			branch_exmem_i     : in  std_logic; --M
 			memRead_exmem_i    : in  std_logic;
@@ -157,6 +160,7 @@ architecture RTL of TOP_Lvl is
 			zero_flag_exmem_o  : out std_logic;
 			dataAddr_exmem_o   : out std_logic_vector(4 downto 0);
 			PCSource_exmem_o   : out std_logic_vector(1 DOWNTO 0);
+			offset_exmem_o     : out std_logic_vector(25 downto 0);
 
 			branch_exmem_o     : out std_logic;
 			memRead_exmem_o    : out std_logic;
@@ -175,7 +179,6 @@ architecture RTL of TOP_Lvl is
 			PC_memwb_i             : in  std_logic_vector(31 downto 0);
 			ALU_result_memwb_i     : in  std_logic_vector(31 downto 0);
 			dataAddr_memwb_i       : in  std_logic_vector(4 downto 0);
-			PCSource_memwb_i       : in  std_logic_vector(1 DOWNTO 0);
 
 			memToReg_memwb_i       : in  std_logic; --WB
 			regWrite_memwb_i       : in  std_logic;
@@ -184,7 +187,6 @@ architecture RTL of TOP_Lvl is
 			memoryReadData_memwb_o : out std_logic_vector(31 downto 0);
 			ALU_result_memwb_o     : out std_logic_vector(31 downto 0);
 			dataAddr_memwb_o       : out std_logic_vector(4 downto 0);
-			PCSource_memwb_o       : out std_logic_vector(1 DOWNTO 0);
 
 			memToReg_memwb_o       : out std_logic;
 			regWrite_memwb_o       : out std_logic
@@ -292,16 +294,16 @@ architecture RTL of TOP_Lvl is
 	signal branch_exmem_pc : std_logic; -- noch mal sichergehen wie genau (PCSource?)
 	signal B_data_exmem_dm : std_logic_vector(31 downto 0);	
 
-
-
 	--exmem --> memwb
 	signal PC_exmem_memwb         : std_logic_vector(31 downto 0);
-	signal PC_Src_exmem_memwb     : std_logic_vector(1 downto 0);
 	signal memToReg_exmem_memwb   : std_logic;
 	signal regWrite_exmem_memwb   : std_logic;
-
-
-
+	
+	--exmem --> jas
+	signal PCSrc_exmem_jas     : std_logic_vector(1 downto 0);
+	
+	--exmem --> jac 
+	signal offset_exmem_jac 	: std_logic_vector(25 downto 0);
 
 	--exmem --> dataMemory
 	signal memRead_exmem_dm : std_logic;
@@ -322,6 +324,8 @@ architecture RTL of TOP_Lvl is
 	signal memToReg_idex_exmem : std_logic;
 	signal regWrite_idex_exmem : std_logic;
 	signal dataAddr_idex_exmem : std_logic_vector(4 downto 0);
+	signal instruction_25_16_idex_exmem : std_logic_vector(9 downto 0);
+	signal offset_idex_exmem : std_logic_vector(25 downto 0);
 
 	--alu --> exmem
 	signal zero_alu_exmem : std_logic;
@@ -382,10 +386,12 @@ architecture RTL of TOP_Lvl is
 	
 	--memwb --> jumpAddressCompute
 	signal PC_memwb_jac : std_logic_vector(31 downto 0);
-	--memwb --> jumpAddressSelct, ds
-	signal PC_memwb_jas         : std_logic_vector(31 downto 0);
-	signal PCSource_memwb_jas   : std_logic_vector(1 downto 0);
+	
+	--memwb --> jumpAddressSeelct, ds
 	signal ALU_result_memwb_ds  : std_logic_vector(31 downto 0);
+
+	--jumAddressCompute --> jumpAddressSelect
+	signal PC_jac_jas         : std_logic_vector(31 downto 0);
 	
 	--dm --> jumpadressselect? ds, 
 	signal memData_dm_jas : std_logic_vector(31 downto 0); 
@@ -397,7 +403,6 @@ architecture RTL of TOP_Lvl is
 
 	--memwb --> ds		
 	signal memToReg_memwb_ds       : std_logic;
-	signal memoryReadData_memwb_ds : std_logic_vector(31 downto 0);  --temporaer nicht angeschlossen
 
 	--memwb --> rf
 	signal regWrite_memwb_rf : std_logic;
@@ -414,6 +419,8 @@ architecture RTL of TOP_Lvl is
 	--os --> alu
 	signal dataA_os_alu : std_logic_vector(31 downto 0);
 	signal dataB_os_alu : std_logic_vector(31 downto 0);
+	
+	
 
 begin
 	--pc: PCSource unnoetig, da jumpaddressselect?
@@ -422,8 +429,11 @@ begin
 	reset  <= rst_i;
 	enable <= enable_i;
 
+	
+	--nice to have: make it clearer
 	signExtAddr_complete_idex_se <= signExtAddr_idex_se & functioncode_idex_ac;
-
+	offset_idex_exmem <= instruction_25_16_idex_exmem & signExtAddr_complete_idex_se;
+	
 	ds : dataSelect
 	port map(	ALU_result_i => ALU_result_memwb_ds,
 				memoryReadData_i => memData_dm_jas,
@@ -441,10 +451,10 @@ begin
 			     PC_o        => address_pc_ifid);
 
 	jas : jumpAddressSelect
-		port map(PCSource_i          => PCSource_memwb_jas,
-			     ALU_result          => ALU_result_memwb_ds,
-			     ALU_result_modified => ALU_result_memwb_ds,
-			     PC_modified         => PC_memwb_jas,
+		port map(PCSource_i          => PCSrc_exmem_jas,
+			     ALU_result          => ALU_result_exmem_dm,
+			     ALU_result_modified => ALU_result_exmem_dm,
+			     PC_modified         => PC_jac_jas,
 			     jumpAddress_o       => jumpAddress_jas_pc);
 
 	memwb : MEM_WB
@@ -453,22 +463,19 @@ begin
 			enable_i               => enable,
 			PC_memwb_i             => PC_exmem_memwb,
 			ALU_result_memwb_i 	   => ALU_result_exmem_dm,
-			PCSource_memwb_i       => PC_Src_exmem_memwb,
 			dataAddr_memwb_i       => dataAddr_exmem_rds,
 			memToReg_memwb_i       => memToReg_exmem_memwb,
 			regWrite_memwb_i       => regWrite_exmem_memwb,
 			PC_memwb_o             => PC_memwb_jac,
-			memoryReadData_memwb_o => memoryReadData_memwb_ds,
 			ALU_result_memwb_o	   => ALU_result_memwb_ds,
 			dataAddr_memwb_o       => dataAddr_memwb_rf,
-			PCSource_memwb_o       => PCSource_memwb_jas,
 			memToReg_memwb_o       => memToReg_memwb_ds,
 			regWrite_memwb_o       => regWrite_memwb_rf);
 	
 	jac : JumpAddrCompute
-		port map(jumpAddr_i => data_ifid_rf(25 downto 0),
-			     pc_i       => PC_memwb_jac,
-			     pc_o       => PC_memwb_jas);
+		port map(jumpAddr_i => offset_exmem_jac,
+			     pc_i       => PC_exmem_memwb,
+			     pc_o       => PC_jac_jas);
 
 	ifid : IF_ID
 		port map(clk_i         => clock,
@@ -491,6 +498,7 @@ begin
 			     function_code_idex_i => data_ifid_rf(5 downto 0),
 			     signExtAddr_idex_i   => data_ifid_rf(15 downto 6),
 				 op_idex_i			  => data_ifid_rf(31 downto 26),
+				 instruction_25_16_idex_i => data_ifid_rf(25 downto 16),
 			     branch_idex_i        => branch_ctrl_idex,
 			     memRead_idex_i       => memRead_ctrl_idex,
 			     memWrite_idex_i      => memWrite_ctrl_idex,
@@ -505,6 +513,7 @@ begin
 			     function_code_idex_o => functioncode_idex_ac,
 			     signExtAddr_idex_o   => signExtAddr_idex_se,
 				 op_idex_o 			  => op_idex_ac,
+				 instruction_25_16_idex_o => instruction_25_16_idex_exmem,
 			     branch_idex_o        => branch_idex_exmem,
 			     memRead_idex_o       => memRead_idex_exmem,
 			     memWrite_idex_o      => memWrite_idex_exmem,
@@ -552,6 +561,7 @@ begin
 			     enable_i           => enable,
 			     PC_exmem_i         => PC_idex_exmem,
 			     PCSource_exmem_i   => PCSrc_idex_exmem,
+				 offset_exmem_i 	=> offset_idex_exmem,
 			     ALU_result_exmem_i => C_alu_exmem,
 				 B_data_exmem_i		=> dataB_rf_alu,
 			     zero_flag_exmem_i  => zero_alu_exmem,
@@ -566,7 +576,8 @@ begin
 				 B_data_exmem_o		=> B_data_exmem_dm,
 			     zero_flag_exmem_o  => zero_exmem_pc,
 			     dataAddr_exmem_o   => dataAddr_exmem_rds,
-			     PCSource_exmem_o   => PC_Src_exmem_memwb,
+			     PCSource_exmem_o   => PCSrc_exmem_jas,
+				 offset_exmem_o 	=> offset_exmem_jac,
 			     branch_exmem_o     => branch_exmem_pc,
 			     memRead_exmem_o    => memRead_exmem_dm,
 			     memWrite_exmem_o   => memWrite_exmem_dm,
