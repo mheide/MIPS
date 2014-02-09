@@ -10,37 +10,37 @@ package Instructions_pack is
 	--- MIPS registers ---------------------------------
 	----------------------------------------------------
 	constant R0             : std_logic_vector(4 downto 0) := (others => '0');
-	constant Rat            : std_logic_vector(4 downto 0) := '0' & "1"; 
-	constant Rv0            : std_logic_vector(4 downto 0) := '0' & "2"; 
-	constant Rv1            : std_logic_vector(4 downto 0) := '0' & "3"; 
-	constant Ra0            : std_logic_vector(4 downto 0) := '0' & "4";
-	constant Ra1            : std_logic_vector(4 downto 0) := '0' & "5";
-	constant Ra2            : std_logic_vector(4 downto 0) := '0' & "6";
-	constant Ra3            : std_logic_vector(4 downto 0) := '0' & "7";
-	constant Rt0            : std_logic_vector(4 downto 0) := '0' & "8";
-	constant Rt1            : std_logic_vector(4 downto 0) := '0' & "9";
-	constant Rt2            : std_logic_vector(4 downto 0) := '0' & "A";
-	constant Rt3            : std_logic_vector(4 downto 0) := '0' & "B";
-	constant Rt4            : std_logic_vector(4 downto 0) := '0' & "C";
-	constant Rt5            : std_logic_vector(4 downto 0) := '0' & "D";
-	constant Rt6            : std_logic_vector(4 downto 0) := '0' & "E";
-	constant Rt7            : std_logic_vector(4 downto 0) := '0' & "F"; --15
-	constant Rt8            : std_logic_vector(4 downto 0) := '1' & "8"; --24
-	constant Rt9            : std_logic_vector(4 downto 0) := '1' & "9"; --25
-	constant Rs0            : std_logic_vector(4 downto 0) := '1' & "0"; --16
-	constant Rs1            : std_logic_vector(4 downto 0) := '1' & "1"; --17
-	constant Rs2            : std_logic_vector(4 downto 0) := '1' & "2"; --18
-	constant Rs3            : std_logic_vector(4 downto 0) := '1' & "3"; --19
-	constant Rs4            : std_logic_vector(4 downto 0) := '1' & "4"; --20
-	constant Rs5            : std_logic_vector(4 downto 0) := '1' & "5"; --21
-	constant Rs6            : std_logic_vector(4 downto 0) := '1' & "6"; --22
-	constant Rs7            : std_logic_vector(4 downto 0) := '1' & "7"; --23
-	constant Rk0            : std_logic_vector(4 downto 0) := '1' & "A"; --26
-	constant Rk1            : std_logic_vector(4 downto 0) := '1' & "B"; --27
-	constant Rgp            : std_logic_vector(4 downto 0) := '1' & "C"; --28
-	constant Rsp            : std_logic_vector(4 downto 0) := '1' & "D"; --29
-	constant Rfp            : std_logic_vector(4 downto 0) := '1' & "E"; --30
-	constant Rra            : std_logic_vector(4 downto 0) := '1' & "F"; --31
+	constant Rat            : std_logic_vector(4 downto 0) := '0' & x"1";
+	constant Rv0            : std_logic_vector(4 downto 0) := '0' & x"2";
+	constant Rv1            : std_logic_vector(4 downto 0) := '0' & x"3";
+	constant Ra0            : std_logic_vector(4 downto 0) := '0' & x"4";
+	constant Ra1            : std_logic_vector(4 downto 0) := '0' & x"5";
+	constant Ra2            : std_logic_vector(4 downto 0) := '0' & x"6";
+	constant Ra3            : std_logic_vector(4 downto 0) := '0' & x"7";
+	constant Rt0            : std_logic_vector(4 downto 0) := '0' & x"8";
+	constant Rt1            : std_logic_vector(4 downto 0) := '0' & x"9";
+	constant Rt2            : std_logic_vector(4 downto 0) := '0' & x"A";
+	constant Rt3            : std_logic_vector(4 downto 0) := '0' & x"B";
+	constant Rt4            : std_logic_vector(4 downto 0) := '0' & x"C";
+	constant Rt5            : std_logic_vector(4 downto 0) := '0' & x"D";
+	constant Rt6            : std_logic_vector(4 downto 0) := '0' & x"E";
+	constant Rt7            : std_logic_vector(4 downto 0) := '0' & x"F"; --15
+	constant Rt8            : std_logic_vector(4 downto 0) := '1' & x"8"; --24
+	constant Rt9            : std_logic_vector(4 downto 0) := '1' & x"9"; --25
+	constant Rs0            : std_logic_vector(4 downto 0) := '1' & x"0"; --16
+	constant Rs1            : std_logic_vector(4 downto 0) := '1' & x"1"; --17
+	constant Rs2            : std_logic_vector(4 downto 0) := '1' & x"2"; --18
+	constant Rs3            : std_logic_vector(4 downto 0) := '1' & x"3"; --19
+	constant Rs4            : std_logic_vector(4 downto 0) := '1' & x"4"; --20
+	constant Rs5            : std_logic_vector(4 downto 0) := '1' & x"5"; --21
+	constant Rs6            : std_logic_vector(4 downto 0) := '1' & x"6"; --22
+	constant Rs7            : std_logic_vector(4 downto 0) := '1' & x"7"; --23
+	constant Rk0            : std_logic_vector(4 downto 0) := '1' & x"A"; --26
+	constant Rk1            : std_logic_vector(4 downto 0) := '1' & x"B"; --27
+	constant Rgp            : std_logic_vector(4 downto 0) := '1' & x"C"; --28
+	constant Rsp            : std_logic_vector(4 downto 0) := '1' & x"D"; --29
+	constant Rfp            : std_logic_vector(4 downto 0) := '1' & x"E"; --30
+	constant Rra            : std_logic_vector(4 downto 0) := '1' & x"F"; --31
 
 	----------------------------------------------------
 	------- r type constants ---------------------------
@@ -171,13 +171,24 @@ package Instructions_pack is
 		rt     : std_logic_vector(4 downto 0);
 	end record;
 
+	type Branch_Type_2regs_Const is record
+		opcode : std_logic_vector(c_op_bits - 1 downto 0);
+	end record;
+
+	--branch on equal, use 2 registers
+	constant c_beq : Branch_Type_2regs_Const := (opcode => "00" & x"4");
+
+	--branch on not equal, use 2 registers
+	constant c_bne : Branch_Type_2regs_Const := (opcode => "00" & x"5");
+
 	-- branch on greater than equal zero
 	constant c_bgez : Branch_Type_Const := (
 		opcode => "00" & x"1",
 		rt     => "0" & x"1"
 	);
 
-	--branch on greater than equal zero and link
+	--branch on greater than equal zero and link 
+	--(save the address of next instruct. in reg. 31)
 	constant c_bgezal : Branch_Type_Const := (
 		opcode => "00" & x"1",
 		rt     => "1" & x"1"
@@ -196,6 +207,7 @@ package Instructions_pack is
 	);
 
 	--branch on less than zero and link
+	--(save address in reg. 31)
 	constant c_bltzal : Branch_Type_Const := (
 		opcode => "00" & x"1",
 		rt     => "1" & x"0"
@@ -208,7 +220,7 @@ package Instructions_pack is
 	);
 
 	------------------------------------------------------
-	-----i type constants --------------------------------
+	-----i type instructions, load store
 	------------------------------------------------------
 	subtype OP_Type_Const is std_logic_vector(c_op_bits - 1 downto 0);
 
@@ -237,11 +249,57 @@ package Instructions_pack is
 	constant c_lwl   : OP_Type_Const := "10" & x"2";
 	--lw right
 	constant c_lwr   : OP_Type_Const := "10" & x"6";
-	--branching
-	--branch on equal
-	constant c_beq   : OP_Type_Const := "00" & x"4";
-	--branch on not equal
-	constant c_bne   : OP_Type_Const := "00" & x"5";
+	--load linked
+	constant c_ll    : OP_Type_Const := "11" & x"0";
+	--store word (sw)
+	constant c_sw    : OP_Type_Const := "10" & x"B";
+	--store byte
+	constant c_sb    : OP_Type_Const := "10" & x"8";
+	--store halfword
+	constant c_sh    : OP_Type_Const := "10" & x"9";
+	--store word left
+	constant c_swl   : OP_Type_Const := "10" & x"A";
+	--store word right
+	constant c_swr   : OP_Type_Const := "10" & x"E";
+	--store conditional: olways succeeds on SPIM (stores 1 to rt)
+	constant c_sc    : OP_Type_Const := "11" & x"8";
+
+	------------------------------------------------------
+	--Jump Instructions
+	------------------------------------------------------
+	type J_Type_Const is record
+		opcode : std_logic_vector(c_op_bits - 1 downto 0);
+		rt     : std_logic_vector(c_instr_bits - 1 downto 0);
+		funct  : std_logic_vector(c_op_bits - 1 downto 0);
+	end record;
+
+	--jump unconditionally to instruction at target
+	-- PC(31 downto 28) & target(26 downto 0) & "00"
+	constant c_j : OP_Type_Const := "00" & x"2";
+
+	--Jump and link: unconditionally jump to instruction
+	--at target address, save the address of next
+	--instruction in register $ra (register 31)
+	--PC(31 downto 28) & target(26 downto 0) & "00"
+	constant c_jal : OP_Type_Const := "00" & x"3";
+
+	--jump and link register:
+	--unconditionally jump to instruction whose address
+	--is in register rs. Save address of next instruct.
+	--in register rd (default reg $ra)
+	constant c_jalr : J_Type_Const := (
+		opcode => "00" & x"0",
+		rt     => "00000",
+		funct  => "00" & x"9"
+	);
+
+	--jump register:
+	--unconditionally jump to instruction whose address is in register rs
+	constant c_jr : J_Type_Const := (
+		opcode => "000000",
+		rt     => "00000",
+		funct  => "00" & x"8"
+	);
 
 	------------------------------------------------------
 
@@ -268,6 +326,15 @@ package Instructions_pack is
 		opcode  : std_logic_vector(c_op_bits - 1 downto 0);
 		address : std_logic_vector(c_address_bits - 1 downto 0);
 	end record;
+	
+	
+	--alu code definition
+	type alu_code is (	c_alu_add, c_alu_addu, c_alu_sub, c_alu_subu,
+						c_alu_and, c_alu_or, c_alu_nor, c_alu_xor,
+						c_alu_sllv, c_alu_srlv, c_alu_sll, c_alu_srl,
+						c_alu_sra, c_alu_srav, c_alu_zero,
+						c_alu_error --needed?
+						);
 
 end package Instructions_pack;
 
