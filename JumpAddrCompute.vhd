@@ -15,16 +15,10 @@ end entity JumpAddrCompute;
 architecture RTL of JumpAddrCompute is
 	signal pc_high : std_logic_vector(31 downto 0) := (others => '0');
 	signal pc      : std_logic_vector(31 downto 0) := (others => '0');
+
 begin
-	process(clk_i, rst_i)
-	begin
-		if (rst_i = '1') then
-			pc_high <= (others => '0');
-			pc      <= (others => '0');
-		elsif rising_edge(clk_i) then
-			pc_high <= std_logic_vector(unsigned(pc_i) + 4);
-			pc      <= pc_high(31 downto 28) & jumpAddr_i & "00";
-		end if;
-	end process;
+
+	pc_high <= std_logic_vector(unsigned(pc_i) + 4);
+	pc      <= pc_high(31 downto 28) & jumpAddr_i(25 downto 0) & "00";
 	pc_o <= pc;
 end architecture RTL;

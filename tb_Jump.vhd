@@ -19,7 +19,7 @@ architecture testbench of tb_Jump is
 	constant period : time      := 10 ns;
 
 	signal jumpAddr : std_logic_vector(25 downto 0) := (others => '0');
-	signal pc_in    : std_logic_vector(31 downto 0) := (others => '0');
+	signal pc_in    : std_logic_vector(31 downto 0) := x"FFFFFFF0";--(others => '0');
 	signal pc_out   : std_logic_vector(31 downto 0) := (others => '0');
 begin
 	rst <= '1', '0' after 10 ns;
@@ -42,8 +42,7 @@ begin
 	begin
 		if rst = '1' then
 			jumpAddr <= (others => '0');
-			pc_in    <= (others => '0');
-			pc_out   <= (others => '0');
+			pc_in    <= x"1FFFFF00";
 		elsif rising_edge(clk) then
 			jumpAddr <= "00" & x"000010";
 			pc_in    <= std_logic_vector(unsigned(pc_in) + 4);
