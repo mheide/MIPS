@@ -13,7 +13,7 @@ entity pc_counter is
 		PC_o        : out std_logic_vector(31 downto 0)
 	);
 end pc_counter;
-
+--TODO:use ALU for counter
 architecture behavior of pc_counter is
 	signal pc : std_logic_vector(31 downto 0) := (others => '0');
 begin

@@ -50,6 +50,7 @@ begin
 						"10" when op = c_xori else	
 						"10" when op = c_lw else
 						"10" when op = c_sw else
+						"01" when op = c_jal else
 						(others => '0');
 	ALUSrcA_o  <= '1' when op = "000000" else
 						'1' when op = c_addi else
@@ -59,6 +60,7 @@ begin
 						'1' when op = c_xori else						
 						'1' when op = c_lw else
 						'1' when op = c_sw else
+						'0' when op = c_jal else
 						'0';
 	MemWrite_o <= '0' when op = "000000" else 
 						'0' when op = c_addi else
@@ -132,10 +134,15 @@ begin
 						'0' when op = c_addiu else
 						'0' when op = c_andi else
 						'0' when op = c_ori else
-						'0' when op = c_xori else		
+						'0' when op = c_xori else
+						'0' when op = c_jal else 		
 						'1' when op = c_lw else
 						'-' when op = c_sw else
 						'0';
+	PCWrite_o <= '1' when op = c_j else
+		         '1' when op = c_jal else
+		         '0';
+		         
 	branch_o <= '0';
 
 end architecture;
