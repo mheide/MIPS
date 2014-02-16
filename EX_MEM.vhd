@@ -20,6 +20,7 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 
 		memToReg_exmem_i   : in  std_logic; --WB
 		regWrite_exmem_i   : in  std_logic;
+		JorB_exmem_i	   : in  std_logic;
 
 		PC_exmem_o         : out std_logic_vector(31 downto 0);
 		ALU_result_exmem_o : out std_logic_vector(31 downto 0);
@@ -34,7 +35,8 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 		memWrite_exmem_o   : out std_logic;
 
 		memToReg_exmem_o   : out std_logic;
-		regWrite_exmem_o   : out std_logic
+		regWrite_exmem_o   : out std_logic;
+		JorB_exmem_o	   : out std_logic
 	);
 end entity EX_MEM;
 
@@ -49,6 +51,7 @@ architecture behaviour of EX_MEM is
 	signal memWrite   : std_logic;
 	signal memToReg   : std_logic;
 	signal regWrite   : std_logic;
+	signal jorb		  : std_logic;
 	signal pcsource   : std_logic_vector(1 DOWNTO 0);
 	signal offset     : std_logic_vector(25 downto 0);
 
@@ -66,6 +69,7 @@ begin
 			memWrite   <= '0';
 			memToReg   <= '0';
 			regWrite   <= '0';
+			jorb 	   <= '0';
 			pcsource   <= (others => '0');
 			offset     <= (others => '0');
 
@@ -81,6 +85,7 @@ begin
 				memWrite   <= memWrite_exmem_i;
 				memToReg   <= memToReg_exmem_i;
 				regWrite   <= regWrite_exmem_i;
+				jorb 	   <= JorB_exmem_i;
 				pcsource   <= PCSource_exmem_i;
 				offset     <= offset_exmem_i;
 			end if;
@@ -96,6 +101,7 @@ begin
 	memWrite_exmem_o   <= memWrite;
 	memToReg_exmem_o   <= memToReg;
 	regWrite_exmem_o   <= regWrite;
+	JorB_exmem_o 	   <= jorb;
 	dataAddr_exmem_o   <= dataAddr;
 	PCSource_exmem_o   <= pcsource;
 	offset_exmem_o 	   <= offset;

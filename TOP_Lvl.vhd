@@ -67,6 +67,7 @@ architecture RTL of TOP_Lvl is
 			MemWrite_o    : out std_logic;
 			MemToReg_o    : out std_logic;
 			regWrite_o    : out std_logic;
+			JorB_o 		  : out std_logic;
 			ALUOp_o       : out std_logic_vector(1 DOWNTO 0);
 
 			IRWrite_o     : out std_logic;
@@ -112,6 +113,7 @@ architecture RTL of TOP_Lvl is
 
 			memToReg_idex_i      : in  std_logic; --WB
 			regWrite_idex_i      : in  std_logic;
+			JorB_idex_i			 : in  std_logic;
 
 			PCSource_idex_o      : out std_logic_vector(1 DOWNTO 0);
 			PC_idex_o            : out std_logic_vector(31 downto 0);
@@ -130,7 +132,8 @@ architecture RTL of TOP_Lvl is
 			memWrite_idex_o      : out std_logic;
 
 			memToReg_idex_o      : out std_logic; --WB
-			regWrite_idex_o      : out std_logic
+			regWrite_idex_o      : out std_logic;
+			JorB_idex_o			 : out std_logic
 		);
 	end component;
 
@@ -153,6 +156,7 @@ architecture RTL of TOP_Lvl is
 
 			memToReg_exmem_i   : in  std_logic; --WB
 			regWrite_exmem_i   : in  std_logic;
+			JorB_exmem_i	   : in  std_logic;
 
 			PC_exmem_o         : out std_logic_vector(31 downto 0);
 			ALU_result_exmem_o : out std_logic_vector(31 downto 0);
@@ -167,7 +171,8 @@ architecture RTL of TOP_Lvl is
 			memWrite_exmem_o   : out std_logic;
 
 			memToReg_exmem_o   : out std_logic;
-			regWrite_exmem_o   : out std_logic
+			regWrite_exmem_o   : out std_logic;
+			JorB_exmem_o	   : out std_logic
 		);
 	end component;
 
@@ -280,7 +285,8 @@ architecture RTL of TOP_Lvl is
 	end component;
 	
 	component JumpAddrCompute
-		port(jumpAddr_i : in  std_logic_vector(25 downto 0);
+		port(JorB_i	    : in  std_logic;
+			 jumpAddr_i : in  std_logic_vector(25 downto 0);
 			 pc_i       : in  std_logic_vector(31 downto 0);
 			 pc_o       : out std_logic_vector(31 downto 0));
 	end component JumpAddrCompute;
@@ -304,7 +310,8 @@ architecture RTL of TOP_Lvl is
 	
 	--exmem --> jac 
 	signal offset_exmem_jac 	: std_logic_vector(25 downto 0);
-
+	signal JorB_exmem_jac 		: std_logic;
+	
 	--exmem --> dataMemory
 	signal memRead_exmem_dm : std_logic;
 	signal memWrite_exmem_dm : std_logic;
@@ -323,6 +330,7 @@ architecture RTL of TOP_Lvl is
 	signal memWrite_idex_exmem : std_logic;
 	signal memToReg_idex_exmem : std_logic;
 	signal regWrite_idex_exmem : std_logic;
+	signal JorB_idex_exmem	   : std_logic;
 	signal dataAddr_idex_exmem : std_logic_vector(4 downto 0);
 	signal instruction_25_16_idex_exmem : std_logic_vector(9 downto 0);
 	signal offset_idex_exmem : std_logic_vector(25 downto 0);
@@ -365,6 +373,7 @@ architecture RTL of TOP_Lvl is
 	signal memWrite_ctrl_idex : std_logic;
 	signal memToReg_ctrl_idex : std_logic;
 	signal regWrite_ctrl_idex : std_logic;
+	signal JorB_ctrl_idex	  : std_logic;
 	signal ALUop_ctrl_idex    : std_logic_vector(1 downto 0);
 
 	--ctrl --> regDstSelect
@@ -473,7 +482,8 @@ begin
 			regWrite_memwb_o       => regWrite_memwb_rf);
 	
 	jac : JumpAddrCompute
-		port map(jumpAddr_i => offset_exmem_jac,
+		port map(JorB_i		=> JorB_exmem_jac,
+				 jumpAddr_i => offset_exmem_jac,
 			     pc_i       => PC_exmem_memwb,
 			     pc_o       => PC_jac_jas);
 
@@ -504,6 +514,7 @@ begin
 			     memWrite_idex_i      => memWrite_ctrl_idex,
 			     memToReg_idex_i      => memToReg_ctrl_idex,
 			     regWrite_idex_i      => regWrite_ctrl_idex,
+				 JorB_idex_i		  => JorB_ctrl_idex,
 			     PCSource_idex_o      => PCSrc_idex_exmem,
 			     PC_Idex_o            => PC_idex_exmem,
 			     dataAddr_idex_o      => dataAddr_idex_exmem,
@@ -518,7 +529,8 @@ begin
 			     memRead_idex_o       => memRead_idex_exmem,
 			     memWrite_idex_o      => memWrite_idex_exmem,
 			     memToReg_idex_o      => memToReg_idex_exmem,
-			     regWrite_idex_o      => regWrite_idex_exmem);
+			     regWrite_idex_o      => regWrite_idex_exmem,
+				 JorB_idex_o		  => JorB_idex_exmem);
 
 	rds : regDstSelect
 		port map(regDst_i            => regDst_ctrl_rds,
@@ -537,6 +549,7 @@ begin
 			     MemWrite_o    => memWrite_ctrl_idex,
 			     MemToReg_o    => memToReg_ctrl_idex,
 			     regWrite_o    => regWrite_ctrl_idex,
+				 JorB_o		   => JorB_ctrl_idex,
 			     ALUOp_o       => ALUop_ctrl_idex,
 			     IRWrite_o     => IRWrite_ctrl_ir,
 			     PCSource_o    => PCSource_ctrl_idex,
@@ -571,6 +584,7 @@ begin
 			     memWrite_exmem_i   => memWrite_idex_exmem,
 			     memToReg_exmem_i   => memToReg_idex_exmem,
 			     regWrite_exmem_i   => regWrite_idex_exmem,
+				 JorB_exmem_i		=> JorB_idex_exmem,
 			     PC_exmem_o         => PC_exmem_memwb,
 			     ALU_result_exmem_o => ALU_result_exmem_dm,
 				 B_data_exmem_o		=> B_data_exmem_dm,
@@ -582,7 +596,8 @@ begin
 			     memRead_exmem_o    => memRead_exmem_dm,
 			     memWrite_exmem_o   => memWrite_exmem_dm,
 			     memToReg_exmem_o   => memToReg_exmem_memwb,
-			     regWrite_exmem_o   => regWrite_exmem_memwb);
+			     regWrite_exmem_o   => regWrite_exmem_memwb,
+				 JorB_exmem_o		=> JorB_exmem_jac);
 
 	ac : ALU_Control
 		port map(rst_i          => reset,

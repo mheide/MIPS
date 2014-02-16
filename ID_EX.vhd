@@ -25,6 +25,7 @@ entity ID_EX is                         --first pipeline stage with instruction_
 
 		memToReg_idex_i      : in  std_logic; --WB
 		regWrite_idex_i      : in  std_logic;
+		JorB_idex_i			 : in  std_logic;
 
 		PCSource_idex_o      : out std_logic_vector(1 DOWNTO 0);
 		PC_idex_o            : out std_logic_vector(31 downto 0);
@@ -43,7 +44,8 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		memWrite_idex_o      : out std_logic;
 
 		memToReg_idex_o      : out std_logic; --WB
-		regWrite_idex_o      : out std_logic
+		regWrite_idex_o      : out std_logic;
+		JorB_idex_o			 : out std_logic
 	);
 end entity ID_EX;
 
@@ -65,6 +67,7 @@ architecture behaviour of ID_EX is
 	signal memWrite : std_logic;
 	signal memToReg : std_logic;
 	signal regWrite : std_logic;
+	signal jorb 	: std_logic;
 
 begin
 	ID_EX_reg : process(clk_i, rst_i, enable_i) is
@@ -86,6 +89,7 @@ begin
 			memWrite <= '0';
 			memToReg <= '0';
 			regWrite <= '0';
+			jorb	 <= '0';
 
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
@@ -105,6 +109,7 @@ begin
 				memWrite <= memWrite_idex_i;
 				memToReg <= memToReg_idex_i;
 				regWrite <= regWrite_idex_i;
+				jorb 	 <= JorB_idex_i;
 
 			end if;
 		end if;
@@ -127,5 +132,6 @@ begin
 	memWrite_idex_o <= memWrite;
 	memToReg_idex_o <= memToReg;
 	regWrite_idex_o <= regWrite;
+	JorB_idex_o		<= jorb;
 
 end architecture;
