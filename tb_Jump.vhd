@@ -8,8 +8,6 @@ end entity tb_Jump;
 architecture testbench of tb_Jump is
 	component JumpAddrCompute
 		port(
-			clk_i      : in  std_logic;
-			rst_i      : in  std_logic;
 			jumpAddr_i : in  std_logic_vector(25 downto 0);
 			pc_i       : in  std_logic_vector(31 downto 0);
 			pc_o       : out std_logic_vector(31 downto 0));
@@ -24,8 +22,7 @@ architecture testbench of tb_Jump is
 begin
 	rst <= '1', '0' after 10 ns;
 	dut : JumpAddrCompute
-		port map(clk_i      => clk,
-			     rst_i      => rst,
+		port map(
 			     jumpAddr_i => jumpAddr,
 			     pc_i       => pc_in,
 			     pc_o       => pc_out);

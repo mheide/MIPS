@@ -41,6 +41,7 @@ begin
 						"10" when op = c_xori else
 						"00" when op = c_lw else
 						"00" when op = c_sw else
+						"00" when op = c_jal else
 						(others => '0');
 	ALUSrcB_o  <= "00" when op = "000000" else 
 						"10" when op = c_addi else
@@ -80,7 +81,7 @@ begin
 						'1' when op = c_lw else
 						'0' when op = c_sw else
 						'0';
-	--TODO: some PCSource_o values not sane
+
 	PCSource_o <=       "01" when op = c_beq.opcode  else
 	                    "01" when op = c_bgez.opcode else
 	                    "01" when op = c_bgezal.opcode else

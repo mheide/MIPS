@@ -4,8 +4,6 @@ use ieee.numeric_std.all;
 
 entity JumpAddrCompute is
 	port(
-		clk_i      : in  std_logic;
-		rst_i      : in  std_logic;
 		jumpAddr_i : in  std_logic_vector(25 downto 0);
 		pc_i       : in  std_logic_vector(31 downto 0);
 		pc_o       : out std_logic_vector(31 downto 0)
