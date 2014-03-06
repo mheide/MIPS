@@ -207,15 +207,19 @@ architecture RTL of TOP_Lvl is
 
 	component pc_counter is
 		port(
-			clk_i       : in  std_logic;
-			rst_i       : in  std_logic;
-			enable_i    : in  std_logic;
-			PCSrc_i     : in  std_logic_vector(1 DOWNTO 0);
-			jump_flag_i : in  std_logic;
-			jump_addr_i : in  std_logic_vector(31 downto 0); --null in this implementation
-			PC_o        : out std_logic_vector(31 downto 0)
+		clk_i       : in  std_logic;
+		rst_i       : in  std_logic;
+		PC_i     : in  std_logic_vector(1 DOWNTO 0);
+		PC_o        : out std_logic_vector(31 downto 0)
 		);
 	end component;
+	
+	component PCSourceMUX
+		port(pcSource_i : in  std_logic;
+			 PC_i       : in  std_logic_vector(31 downto 0);
+			 PC_jump_i  : in  std_logic_vector(31 downto 0);
+			 PC_o       : out std_logic_vector(31 downto 0));
+	end component PCSourceMUX;
 
 	component jumpAddressSelect is
 		port(
@@ -407,8 +411,15 @@ architecture RTL of TOP_Lvl is
 	--memwb --> rf
 	signal regWrite_memwb_rf : std_logic;
 
+	--obsolete!!!
 	--jas --> PC
-	signal jumpAddress_jas_pc : std_logic_vector(31 downto 0);
+	--signal jumpAddress_jas_pc : std_logic_vector(31 downto 0);
+	
+	--jas --> PCSrcMUX
+	signal jumpAddress_jas_pcsrcmux : std_logic_vector(31 downto 0);
+	
+	--pcsrcmux --> imem
+	signal jumpAddress_pcsrcmux_imem : std_logic_vector(31 downto 0);
 
 	--ds --> rf
 	signal data_ds_rf : std_logic_vector(31 downto 0);
@@ -442,20 +453,24 @@ begin
 				);	
 
 	pc : pc_counter
-		port map(clk_i       => clock,
-			     rst_i       => reset,
-			     enable_i    => enable,
-			     PCSrc_i     => "00",
-			     jump_flag_i => '0',
-			     jump_addr_i => jumpAddress_jas_pc,
-			     PC_o        => address_pc_ifid);
+		port map(clk_i => clock,
+			     rst_i => reset,
+			     PC_i  => jumpAddress_jas_pcsrcmux,
+			     PC_o  => address_pc_ifid);
+			     
+	PCSrcMUX : PCSourceMUX port map(
+		pcSource_i => jumpAddress_jas_pcsrcmux,
+		PC_i       => address_pc_ifid,
+		PC_jump_i  => jumpAddress_jas_pcsrcmux,
+		PC_o       => jumpAddress_pcsrcmux_imem
+	);
 
 	jas : jumpAddressSelect
 		port map(PCSource_i          => PCSrc_exmem_jas,
 			     ALU_result          => ALU_result_exmem_dm,
 			     ALU_result_modified => ALU_result_exmem_dm,
 			     PC_modified         => PC_jac_jas,
-			     jumpAddress_o       => jumpAddress_jas_pc);
+			     jumpAddress_o       => jumpAddress_jas_pcsrcmux);
 
 	memwb : MEM_WB
 	port map(clk_i                             => clock,
