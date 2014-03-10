@@ -17,7 +17,7 @@ entity Control is
 		MemWrite_o    : out std_logic;
 		MemToReg_o    : out std_logic;
 		regWrite_o    : out std_logic;
-		JorB_o		  : out std_logic;
+		branchCond_o  : out branch_condition;
 		ALUOp_o       : out std_logic_vector(1 DOWNTO 0);
 
 		IRWrite_o     : out std_logic;
@@ -137,11 +137,10 @@ begin
 						'1' when op = c_lw else
 						'-' when op = c_sw else
 						'0';
-	JorB_o <= '0' 	when op = c_beq.opcode else --right know not needed, 
-						'0' when op = c_bgtz.opcode else
-						'0' when op = c_blez.opcode else
-						'0' when op = c_bne.opcode else
-						'1';
+	branchCond_o <= bc_beq 	when op = c_beq.opcode else --right know not needed, 
+						bc_bgtz when op = c_bgtz.opcode else
+						bc_blez when op = c_blez.opcode else
+						bc_bne; --when op is not branch, then dont care 
 						
 	branch_o <= '1'when op = c_beq.opcode else  --when branch 1 when jump 0
 						'1' when op = c_bgtz.opcode else
