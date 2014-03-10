@@ -30,11 +30,15 @@ begin
 	alu_code_10 <= 	rtype_alu_code when op_i = "000000" else		--itype or rtype
 					itype_alu_code;	
 				
-	itype_alu_code <= 	c_alu_add  when op_i = c_addi else		--determinaton itype
+	itype_alu_code <= 	c_alu_add  when op_i = c_addi else		--determinaton itype and branch
 						c_alu_addu when op_i = c_addiu else
 						c_alu_and  when op_i = c_andi  else
 						c_alu_or   when op_i = c_ori  else
 						c_alu_xor  when op_i = c_xori else
+						c_alu_sub  when op_i = c_beq.opcode else
+						c_alu_sub  when op_i = c_bgtz.opcode else
+						c_alu_sub  when op_i = c_blez.opcode else
+						c_alu_sub  when op_i = c_bne.opcode else						
 						c_alu_zero;		--don't care
 
 	--with functioncode_i select rtype_alu_code <=
@@ -61,6 +65,6 @@ begin
 					  c_alu_sll  when functioncode_i = c_sll.funct  else
 					  c_alu_srl  when functioncode_i = c_srl.funct  else
 					  c_alu_sra  when functioncode_i = c_sra.funct  else
-					  c_alu_srav when functioncode_i = c_srav.funct else					  
+					  c_alu_srav when functioncode_i = c_srav.funct else	
 		              c_alu_error;
 end architecture RTL;
