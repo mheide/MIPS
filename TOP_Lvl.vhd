@@ -288,7 +288,7 @@ architecture RTL of TOP_Lvl is
 	end component;
 	
 	component JumpAddrCompute
-		port(JorB_i	    : in  std_logic;
+		port(branch_i   : in  std_logic;
 			 jumpAddr_i : in  std_logic_vector(25 downto 0);
 			 pc_i       : in  std_logic_vector(31 downto 0);
 			 pc_o       : out std_logic_vector(31 downto 0));
@@ -487,7 +487,7 @@ begin
 			regWrite_memwb_o       => regWrite_memwb_rf);
 	
 	jac : JumpAddrCompute
-		port map(JorB_i		=> JorB_exmem_jac,
+		port map(branch_i	=> branch_exmem_pc,
 				 jumpAddr_i => offset_exmem_jac,
 			     pc_i       => PC_exmem_memwb,
 			     pc_o       => PC_jac_jas);

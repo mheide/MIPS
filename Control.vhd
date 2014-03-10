@@ -137,12 +137,16 @@ begin
 						'1' when op = c_lw else
 						'-' when op = c_sw else
 						'0';
-	JorB_o <= '0' 	when op = c_beq.opcode else
+	JorB_o <= '0' 	when op = c_beq.opcode else --right know not needed, 
 						'0' when op = c_bgtz.opcode else
 						'0' when op = c_blez.opcode else
 						'0' when op = c_bne.opcode else
 						'1';
 						
-	branch_o <= '0';
+	branch_o <= '1'when op = c_beq.opcode else  --when branch 1 when jump 0
+						'1' when op = c_bgtz.opcode else
+						'1' when op = c_blez.opcode else
+						'1' when op = c_bne.opcode else
+						'0';
 
 end architecture;
