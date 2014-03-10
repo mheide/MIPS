@@ -21,6 +21,7 @@ architecture RTL of TOP_Lvl is
 			shamt_i	   : in  std_logic_vector(4 downto 0);
 			
 			C_o        : out std_logic_vector(31 downto 0);
+			negative_o : out std_logic;
 			zero_o     : out std_logic
 		);
 	end component ALU;
@@ -145,6 +146,7 @@ architecture RTL of TOP_Lvl is
 			PC_exmem_i         : in  std_logic_vector(31 downto 0);
 			ALU_result_exmem_i : in  std_logic_vector(31 downto 0);
 			B_data_exmem_i	   : in  std_logic_vector(31 downto 0);
+			neg_flag_exmem_i   : in  std_logic;
 			zero_flag_exmem_i  : in  std_logic;
 			dataAddr_exmem_i   : in  std_logic_vector(4 downto 0);
 			PCSource_exmem_i   : in  std_logic_vector(1 DOWNTO 0);
@@ -160,7 +162,8 @@ architecture RTL of TOP_Lvl is
 
 			PC_exmem_o         : out std_logic_vector(31 downto 0);
 			ALU_result_exmem_o : out std_logic_vector(31 downto 0);
-			B_data_exmem_o	   : out std_logic_vector(31 downto 0);		
+			B_data_exmem_o	   : out std_logic_vector(31 downto 0);	
+			neg_flag_exmem_o   : out std_logic;
 			zero_flag_exmem_o  : out std_logic;
 			dataAddr_exmem_o   : out std_logic_vector(4 downto 0);
 			PCSource_exmem_o   : out std_logic_vector(1 DOWNTO 0);
@@ -296,7 +299,8 @@ architecture RTL of TOP_Lvl is
 	signal enable : std_logic;
 
 	--exmem --> pc --beide nicht angekommen
-	signal zero_exmem_pc   : std_logic;
+	signal neg_exmem_pc    : std_logic;	--fuer branch
+	signal zero_exmem_pc   : std_logic;	--fuer branch
 	signal branch_exmem_pc : std_logic; -- noch mal sichergehen wie genau (PCSource?)
 	signal B_data_exmem_dm : std_logic_vector(31 downto 0);	
 
@@ -336,6 +340,7 @@ architecture RTL of TOP_Lvl is
 	signal offset_idex_exmem : std_logic_vector(25 downto 0);
 
 	--alu --> exmem
+	signal neg_alu_exmem : std_logic;
 	signal zero_alu_exmem : std_logic;
 	signal C_alu_exmem    : std_logic_vector(31 downto 0);
 
@@ -577,6 +582,7 @@ begin
 				 offset_exmem_i 	=> offset_idex_exmem,
 			     ALU_result_exmem_i => C_alu_exmem,
 				 B_data_exmem_i		=> dataB_rf_alu,
+				 neg_flag_exmem_i	=> neg_alu_exmem,
 			     zero_flag_exmem_i  => zero_alu_exmem,
 			     dataAddr_exmem_i   => dataAddr_idex_exmem,
 			     branch_exmem_i     => branch_idex_exmem,
@@ -588,6 +594,7 @@ begin
 			     PC_exmem_o         => PC_exmem_memwb,
 			     ALU_result_exmem_o => ALU_result_exmem_dm,
 				 B_data_exmem_o		=> B_data_exmem_dm,
+				 neg_flag_exmem_o   => neg_exmem_pc,
 			     zero_flag_exmem_o  => zero_exmem_pc,
 			     dataAddr_exmem_o   => dataAddr_exmem_rds,
 			     PCSource_exmem_o   => PCSrc_exmem_jas,
@@ -614,6 +621,7 @@ begin
 			     ALU_ctrl_i => alu_code_ac_alu,
 				 shamt_i 	=> signExtAddr_idex_se(4 downto 0),
 			     C_o        => C_alu_exmem,
+				 negative_o => neg_alu_exmem,
 			     zero_o     => zero_alu_exmem);
 
 	se : signExtend

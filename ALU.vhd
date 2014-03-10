@@ -12,6 +12,7 @@ entity ALU is
 		ALU_ctrl_i : in  alu_code;
 		shamt_i	   : in  std_logic_vector(4 downto 0);  	--needed for bitshifts
 		C_o        : out std_logic_vector(31 downto 0);
+		negative_o : out std_logic;
 		zero_o     : out std_logic
 	);
 end entity ALU;
@@ -26,6 +27,7 @@ architecture Behavioral of ALU is
 begin
 	zero_o <= '1' when C_temp = c_alu_zero else '0';
 	C_o    <= C_temp;
+	negative_o <= C_temp(31);
 
 	ALU : process(rst_i, ALU_ctrl_i, A_i, B_i) is
 	begin
