@@ -294,6 +294,17 @@ architecture RTL of TOP_Lvl is
 			 pc_o       : out std_logic_vector(31 downto 0));
 	end component JumpAddrCompute;
 	
+	component branchCondCheck is 
+		port(
+			branch_i 		: in std_logic;
+			branchCond_i	: in branch_condition;
+			zero_i			: in std_logic;
+			negative_i	 	: in std_logic;
+			
+			jump_flag_o		: out std_logic
+		);
+	end component;	
+	
 	signal reset : std_logic;
 	signal clock : std_logic;
 	signal enable : std_logic;
@@ -314,7 +325,7 @@ architecture RTL of TOP_Lvl is
 	
 	--exmem --> jac 
 	signal offset_exmem_jac 	: std_logic_vector(25 downto 0);
-	signal branchCond_exmem_bcs : branch_condition;
+	signal branchCond_exmem_bcc : branch_condition;
 	
 	--exmem --> dataMemory
 	signal memRead_exmem_dm : std_logic;
@@ -434,6 +445,9 @@ architecture RTL of TOP_Lvl is
 	signal dataA_os_alu : std_logic_vector(31 downto 0);
 	signal dataB_os_alu : std_logic_vector(31 downto 0);
 	
+	--bcc --> pc
+	signal jump_flag_bcc_pc : std_logic;
+	
 	
 
 begin
@@ -460,7 +474,7 @@ begin
 			     rst_i       => reset,
 			     enable_i    => enable,
 			     PCSrc_i     => "00",
-			     jump_flag_i => '0',
+			     jump_flag_i => jump_flag_bcc_pc,
 			     jump_addr_i => jumpAddress_jas_pc,
 			     PC_o        => address_pc_ifid);
 
@@ -491,7 +505,15 @@ begin
 				 jumpAddr_i => offset_exmem_jac,
 			     pc_i       => PC_exmem_memwb,
 			     pc_o       => PC_jac_jas);
-
+	
+	bcc : branchCondCheck
+	port map(branch_i 		=> branch_exmem_pc,
+			branchCond_i 	=> branchCond_exmem_bcc,
+			zero_i 			=> zero_exmem_pc,
+			negative_i 		=> neg_exmem_pc,
+			jump_flag_o		=> jump_flag_bcc_pc);
+			
+				 
 	ifid : IF_ID
 		port map(clk_i         => clock,
 			     rst_i         => reset,
@@ -604,7 +626,7 @@ begin
 			     memWrite_exmem_o   => memWrite_exmem_dm,
 			     memToReg_exmem_o   => memToReg_exmem_memwb,
 			     regWrite_exmem_o   => regWrite_exmem_memwb,
-				 branchCond_exmem_o	=> branchCond_exmem_bcs);
+				 branchCond_exmem_o	=> branchCond_exmem_bcc);
 
 	ac : ALU_Control
 		port map(rst_i          => reset,
@@ -646,6 +668,7 @@ begin
 				memWrite_i	=> memWrite_exmem_dm,
 				memRead_i	=> memRead_exmem_dm,
 				readData_o  => memData_dm_jas);
+	
 	
 
 end architecture RTL;
