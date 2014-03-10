@@ -20,7 +20,7 @@ architecture RTL of ALU_Control is
 	
 	signal rtype_alu_code : alu_code;
 	signal itype_alu_code : alu_code;
-	signal alu_code_10    : alu_code;	
+	signal alu_code_10    : alu_code;
 
 begin
 	alu_code_o <= alu_code_10 when ALU_Op_i(1) = '1' else
@@ -35,6 +35,8 @@ begin
 						c_alu_and  when op_i = c_andi  else
 						c_alu_or   when op_i = c_ori  else
 						c_alu_xor  when op_i = c_xori else
+						--jump and link
+						c_alu_jal  when op_i = c_jal  else
 						c_alu_zero;		--don't care
 
 	--with functioncode_i select rtype_alu_code <=
@@ -61,6 +63,9 @@ begin
 					  c_alu_sll  when functioncode_i = c_sll.funct  else
 					  c_alu_srl  when functioncode_i = c_srl.funct  else
 					  c_alu_sra  when functioncode_i = c_sra.funct  else
-					  c_alu_srav when functioncode_i = c_srav.funct else					  
+					  c_alu_srav when functioncode_i = c_srav.funct else
+					  --jump instructions
+					  c_alu_jalr when functioncode_i = c_jalr.funct else
+					  c_alu_jr   when functioncode_i = c_jr.funct   else					  
 		              c_alu_error;
 end architecture RTL;

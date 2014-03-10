@@ -8,11 +8,9 @@ entity Control is
 		op_i          : in  std_logic_vector(5 DOWNTO 0);
 
 		PCWriteCond_o : out std_logic;
-		PCWrite_o     : out std_logic;
-		IorD_o        : out std_logic;
+		--IorD_o not needed any more (Chap. 6, Page. 404)
 
-       --PCSource replace jump and branch in multicycle implementation (Page 324)
-		branch_o      : out std_logic;	
+       --PCSource replace jump and branch (pipelined implementation, Chapter 6, Page 404)	
 		MemRead_o     : out std_logic;
 		MemWrite_o    : out std_logic;
 		MemToReg_o    : out std_logic;
@@ -21,10 +19,10 @@ entity Control is
 
 		IRWrite_o     : out std_logic;
 
-		PCSource_o    : out std_logic_vector(1 DOWNTO 0);
+		PCSource_o    : out std_logic;
 		ALUSrcB_o     : out std_logic_vector(1 DOWNTO 0);
 		ALUSrcA_o     : out std_logic;
-		RegDst_o      : out std_logic
+		RegDst_o      : out std_logic_vector(1 downto 0)
 	);
 end entity Control;
 
@@ -52,6 +50,7 @@ begin
 						"10" when op = c_lw else
 						"10" when op = c_sw else
 						"01" when op = c_jal else
+						"01" when op = c_jalr else
 						(others => '0');
 	ALUSrcA_o  <= '1' when op = "000000" else
 						'1' when op = c_addi else
@@ -62,6 +61,7 @@ begin
 						'1' when op = c_lw else
 						'1' when op = c_sw else
 						'0' when op = c_jal else
+						'0' when op = c_jalr else
 						'0';
 	MemWrite_o <= '0' when op = "000000" else 
 						'0' when op = c_addi else
@@ -109,18 +109,21 @@ begin
 						"01" when op = c_sh else
 						"01" when op = c_swl else
 						"01" when op = c_swr else
-						"10" when op = c_j else --jump
-						"10" when op = c_jal else --jump and link
+						"11" when op = c_j else --jump
+						"11" when op = c_jal else --jump and link
+						"10" when op = c_jalr.opcode else --jump and link register op="00000"
+						"11" when op = c_jr.opcode else --jump register
 						(others => '0');
-	RegDst_o   <= '1' when op = "000000" else 
-						'0' when op = c_addi else
-						'0' when op = c_addiu else
-						'0' when op = c_andi else
-						'0' when op = c_ori else
-						'0' when op = c_xori else	
-						'0' when op = c_lw else
-						'-' when op = c_sw else
-						'0';
+	RegDst_o   <= "11" when op = "000000" else 
+						"10" when op = c_addi else
+						"10" when op = c_addiu else
+						"10" when op = c_andi else
+						"10" when op = c_ori else
+						"10" when op = c_xori else	
+						"10" when op = c_lw else
+						"00" when op = c_sw else
+						"00" when op = c_jal else
+						"00";
 	regWrite_o <= '1' when op = "000000" else 
 						'1' when op = c_addi else
 						'1' when op = c_addiu else
@@ -128,7 +131,10 @@ begin
 						'1' when op = c_ori else
 						'1' when op = c_xori else		
 						'1' when op = c_lw else
+						'1' when op = c_jal else
 						'0' when op = c_sw else
+						'0' when op = c_j  else
+						'0' when op = c_jr else
 						'0';
 	MemToReg_o <= '0' when op = "000000" else
 						'0' when op = c_addi else
@@ -136,14 +142,10 @@ begin
 						'0' when op = c_andi else
 						'0' when op = c_ori else
 						'0' when op = c_xori else
-						'0' when op = c_jal else 		
+						'0' when op = c_jal else	
 						'1' when op = c_lw else
 						'-' when op = c_sw else
 						'0';
-	PCWrite_o <= '1' when op = c_j else
-		         '1' when op = c_jal else
-		         '0';
-		         
-	branch_o <= '0';
+	--PCWrite not needed any more (Chap. 6, P. 404)
 
 end architecture;
