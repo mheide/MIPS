@@ -54,21 +54,25 @@ architecture RTL of TOP_Lvl is
 
 	component Control
 		port(
-			clk_i      : in  std_logic;
-			rst_i      : in  std_logic;
-			op_i       : in  std_logic_vector(5 DOWNTO 0);
-
-			MemRead_o  : out std_logic;
-			MemWrite_o : out std_logic;
-			MemToReg_o : out std_logic;
-			regWrite_o : out std_logic;
-			ALUOp_o    : out std_logic_vector(1 DOWNTO 0);
-
-			PCSource_o : out std_logic_vector(1 downto 0);
-			ALUSrcB_o  : out std_logic_vector(1 DOWNTO 0);
-			ALUSrcA_o  : out std_logic;
-			RegDst_o   : out std_logic_vector(1 downto 0);
-			enable_o   : out std_logic
+			clk_i         : in  std_logic;
+			rst_i         : in  std_logic;
+			op_i          : in  std_logic_vector(5 DOWNTO 0);
+			PCWriteCond_o : out std_logic;
+			PCWrite_o     : out std_logic;
+			IorD_o        : out std_logic;
+			branch_o      : out std_logic;
+			MemRead_o     : out std_logic;
+			MemWrite_o    : out std_logic;
+			MemToReg_o    : out std_logic;
+			regWrite_o    : out std_logic;
+			JorB_o        : out std_logic;
+			ALUOp_o       : out std_logic_vector(1 DOWNTO 0);
+			IRWrite_o     : out std_logic;
+			PCSource_o    : out std_logic_vector(1 downto 0);
+			ALUSrcB_o     : out std_logic_vector(1 DOWNTO 0);
+			ALUSrcA_o     : out std_logic;
+			RegDst_o      : out std_logic_vector(1 downto 0);
+			enable_o      : out std_logic
 		);
 	end component;
 
@@ -563,11 +567,17 @@ begin
 		port map(clk_i      => clock,
 			     rst_i      => reset,
 			     op_i       => data_ifid_rf(31 downto 26),
+			     PCWriteCond_o => open,
+			     PCWrite_o => open,
+			     IorD_o    => open,
+			     branch_o  => open,
 			     MemRead_o  => memRead_ctrl_idex,
 			     MemWrite_o => memWrite_ctrl_idex,
 			     MemToReg_o => memToReg_ctrl_idex,
 			     regWrite_o => regWrite_ctrl_idex,
+			     JorB_o     => open,
 			     ALUOp_o    => ALUop_ctrl_idex,
+			     IRWrite_o  => open,
 			     PCSource_o => PCSource_ctrl_idex,
 			     ALUSrcB_o  => ALUSrcB_ctrl_idex,
 			     ALUSrcA_o  => ALUSrcA_ctrl_idex,

@@ -9,15 +9,19 @@ entity Control is
 		rst_i         : in  std_logic;
 		op_i          : in  std_logic_vector(5 DOWNTO 0);
 
-		--PCWriteCond_o : out std_logic;
-		--IorD_o not needed any more (Chap. 6, Page. 404)
+		PCWriteCond_o : out std_logic;
+		PCWrite_o     : out std_logic;
+		IorD_o        : out std_logic;
 
-       --PCSource replace jump and branch (pipelined implementation, Chapter 6, Page 404)	
+		branch_o      : out std_logic;
 		MemRead_o     : out std_logic;
 		MemWrite_o    : out std_logic;
 		MemToReg_o    : out std_logic;
 		regWrite_o    : out std_logic;
+		JorB_o		  : out std_logic;
 		ALUOp_o       : out std_logic_vector(1 DOWNTO 0);
+
+		IRWrite_o     : out std_logic;
 
 		PCSource_o    : out std_logic_vector(1 downto 0);
 		ALUSrcB_o     : out std_logic_vector(1 DOWNTO 0);
@@ -114,10 +118,10 @@ begin
 						"01" when op = c_sh else
 						"01" when op = c_swl else
 						"01" when op = c_swr else
-						"11" when op = c_j else --jump
-						"11" when op = c_jal else --jump and link
-						--"10" when op = c_jalr.opcode else --jump and link register op="00000"
-						--"11" when op = c_jr.opcode else --jump register
+						"10" when op = c_j else --jump
+						"10" when op = c_jal else --jump and link
+						"11" when op = c_jalr.opcode else --jump and link register op="00000"
+						"11" when op = c_jr.opcode else --jump register
 						(others => '0');
 	RegDst_o   <= "11" when op = "000000" else 
 						"10" when op = c_addi else
@@ -128,7 +132,7 @@ begin
 						"10" when op = c_lw else
 						"00" when op = c_sw else
 						"00" when op = c_jal else
-						"00";
+						"--";
 	regWrite_o <= '1' when op = "000000" else 
 						'1' when op = c_addi else
 						'1' when op = c_addiu else
@@ -139,7 +143,6 @@ begin
 						'1' when op = c_jal else
 						'0' when op = c_sw else
 						'0' when op = c_j  else
-						'0' when op = c_jr.opcode else
 						'0';
 	MemToReg_o <= '0' when op = "000000" else
 						'0' when op = c_addi else
@@ -151,6 +154,13 @@ begin
 						'1' when op = c_lw else
 						'-' when op = c_sw else
 						'0';
+	JorB_o <= '0' 	when op = c_beq.opcode else
+						'0' when op = c_bgtz.opcode else
+						'0' when op = c_blez.opcode else
+						'0' when op = c_bne.opcode else
+						'1';
+						
+	branch_o <= '0';
 	stall <= '1' when op = c_j else
 	         '1' when op = c_jal else
 	         --'1' when op = c_jalr.opcode else

@@ -20,11 +20,11 @@ architecture Behavioral of ALU is
 
 	constant c_alu_error : std_logic_vector(31 downto 0) := (others => 'X');
 	constant c_alu_zero  : std_logic_vector(31 downto 0) := (others => '0');
+	
 	signal C_temp : std_logic_vector(31 downto 0);
 
 begin
 	--zero_o <= '1' when C_temp = c_alu_zero else '0';
-
 	C_o    <= C_temp;
 
 	ALU : process(rst_i, ALU_ctrl_i, A_i, B_i) is

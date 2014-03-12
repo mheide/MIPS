@@ -17,29 +17,31 @@ end entity Instruction_Memory;
 
 architecture behaviour of Instruction_Memory is
 	constant size2 : integer := size * 4;
-	constant jump : J_Type := (opcode => c_j, address => "00" & x"000040"); --jump to pc==64 (add normal)
-	type memRegType is array (0 to 83) of std_logic_vector(7 downto 0);
+	constant jump2 : J_Type := (opcode => c_j, address => "00" & x"000006"); --jump to pc = 24
+	constant jump : J_Type := (opcode => c_j, address => "00" & x"000001"); --jump to pc==4 (add normal)
+	constant jal : J_Type := (opcode => c_jal, address => "00" & x"000014"); --jump to pc80 and link to $ra
+	type memRegType is array (0 to 99) of std_logic_vector(7 downto 0);
 	signal memReg : memRegType := (
 		
-		"00000000",	"00000000",	"00000000",	"00100000",	--nop pc=0
+		"00000000",	"00000000",	"00000000",	"00000000",	--nop pc=0
 		
-		"00100000", "00100010", "00000000", "00001111", --addi pc=4
+		jump2.opcode & jump2.address(25 downto 24), jump2.address(23 downto 16), jump2.address(15 downto 8), jump2.address(7 downto 0), --jump to pc64, pc=4
 		
-		"00110000", "10000011", "11111111", "11111000",	--andi pc=8
+		x"00", x"00", x"00", x"00",	--nop pc=8
 		
-		"00110100", "10100100", "01010101", "10101010", --ori pc=12
+		x"00", x"00", x"00", x"00", --nop pc=12
 		
-		"10101100",	"00000001",	"00000000",	"00000000",	--store pc=16
+		x"00", x"00", x"00", x"00",	--nop pc=16
 		
 		"10101100",	"00000010",	"00000000",	"00000100", --pc=20
 		
-		"10101100",	"00001011",	"00000000",	"00001000",	--pc=24
+		jal.opcode & jal.address(25 downto 24), jal.address(23 downto 16), jal.address(15 downto 8), jal.address(7 downto 0),	--pc=24
 
-		"10101100",	"00010010",	"00000000",	"00001100",	--pc=28
+		x"00",	x"00",	x"00",	x"00",	--pc=28 nop
 
-		"00000000",	"00000000", "00000000",	"00100000", --nop pc=32
+		"00000000",	"00000000", "00000000",	"00000000", --nop pc=32
 
-		"00000000",	"00000000",	"00000000",	"00100000", --nop pc=36
+		"00000000",	"00000000",	"00000000",	"00000000", --nop pc=36
 		
 		"10001100",	"00000100",	"00000000",	"00000000",	--load pc=40
 		
@@ -61,7 +63,12 @@ architecture behaviour of Instruction_Memory is
 		
 		"00000000", "01100110",	"11111000",	"00100010",	--sub pc=76
 		
-		 jump.opcode & jump.address(25 downto 24), jump.address(23 downto 16), jump.address(15 downto 8), jump.address(7 downto 0)--jump pc=80
+		 jump.opcode & jump.address(25 downto 24), jump.address(23 downto 16), jump.address(15 downto 8), jump.address(7 downto 0),--jump pc=80
+		 
+		 x"00", x"00", x"00", x"00", --pc84
+		 x"00", x"00", x"00", x"00", --pc88
+		 x"00", x"00", x"00", x"00", --pc92
+		 x"00", x"00", x"00", x"00" --pc96
 
 		
 	);

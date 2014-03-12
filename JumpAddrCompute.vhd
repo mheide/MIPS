@@ -16,7 +16,7 @@ architecture RTL of JumpAddrCompute is
 
 begin
 
-	pc_high <= std_logic_vector(unsigned(pc_i) + 4);
-	pc      <= pc_high(31 downto 28) & jumpAddr_i(25 downto 0) & "00";
-	pc_o <= pc;
+	--pc_high <= std_logic_vector(unsigned(pc_i) + 4);
+	pc_o      <= pc_i(31 downto 28) & jumpAddr_i(25 downto 0) & "00";
+	--pc_o <= pc;
 end architecture RTL;

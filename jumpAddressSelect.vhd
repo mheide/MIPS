@@ -18,9 +18,9 @@ end entity jumpAddressSelect;
 architecture behaviour of jumpAddressSelect is
 	signal pc_source_tmp : std_logic;
 begin
-	jumpAddress_o <= PC_modified when PCSource_i = "11" ELSE 
-	                 ALU_result when PCSource_i = "01" ELSE
-	                 pc_from_reg_i when PCSource_i = "10" else
+	jumpAddress_o <= PC_modified when PCSource_i = "10" ELSE 
+	                 ALU_result when PCSource_i = "00" ELSE
+	                 pc_from_reg_i when PCSource_i = "11" else
 	                 (others => '0');
 	pc_source_tmp <= '0' when rst_i = '1' else
 	                 '1' when PCSource_i(0) = '1' and ALU_zero_i = '1'

@@ -23,7 +23,7 @@ begin
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
 				if pcSource_i = '1' then
-					pc <= std_logic_vector(unsigned(PC_jump_i) + 4);
+					pc <= PC_jump_i;
 				else
 					pc <= std_logic_vector(unsigned(pc) + 4);
 				end if;
