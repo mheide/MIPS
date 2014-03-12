@@ -13,12 +13,14 @@ entity ID_EX is                         --first pipeline stage with instruction_
 
 		ALUSrcB_idex_i       : in  std_logic_vector(1 DOWNTO 0); --EX
 		ALUSrcA_idex_i       : in  std_logic;
+		dataA_idex_i         : in  std_logic_vector(31 downto 0);
+		dataB_idex_i         : in  std_logic_vector(31 downto 0);
 		ALU_op_idex_i        : in  std_logic_vector(1 DOWNTO 0);
 		function_code_idex_i : in  std_logic_vector(5 DOWNTO 0);
 		signExtAddr_idex_i	 : in  std_logic_vector(9 DOWNTO 0);
 		op_idex_i			 : in  std_logic_vector(5 downto 0);
 		instruction_25_16_idex_i : in std_logic_vector(9 downto 0);
-		instruction_25_0_i   : in std_logic_vector(26 downto 0);
+		instruction_25_0_i   : in std_logic_vector(25 downto 0);
 
 		memRead_idex_i       : in  std_logic;
 		memWrite_idex_i      : in  std_logic;
@@ -32,6 +34,8 @@ entity ID_EX is                         --first pipeline stage with instruction_
 
 		ALUSrcB_idex_o       : out std_logic_vector(1 DOWNTO 0);
 		ALUSrcA_idex_o       : out std_logic;
+		dataA_idex_o         : out std_logic_vector(31 downto 0);
+		dataB_idex_o         : out std_logic_vector(31 downto 0);
 		ALU_op_idex_o        : out std_logic_vector(1 DOWNTO 0);
 		function_code_idex_o : out std_logic_vector(5 DOWNTO 0);
 		signExtAddr_idex_o   : out std_logic_vector(9 DOWNTO 0);
@@ -56,11 +60,12 @@ architecture behaviour of ID_EX is
 	signal signExtAddr	: std_logic_vector(9 downto 0);
 	signal op			: std_logic_vector(5 downto 0);
 	signal instr25_16   : std_logic_vector(9 downto 0);
-	signal instr25_0    : std_logic_vector(31 downto 0);
+	signal instr25_0    : std_logic_vector(25 downto 0);
 	
 
 	signal aluSrcA  : std_logic;
 	signal aluSrcB  : std_logic_vector(1 DOWNTO 0);
+	signal dataA, dataB : std_logic_vector(31 downto 0);
 	signal memRead  : std_logic;
 	signal memWrite : std_logic;
 	signal memToReg : std_logic;
@@ -82,6 +87,8 @@ begin
 
 			aluSrcB  <= (others => '0');
 			aluSrcA  <= '0';
+			dataA    <= (others => '0');
+			dataB    <= (others => '0');
 			memRead  <= '0';
 			memWrite <= '0';
 			memToReg <= '0';
@@ -101,6 +108,8 @@ begin
 
 				aluSrcB  <= ALUSrcB_idex_i;
 				aluSrcA  <= ALUSrcA_idex_i;
+				dataA    <= dataA_idex_i;
+				dataB    <= dataB_idex_i;
 				memRead  <= memRead_idex_i;
 				memWrite <= memWrite_idex_i;
 				memToReg <= memToReg_idex_i;
@@ -116,6 +125,8 @@ begin
 
 	ALUSrcB_idex_o       <= aluSrcB;
 	ALUSrcA_idex_o       <= aluSrcA;
+	dataA_idex_o         <= dataA;
+	dataB_idex_o         <= dataB;
 	ALU_op_idex_o        <= aluop;
 	function_code_idex_o <= functioncode;
 	signExtAddr_idex_o   <= signExtAddr;

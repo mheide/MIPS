@@ -17,7 +17,7 @@ architecture behaviour of regDstSelect is
 begin
 	instruction_o <= instruction_15_11_i when regDst_i = "11" ELSE 
 	                 instruction_20_16_i when regDst_i = "10" ELSE
-	                 std_logic_vector(to_unsigned(c_ra)) when regDst_i = "00" else
+	                 std_logic_vector(to_unsigned(c_ra, 5)) when regDst_i = "00" else
 	                 (others => 'X');
 
 end architecture behaviour;

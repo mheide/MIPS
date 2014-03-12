@@ -4,13 +4,15 @@ use ieee.numeric_std.all;
 
 entity pc_counter is
 	port(
-		clk_i       : in  std_logic;
-		rst_i       : in  std_logic;
-		PC_i     : in  std_logic_vector(1 DOWNTO 0);
-		PC_o        : out std_logic_vector(31 downto 0)
+		clk_i      : in  std_logic;
+		rst_i      : in  std_logic;
+		pcSource_i : in  std_logic;
+		enable_i   : in  std_logic;
+		PC_jump_i  : in  std_logic_vector(31 DOWNTO 0);
+		PC_o       : out std_logic_vector(31 downto 0)
 	);
 end pc_counter;
---TODO:use ALU for counter
+
 architecture behavior of pc_counter is
 	signal pc : std_logic_vector(31 downto 0) := (others => '0');
 begin
@@ -19,7 +21,13 @@ begin
 		if rst_i = '1' then
 			pc <= (others => '0');
 		elsif rising_edge(clk_i) then
-			pc <= std_logic_vector(unsigned(PC_i) + 4);
+			if enable_i = '1' then
+				if pcSource_i = '1' then
+					pc <= std_logic_vector(unsigned(PC_jump_i) + 4);
+				else
+					pc <= std_logic_vector(unsigned(pc) + 4);
+				end if;
+			end if;
 		end if;
 	end process PC_cntr;
 

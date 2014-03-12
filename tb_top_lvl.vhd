@@ -9,8 +9,7 @@ architecture tb of tb_top_lvl is
 
 component TOP_Lvl
 	port(clk_i    : in std_logic;
-		 rst_i    : in std_logic;
-		 enable_i : in std_logic);
+		 rst_i    : in std_logic);
 end component TOP_Lvl;
 
 	signal CLK : std_logic := '0';
@@ -21,11 +20,10 @@ begin
 	dut : TOP_Lvl
 	port map(
 		clk_i    => CLK,
-		rst_i    => RST,
-		enable_i => ENABLE
+		rst_i    => RST
 	);
 	
-	RST <= '0' after 55 ns;
+	RST <= '1', '0' after 15 ns;
 	
 	clock_generator : process is
 	begin
@@ -34,7 +32,5 @@ begin
 		CLK <= '1';
 		wait for PERIOD/2;
 	end process;
-	
-	
 
 end architecture;
