@@ -20,14 +20,14 @@ architecture Behavioral of ALU is
 
 	constant c_alu_error : std_logic_vector(31 downto 0) := (others => 'X');
 	constant c_alu_zero  : std_logic_vector(31 downto 0) := (others => '0');
-	
+	constant c_next_pc : natural := 4;
 	signal C_temp : std_logic_vector(31 downto 0);
 
 begin
 	--zero_o <= '1' when C_temp = c_alu_zero else '0';
 	C_o    <= C_temp;
 
-	ALU : process(rst_i, ALU_ctrl_i, A_i, B_i) is
+	ALU : process(rst_i, ALU_ctrl_i, A_i, B_i, shamt_i) is
 	begin
 		if rst_i = '1' then
 			C_temp <= (others => '0');
@@ -50,9 +50,9 @@ begin
 				when c_alu_sra  => C_temp <= std_logic_vector(shift_right(signed(A_i), to_integer(unsigned(B_i(4 downto 0)))));
 				when c_alu_srav => C_temp <= std_logic_vector(shift_right(signed(B_i), to_integer(unsigned(shamt_i))));
 				--jump
-				when c_alu_jal =>  C_temp <= std_logic_vector(unsigned(A_i) + unsigned(B_i));
+				when c_alu_jal =>  C_temp <= std_logic_vector(unsigned(A_i) + unsigned(c_next_pc));
 				                   zero_o <= '1';
-				when c_alu_jalr => C_temp <= B_i;
+				when c_alu_jalr => C_temp <= std_logic_vector(unsigned(A_i) + unsigned(c_next_pc));
 				                   zero_o <= '1';
 				when c_alu_jr   => C_temp <= A_i;
 				                   zero_o <= '1';
