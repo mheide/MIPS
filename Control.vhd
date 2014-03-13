@@ -51,6 +51,10 @@ begin
 						"10" when op = c_xori else	
 						"10" when op = c_lw else
 						"10" when op = c_sw else
+						"00" when op = c_beq.opcode else
+						"00" when op = c_bne.opcode else
+						"00" when op = c_blez.opcode else
+						"00" when op = c_bgtz.opcode else						
 						(others => '0');
 	ALUSrcA_o  <= '1' when op = "000000" else
 						'1' when op = c_addi else
@@ -60,6 +64,10 @@ begin
 						'1' when op = c_xori else						
 						'1' when op = c_lw else
 						'1' when op = c_sw else
+						'1' when op = c_beq.opcode else
+						'1' when op = c_bne.opcode else
+						'1' when op = c_blez.opcode else
+						'1' when op = c_bgtz.opcode else						
 						'0';
 	MemWrite_o <= '0' when op = "000000" else 
 						'0' when op = c_addi else

@@ -23,6 +23,6 @@ begin
 	cond <= zero_i 								when branchCond_i = bc_beq else
 			(not zero_i) 						when branchCond_i = bc_bne else
 			(not negative_i)  and (not zero_i)	when branchCond_i = bc_bgtz else
-			(zero_i or negative_i); --bc_blez
+			(zero_i or negative_i) ; --bc_blez
 
 end architecture behaviour;
