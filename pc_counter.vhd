@@ -7,9 +7,8 @@ entity pc_counter is
 		clk_i       : in  std_logic;
 		rst_i       : in  std_logic;
 		enable_i    : in  std_logic;
-		PCSrc_i     : in  std_logic_vector(1 DOWNTO 0);
 		jump_flag_i : in  std_logic;
-		jump_addr_i : in  std_logic_vector(31 downto 0); --null in this implementation
+		jump_addr_i : in  std_logic_vector(31 DOWNTO 0);
 		PC_o        : out std_logic_vector(31 downto 0)
 	);
 end pc_counter;
@@ -24,9 +23,7 @@ begin
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
 				if jump_flag_i = '1' then
-					if PCSrc_i = "00" then
-					-- auswahl welche quelle
-					end if;
+					pc <= jump_addr_i;
 				else
 					pc <= std_logic_vector(unsigned(pc) + 4);
 				end if;

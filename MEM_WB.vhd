@@ -6,14 +6,12 @@ entity MEM_WB is                        --first pipeline stage with instruction_
 		clk_i                  : in  std_logic;
 		rst_i                  : in  std_logic;
 		enable_i               : in  std_logic;
-		PC_memwb_i             : in  std_logic_vector(31 downto 0);
 		ALU_result_memwb_i     : in  std_logic_vector(31 downto 0);
 		dataAddr_memwb_i       : in  std_logic_vector(4 downto 0);
 
 		memToReg_memwb_i       : in  std_logic; --WB
 		regWrite_memwb_i       : in  std_logic;
 
-		PC_memwb_o             : out std_logic_vector(31 downto 0);
 		memoryReadData_memwb_o : out std_logic_vector(31 downto 0);
 		ALU_result_memwb_o     : out std_logic_vector(31 downto 0);
 		dataAddr_memwb_o       : out std_logic_vector(4 downto 0);
@@ -24,7 +22,7 @@ entity MEM_WB is                        --first pipeline stage with instruction_
 end entity MEM_WB;
 
 architecture behaviour of MEM_WB is
-	signal pc             : std_logic_vector(31 DOWNTO 0);
+
 	signal aluResult      : std_logic_vector(31 downto 0);
 	signal dataAddr       : std_logic_vector(4 downto 0);
 
@@ -35,7 +33,6 @@ begin
 	MEM_WB_reg : process(clk_i, rst_i, enable_i) is
 	begin
 		if rst_i = '1' then
-			pc             <= (others => '0');
 			dataAddr       <= (others => '0');
 			aluResult      <= (others => '0');
 
@@ -44,7 +41,6 @@ begin
 
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
-				pc             <= PC_memwb_i;
 				aluResult      <= ALU_result_memwb_i;
 				dataAddr       <= dataAddr_memwb_i;
 
@@ -54,7 +50,6 @@ begin
 		end if;
 	end process MEM_WB_reg;
 
-	PC_memwb_o             <= pc;
 	ALU_result_memwb_o     <= aluResult;
 	dataAddr_memwb_o       <= dataAddr;
 

@@ -3,7 +3,6 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.Instructions_pack.all;
 
-
 entity ALU is
 	port(
 		rst_i      : in  std_logic;
@@ -29,7 +28,7 @@ begin
 	C_o    <= C_temp;
 	negative_o <= C_temp(31);
 
-	ALU : process(rst_i, ALU_ctrl_i, A_i, B_i) is
+	ALU : process(rst_i, ALU_ctrl_i, A_i, B_i, shamt_i) is
 	begin
 		if rst_i = '1' then
 			C_temp <= (others => '0');

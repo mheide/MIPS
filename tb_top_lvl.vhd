@@ -25,7 +25,7 @@ begin
 		enable_i => ENABLE
 	);
 	
-	RST <= '0' after 55 ns;
+	RST <= '1', '0' after 15 ns;
 	
 	clock_generator : process is
 	begin
@@ -34,7 +34,5 @@ begin
 		CLK <= '1';
 		wait for PERIOD/2;
 	end process;
-	
-	
 
 end architecture;
