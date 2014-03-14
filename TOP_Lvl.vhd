@@ -150,7 +150,7 @@ architecture RTL of TOP_Lvl is
 			zero_flag_exmem_i  : in  std_logic;
 			dataAddr_exmem_i   : in  std_logic_vector(4 downto 0);
 			PCSource_exmem_i   : in  std_logic_vector(1 DOWNTO 0);
-			offset_exmem_i 	   : in  std_logic_vector(25 downto 0);
+			jumpAddr_exmem_i   : in  std_logic_vector(31 downto 0);
 
 			branch_exmem_i     : in  std_logic; --M
 			memRead_exmem_i    : in  std_logic;
@@ -167,7 +167,7 @@ architecture RTL of TOP_Lvl is
 			zero_flag_exmem_o  : out std_logic;
 			dataAddr_exmem_o   : out std_logic_vector(4 downto 0);
 			PCSource_exmem_o   : out std_logic_vector(1 DOWNTO 0);
-			offset_exmem_o     : out std_logic_vector(25 downto 0);
+			jumpAddr_exmem_o   : out std_logic_vector(31 downto 0);
 
 			branch_exmem_o     : out std_logic;
 			memRead_exmem_o    : out std_logic;
@@ -322,9 +322,9 @@ architecture RTL of TOP_Lvl is
 	
 	--exmem --> jas
 	signal PCSrc_exmem_jas     : std_logic_vector(1 downto 0);
-	
-	--exmem --> jac 
-	signal offset_exmem_jac 	: std_logic_vector(25 downto 0);
+	signal jumpAddr_exmem_jas  : std_logic_vector(31 downto 0);
+
+	--exmem --> bcc
 	signal branchCond_exmem_bcc : branch_condition;
 	
 	--exmem --> dataMemory
@@ -348,7 +348,9 @@ architecture RTL of TOP_Lvl is
 	signal branchCond_idex_exmem	   : branch_condition;
 	signal dataAddr_idex_exmem : std_logic_vector(4 downto 0);
 	signal instruction_25_16_idex_exmem : std_logic_vector(9 downto 0);
-	signal offset_idex_exmem : std_logic_vector(25 downto 0);
+	
+	--idex --> jac
+	signal offset_idex_jac : std_logic_vector(25 downto 0);
 
 	--alu --> exmem
 	signal neg_alu_exmem : std_logic;
@@ -415,8 +417,8 @@ architecture RTL of TOP_Lvl is
 	--memwb --> jumpAddressSeelct, ds
 	signal ALU_result_memwb_ds  : std_logic_vector(31 downto 0);
 
-	--jumAddressCompute --> jumpAddressSelect
-	signal PC_jac_jas         : std_logic_vector(31 downto 0);
+	--jumAddressCompute --> exmem
+	signal PC_jac_exmem      : std_logic_vector(31 downto 0);
 	
 	--dm --> jumpadressselect? ds, 
 	signal memData_dm_jas : std_logic_vector(31 downto 0); 
@@ -448,6 +450,8 @@ architecture RTL of TOP_Lvl is
 	--bcc --> pc
 	signal jump_flag_bcc_pc : std_logic;
 	
+
+	
 	
 
 begin
@@ -460,7 +464,7 @@ begin
 	
 	--nice to have: make it clearer
 	signExtAddr_complete_idex_se <= signExtAddr_idex_se & functioncode_idex_ac;
-	offset_idex_exmem <= instruction_25_16_idex_exmem & signExtAddr_complete_idex_se;
+	offset_idex_jac <= instruction_25_16_idex_exmem & signExtAddr_complete_idex_se;
 	
 	ds : dataSelect
 	port map(	ALU_result_i => ALU_result_memwb_ds,
@@ -482,7 +486,7 @@ begin
 		port map(PCSource_i          => PCSrc_exmem_jas,
 			     ALU_result          => ALU_result_exmem_dm,
 			     ALU_result_modified => ALU_result_exmem_dm,
-			     PC_modified         => PC_jac_jas,
+			     PC_modified         => jumpAddr_exmem_jas,
 			     jumpAddress_o       => jumpAddress_jas_pc);
 
 	memwb : MEM_WB
@@ -501,10 +505,10 @@ begin
 			regWrite_memwb_o       => regWrite_memwb_rf);
 	
 	jac : JumpAddrCompute
-		port map(branch_i	=> branch_exmem_pc,
-				 jumpAddr_i => offset_exmem_jac,
-			     pc_i       => PC_exmem_memwb,
-			     pc_o       => PC_jac_jas);
+		port map(branch_i	=> branch_idex_exmem,
+				 jumpAddr_i => offset_idex_jac,
+			     pc_i       => PC_idex_exmem,
+			     pc_o       => PC_jac_exmem);
 	
 	bcc : branchCondCheck
 	port map(branch_i 		=> branch_exmem_pc,
@@ -601,7 +605,7 @@ begin
 			     enable_i           => enable,
 			     PC_exmem_i         => PC_idex_exmem,
 			     PCSource_exmem_i   => PCSrc_idex_exmem,
-				 offset_exmem_i 	=> offset_idex_exmem,
+				 jumpAddr_exmem_i 	=> pc_jac_exmem,
 			     ALU_result_exmem_i => C_alu_exmem,
 				 B_data_exmem_i		=> dataB_rf_alu,
 				 neg_flag_exmem_i	=> neg_alu_exmem,
@@ -620,7 +624,7 @@ begin
 			     zero_flag_exmem_o  => zero_exmem_pc,
 			     dataAddr_exmem_o   => dataAddr_exmem_rds,
 			     PCSource_exmem_o   => PCSrc_exmem_jas,
-				 offset_exmem_o 	=> offset_exmem_jac,
+				 jumpAddr_exmem_o 	=> jumpAddr_exmem_jas,
 			     branch_exmem_o     => branch_exmem_pc,
 			     memRead_exmem_o    => memRead_exmem_dm,
 			     memWrite_exmem_o   => memWrite_exmem_dm,

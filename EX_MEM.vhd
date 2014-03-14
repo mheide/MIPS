@@ -14,7 +14,7 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 		zero_flag_exmem_i  : in  std_logic;
 		dataAddr_exmem_i   : in  std_logic_vector(4 downto 0);
 		PCSource_exmem_i   : in  std_logic_vector(1 DOWNTO 0);
-		offset_exmem_i 	   : in  std_logic_vector(25 downto 0);
+		jumpAddr_exmem_i   : in  std_logic_vector(31 downto 0);
 
 		branch_exmem_i     : in  std_logic; --M
 		memRead_exmem_i    : in  std_logic;
@@ -31,7 +31,7 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 		zero_flag_exmem_o  : out std_logic;
 		dataAddr_exmem_o   : out std_logic_vector(4 downto 0);
 		PCSource_exmem_o   : out std_logic_vector(1 DOWNTO 0);
-		offset_exmem_o     : out std_logic_vector(25 downto 0);
+		jumpAddr_exmem_o   : out std_logic_vector(31 downto 0);
 
 		branch_exmem_o     : out std_logic;
 		memRead_exmem_o    : out std_logic;
@@ -57,7 +57,7 @@ architecture behaviour of EX_MEM is
 	signal regWrite   : std_logic;
 	signal branchC	  : branch_condition;
 	signal pcsource   : std_logic_vector(1 DOWNTO 0);
-	signal offset     : std_logic_vector(25 downto 0);
+	signal jaddr      : std_logic_vector(31 downto 0);
 
 begin
 	EX_MEM_reg : process(clk_i, rst_i, enable_i) is
@@ -76,7 +76,7 @@ begin
 			regWrite   <= '0';
 			branchC	   <= bc_bne;
 			pcsource   <= (others => '0');
-			offset     <= (others => '0');
+			jaddr      <= (others => '0');
 
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
@@ -93,7 +93,7 @@ begin
 				regWrite   <= regWrite_exmem_i;
 				branchC	   <= branchCond_exmem_i;
 				pcsource   <= PCSource_exmem_i;
-				offset     <= offset_exmem_i;
+				jaddr      <= jumpAddr_exmem_i;
 			end if;
 		end if;
 	end process EX_MEM_reg;
@@ -111,6 +111,6 @@ begin
 	branchCond_exmem_o <= branchC;
 	dataAddr_exmem_o   <= dataAddr;
 	PCSource_exmem_o   <= pcsource;
-	offset_exmem_o 	   <= offset;
+	jumpAddr_exmem_o   <= jaddr;
 
 end architecture;

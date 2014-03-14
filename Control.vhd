@@ -92,14 +92,14 @@ begin
 						'0' when op = c_sw else
 						'0';
 	--TODO: some PCSource_o values not sane
-	PCSource_o <=       "01" when op = c_beq.opcode  else
-	                    "01" when op = c_bgez.opcode else
-	                    "01" when op = c_bgezal.opcode else
-	                    "01" when op = c_bgtz.opcode else
-	                    "01" when op = c_blez.opcode else
-	                    "01" when op = c_bltzal.opcode else
-	                    "01" when op = c_bne.opcode else
-	                    "01" when op = c_bltz.opcode else
+	PCSource_o <=       "10" when op = c_beq.opcode  else
+	                    "10" when op = c_bgez.opcode else
+	                    "10" when op = c_bgezal.opcode else
+	                    "10" when op = c_bgtz.opcode else
+	                    "10" when op = c_blez.opcode else
+	                    "10" when op = c_bltzal.opcode else
+	                    "10" when op = c_bne.opcode else
+	                    "10" when op = c_bltz.opcode else
 						"01" when op = c_addi else
 						"01" when op = c_addiu else
 						"01" when op = c_andi else
