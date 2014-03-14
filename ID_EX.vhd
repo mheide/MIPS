@@ -24,6 +24,7 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		branch_idex_i        : in  std_logic; --M
 		memRead_idex_i       : in  std_logic;
 		memWrite_idex_i      : in  std_logic;
+		PCWrite_idex_i       : in  std_logic;
 
 		memToReg_idex_i      : in  std_logic; --WB
 		regWrite_idex_i      : in  std_logic;
@@ -45,6 +46,7 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		branch_idex_o        : out std_logic;
 		memRead_idex_o       : out std_logic;
 		memWrite_idex_o      : out std_logic;
+		PCWrite_idex_o       : out std_logic;
 
 		memToReg_idex_o      : out std_logic; --WB
 		regWrite_idex_o      : out std_logic;
@@ -68,6 +70,7 @@ architecture behaviour of ID_EX is
 	signal branch   : std_logic;
 	signal memRead  : std_logic;
 	signal memWrite : std_logic;
+	signal pcWrite  : std_logic;
 	signal memToReg : std_logic;
 	signal regWrite : std_logic;
 	signal branchC 	: branch_condition;
@@ -91,6 +94,7 @@ begin
 			branch   <= '0';
 			memRead  <= '0';
 			memWrite <= '0';
+			pcWrite  <= '0';
 			memToReg <= '0';
 			regWrite <= '0';
 			branchC	 <= bc_bne;
@@ -112,6 +116,7 @@ begin
 				branch   <= branch_idex_i;
 				memRead  <= memRead_idex_i;
 				memWrite <= memWrite_idex_i;
+				pcWrite  <= PCWrite_idex_i;
 				memToReg <= memToReg_idex_i;
 				regWrite <= regWrite_idex_i;
 				branchC  <= branchCond_idex_i;
@@ -136,6 +141,7 @@ begin
 	branch_idex_o   <= branch;
 	memRead_idex_o  <= memRead;
 	memWrite_idex_o <= memWrite;
+	PCWrite_idex_o  <= pcWrite;
 	memToReg_idex_o <= memToReg;
 	regWrite_idex_o <= regWrite;
 	branchCond_idex_o <= branchC;

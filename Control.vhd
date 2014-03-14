@@ -30,9 +30,11 @@ entity Control is
 end entity Control;
 
 architecture behaviour of Control is
-	signal op : std_logic_vector(5 downto 0);
+	signal op    : std_logic_vector(5 downto 0);
+	signal funct : std_logic_vector(5 downto 0);
 begin
 	op         <= op_i;
+	funct      <= funct_i;
 	ALUOp_o    <= "10" when op = "000000" else
 	                    "10" when op = "000010" else
 						"10" when op = c_addi else
@@ -166,5 +168,10 @@ begin
 						'1' when op = c_blez.opcode else
 						'1' when op = c_bne.opcode else
 						'0';
+	PCWrite_o <= '1' when op = c_j else
+	             '1' when op = c_jal else
+	             '1' when op = c_jr.opcode and funct = c_jr.funct else
+	             '1' when op = c_jalr.opcode and funct = c_jalr.funct else
+	             '0';
 
 end architecture;

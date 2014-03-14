@@ -20,6 +20,7 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 		branch_exmem_i     : in  std_logic; --M
 		memRead_exmem_i    : in  std_logic;
 		memWrite_exmem_i   : in  std_logic;
+		PCWrite_exmem_i    : in  std_logic;
 
 		memToReg_exmem_i   : in  std_logic; --WB
 		regWrite_exmem_i   : in  std_logic;
@@ -38,6 +39,7 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 		branch_exmem_o     : out std_logic;
 		memRead_exmem_o    : out std_logic;
 		memWrite_exmem_o   : out std_logic;
+		PCWrite_exmem_o    : out std_logic;
 
 		memToReg_exmem_o   : out std_logic;
 		regWrite_exmem_o   : out std_logic;
@@ -56,6 +58,7 @@ architecture behaviour of EX_MEM is
 	signal branch     : std_logic;
 	signal memRead    : std_logic;
 	signal memWrite   : std_logic;
+	signal pcWrite    : std_logic;
 	signal memToReg   : std_logic;
 	signal regWrite   : std_logic;
 	signal branchC	  : branch_condition;
@@ -76,6 +79,7 @@ begin
 			branch     <= '0';
 			memRead    <= '0';
 			memWrite   <= '0';
+			pcWrite    <= '0';
 			memToReg   <= '0';
 			regWrite   <= '0';
 			branchC	   <= bc_bne;
@@ -94,6 +98,7 @@ begin
 				branch     <= branch_exmem_i;
 				memRead    <= memRead_exmem_i;
 				memWrite   <= memWrite_exmem_i;
+				pcWrite    <= PCWrite_exmem_i;
 				memToReg   <= memToReg_exmem_i;
 				regWrite   <= regWrite_exmem_i;
 				branchC	   <= branchCond_exmem_i;
@@ -112,6 +117,7 @@ begin
 	branch_exmem_o     <= branch;
 	memRead_exmem_o    <= memRead;
 	memWrite_exmem_o   <= memWrite;
+	PCWrite_exmem_o    <= pcWrite;
 	memToReg_exmem_o   <= memToReg;
 	regWrite_exmem_o   <= regWrite;
 	branchCond_exmem_o <= branchC;

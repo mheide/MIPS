@@ -109,6 +109,7 @@ architecture RTL of TOP_Lvl is
 			branch_idex_i            : in  std_logic; --M
 			memRead_idex_i           : in  std_logic;
 			memWrite_idex_i          : in  std_logic;
+			PCWrite_idex_i           : in  std_logic;
 
 			memToReg_idex_i          : in  std_logic; --WB
 			regWrite_idex_i          : in  std_logic;
@@ -130,6 +131,7 @@ architecture RTL of TOP_Lvl is
 			branch_idex_o            : out std_logic;
 			memRead_idex_o           : out std_logic;
 			memWrite_idex_o          : out std_logic;
+			PCWrite_idex_o           : out std_logic;
 
 			memToReg_idex_o          : out std_logic; --WB
 			regWrite_idex_o          : out std_logic;
@@ -155,6 +157,7 @@ architecture RTL of TOP_Lvl is
 			branch_exmem_i     : in  std_logic; --M
 			memRead_exmem_i    : in  std_logic;
 			memWrite_exmem_i   : in  std_logic;
+			PCWrite_exmem_i    : in  std_logic;
 
 			memToReg_exmem_i   : in  std_logic; --WB
 			regWrite_exmem_i   : in  std_logic;
@@ -173,6 +176,7 @@ architecture RTL of TOP_Lvl is
 			branch_exmem_o     : out std_logic;
 			memRead_exmem_o    : out std_logic;
 			memWrite_exmem_o   : out std_logic;
+			PCWrite_exmem_o    : out std_logic;
 
 			memToReg_exmem_o   : out std_logic;
 			regWrite_exmem_o   : out std_logic;
@@ -217,7 +221,7 @@ architecture RTL of TOP_Lvl is
 			clk_i       : in  std_logic;
 			rst_i       : in  std_logic;
 			enable_i    : in  std_logic;
-			--PCSrc_i     : in  std_logic_vector(1 DOWNTO 0);
+			PCWrite_i   : in  std_logic;
 			jump_flag_i : in  std_logic;
 			jump_addr_i : in  std_logic_vector(31 downto 0);
 			PC_o        : out std_logic_vector(31 downto 0)
@@ -309,10 +313,11 @@ architecture RTL of TOP_Lvl is
 	signal enable : std_logic;
 
 	--exmem --> pc --beide nicht angekommen
-	signal neg_exmem_pc    : std_logic; --fuer branch
-	signal zero_exmem_pc   : std_logic; --fuer branch
-	signal branch_exmem_pc : std_logic; -- noch mal sichergehen wie genau (PCSource?)
-	signal B_data_exmem_dm : std_logic_vector(31 downto 0);
+	signal neg_exmem_pc     : std_logic; --fuer branch
+	signal zero_exmem_pc    : std_logic; --fuer branch
+	signal branch_exmem_pc  : std_logic; -- noch mal sichergehen wie genau (PCSource?)
+	signal B_data_exmem_dm  : std_logic_vector(31 downto 0);
+	signal PCWrite_exmem_pc : std_logic;
 
 	--exmem --> memwb
 	signal PC_exmem_memwb       : std_logic_vector(31 downto 0);
@@ -346,6 +351,7 @@ architecture RTL of TOP_Lvl is
 	signal branchCond_idex_exmem        : branch_condition;
 	signal dataAddr_idex_exmem          : std_logic_vector(4 downto 0);
 	signal instruction_25_16_idex_exmem : std_logic_vector(9 downto 0);
+	signal PCWrite_idex_exmem           : std_logic;
 
 	--idex --> jac
 	signal offset_idex_jac     : std_logic_vector(25 downto 0);
@@ -398,7 +404,7 @@ architecture RTL of TOP_Lvl is
 
 	--crtl --> pc --TODO: pc ueberlegen fuer andere befehlstypen
 	signal PCWriteCond_ctrl_pc : std_logic;
-	signal PCWrite_ctrl_pc     : std_logic;
+	signal PCWrite_ctrl_idex     : std_logic;
 	signal IorD_ctrl_pc        : std_logic;
 
 	--ifid --> idex
@@ -464,8 +470,8 @@ begin
 		port map(clk_i       => clock,
 			     rst_i       => reset,
 			     enable_i    => enable,
-			     --PCSrc_i     => "00",
-			     jump_flag_i => '0',    --jump_flag_bcc_pc
+			     PCWrite_i   => PCWrite_exmem_pc,
+			     jump_flag_i => jump_flag_bcc_pc,
 			     jump_addr_i => jumpAddress_jas_pc,
 			     PC_o        => address_pc_ifid);
 
@@ -528,6 +534,7 @@ begin
 			     branch_idex_i            => branch_ctrl_idex,
 			     memRead_idex_i           => memRead_ctrl_idex,
 			     memWrite_idex_i          => memWrite_ctrl_idex,
+			     PCWrite_idex_i           => PCWrite_ctrl_idex,
 			     memToReg_idex_i          => memToReg_ctrl_idex,
 			     regWrite_idex_i          => regWrite_ctrl_idex,
 			     branchCond_idex_i        => branchCond_ctrl_idex,
@@ -545,6 +552,7 @@ begin
 			     branch_idex_o            => branch_idex_exmem,
 			     memRead_idex_o           => memRead_idex_exmem,
 			     memWrite_idex_o          => memWrite_idex_exmem,
+			     PCWrite_idex_o           => PCWrite_idex_exmem,
 			     memToReg_idex_o          => memToReg_idex_exmem,
 			     regWrite_idex_o          => regWrite_idex_exmem,
 			     branchCond_idex_o        => branchCond_idex_exmem);
@@ -560,7 +568,7 @@ begin
 			     op_i          => data_ifid_rf(31 downto 26),
 			     funct_i       => data_ifid_rf(5 downto 0),
 			     PCWriteCond_o => open, --PCWriteCond_ctrl_pc,
-			     PCWrite_o     => open, --PCWrite_ctrl_pc,
+			     PCWrite_o     => PCWrite_ctrl_idex,
 			     IorD_o        => open, --IorD_ctrl_pc,
 			     branch_o      => branch_ctrl_idex,
 			     MemRead_o     => memRead_ctrl_idex,
@@ -601,6 +609,7 @@ begin
 			     branch_exmem_i     => branch_idex_exmem,
 			     memRead_exmem_i    => memRead_idex_exmem,
 			     memWrite_exmem_i   => memWrite_idex_exmem,
+			     PCWrite_exmem_i    => PCWrite_idex_exmem,
 			     memToReg_exmem_i   => memToReg_idex_exmem,
 			     regWrite_exmem_i   => regWrite_idex_exmem,
 			     branchCond_exmem_i => branchCond_idex_exmem,
@@ -616,6 +625,7 @@ begin
 			     branch_exmem_o     => branch_exmem_pc,
 			     memRead_exmem_o    => memRead_exmem_dm,
 			     memWrite_exmem_o   => memWrite_exmem_dm,
+			     PCWrite_exmem_o    => PCWrite_exmem_pc,
 			     memToReg_exmem_o   => memToReg_exmem_memwb,
 			     regWrite_exmem_o   => regWrite_exmem_memwb,
 			     branchCond_exmem_o => branchCond_exmem_bcc);
