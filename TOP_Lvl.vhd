@@ -280,7 +280,7 @@ architecture RTL of TOP_Lvl is
 			rst_i        : in  std_logic;
 			alu_result_i : in  std_logic_vector(31 DOWNTO 0);
 			writeData_i  : in  std_logic_vector(31 DOWNTO 0);
-			memWrite_i   : in  std_logic; --0 for arithmetic op's
+			memWrite_i   : in  std_logic; 
 			memRead_i    : in  std_logic;
 
 			readData_o   : out std_logic_vector(31 DOWNTO 0)
@@ -307,6 +307,21 @@ architecture RTL of TOP_Lvl is
 			jump_flag_o  : out std_logic
 		);
 	end component;
+	
+	component MemRegLock is 
+		port(
+			clk_i 		: in std_logic;
+			rst_i 		: in std_logic;
+			enable_i 	: in std_logic;
+			jump_flag_i : in std_logic;
+			memWrite_i  : in std_logic; --3 cycles
+			regWrite_i  : in std_logic; --4 cycles
+			link_flag_i : in std_logic; -- link
+			
+			memWrite_o  : out std_logic;
+			regWrite_o  : out std_logic
+		);	
+	end component MemRegLock;
 
 	signal reset  : std_logic;
 	signal clock  : std_logic;
@@ -336,6 +351,9 @@ architecture RTL of TOP_Lvl is
 	signal memRead_exmem_dm    : std_logic;
 	signal memWrite_exmem_dm   : std_logic;
 	signal ALU_result_exmem_dm : std_logic_vector(31 downto 0);
+	
+	--exmem --> mrl
+	signal memWrite_exmem_mrl   : std_logic;	
 
 	--exmem --> regDstSelect, memwb
 	signal dataAddr_exmem_rds : std_logic_vector(4 downto 0);
@@ -429,8 +447,8 @@ architecture RTL of TOP_Lvl is
 	--memwb --> ds		
 	signal memToReg_memwb_ds : std_logic;
 
-	--memwb --> rf
-	signal regWrite_memwb_rf : std_logic;
+	--memwb --> mrl
+	signal regWrite_memwb_mrl : std_logic;
 
 	--jas --> PC
 	signal jumpAddress_jas_pc : std_logic_vector(31 downto 0);
@@ -447,6 +465,14 @@ architecture RTL of TOP_Lvl is
 
 	--bcc --> pc
 	signal jump_flag_bcc_pc : std_logic;
+	
+	--mrl --> dm
+	signal memWrite_mrl_dm : std_logic;
+	
+	--mrl --> rf
+	signal regWrite_mrl_rf : std_logic;
+	
+	
 
 begin
 	--pc: PCSource unnoetig, da jumpaddressselect?
@@ -492,7 +518,7 @@ begin
 			     ALU_result_memwb_o => ALU_result_memwb_ds,
 			     dataAddr_memwb_o   => dataAddr_memwb_rf,
 			     memToReg_memwb_o   => memToReg_memwb_ds,
-			     regWrite_memwb_o   => regWrite_memwb_rf);
+			     regWrite_memwb_o   => regWrite_memwb_mrl);
 
 	jac : JumpAddrCompute
 		port map(branch_i      => branch_idex_exmem,
@@ -589,7 +615,7 @@ begin
 			     dataAddr_i   => dataAddr_memwb_rf,
 			     dataA_Addr_i => data_ifid_rf(25 downto 21),
 			     dataB_Addr_i => data_ifid_rf(20 downto 16),
-			     regWrite_i   => regWrite_memwb_rf,
+			     regWrite_i   => regWrite_mrl_rf,
 			     dataA_o      => dataA_rf_alu,
 			     dataB_o      => dataB_rf_alu);
 
@@ -624,7 +650,7 @@ begin
 			     jumpAddr_exmem_o   => jumpAddr_exmem_jas,
 			     branch_exmem_o     => branch_exmem_pc,
 			     memRead_exmem_o    => memRead_exmem_dm,
-			     memWrite_exmem_o   => memWrite_exmem_dm,
+			     memWrite_exmem_o   => memWrite_exmem_mrl,
 			     PCWrite_exmem_o    => PCWrite_exmem_pc,
 			     memToReg_exmem_o   => memToReg_exmem_memwb,
 			     regWrite_exmem_o   => regWrite_exmem_memwb,
@@ -667,8 +693,18 @@ begin
 			     rst_i        => reset,
 			     alu_result_i => ALU_result_exmem_dm,
 			     writeData_i  => B_data_exmem_dm,
-			     memWrite_i   => memWrite_exmem_dm,
+			     memWrite_i   => memWrite_mrl_dm,
 			     memRead_i    => memRead_exmem_dm,
 			     readData_o   => memData_dm_jas);
-
+				 
+	mrl : MemRegLock
+		port map(clk_i 			=> clock,
+				rst_i 			=> reset,
+				enable_i 		=> enable,
+				jump_flag_i 	=> '0', --jump_flag_bcc_pc
+				memWrite_i 		=> memWrite_exmem_mrl,
+				regWrite_i 		=> regWrite_memwb_mrl,
+				link_flag_i 	=> '0', --jump and link flag from between exmem/memwb
+				memWrite_o      => memWrite_mrl_dm,
+				regWrite_o 		=> regWrite_mrl_rf);
 end architecture RTL;
