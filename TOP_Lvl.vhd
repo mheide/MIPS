@@ -497,7 +497,7 @@ begin
 			     rst_i       => reset,
 			     enable_i    => enable,
 			     PCWrite_i   => PCWrite_exmem_pc,
-			     jump_flag_i => jump_flag_bcc_pc,
+			     jump_flag_i => '0',--jump_flag_bcc_pc
 			     jump_addr_i => jumpAddress_jas_pc,
 			     PC_o        => address_pc_ifid);
 

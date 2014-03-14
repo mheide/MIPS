@@ -42,10 +42,14 @@ begin
 						"10" when op = c_andi else
 						"10" when op = c_ori else
 						"10" when op = c_xori else
+						"10" when op = c_beq.opcode else
+						"10" when op = c_bne.opcode else
+						"10" when op = c_blez.opcode else
+						"10" when op = c_bgtz.opcode else						
 						"00" when op = c_lw else
 						"00" when op = c_sw else
 						"10" when op = c_jal else
-						"10" when op = c_j else
+						"10" when op = c_j else						
 						(others => '0');
 	ALUSrcB_o  <= "01" when op = "000000" and funct_i = c_jalr.funct else
 	                    "00" when op = "000000" else 
