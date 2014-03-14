@@ -42,6 +42,10 @@ begin
 						"10" when op = c_xori else
 						"00" when op = c_lw else
 						"00" when op = c_sw else
+						"10" when op = c_beq.opcode else
+						"10" when op = c_bne.opcode else
+						"10" when op = c_blez.opcode else
+						"10" when op = c_bgtz.opcode else	
 						(others => '0');
 	ALUSrcB_o  <= "00" when op = "000000" else 
 						"10" when op = c_addi else
