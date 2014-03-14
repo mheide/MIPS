@@ -25,11 +25,10 @@ begin
 	
 	A_o <= RF_A_i when ALUSrcA_i = '1' ELSE 
 	                 PC_A_i when ALUSrcA_i = '0' ELSE 
-	                 (others => 'X');
+	                 (others => '-');
 	B_o <= RF_B_i when ALUSrcB_i = "00" ELSE
 					std_logic_vector(to_unsigned(4,32)) when ALUSrcB_i = "01" ELSE
 					SignExt_B_i when ALUSrcB_i = "10" ELSE
-					signext_b(29 DOWNTO 0) & "00" when ALUSrcB_i = "11" ELSE
-					(others => 'X');
+					(others => '-');
 
 end architecture behaviour;

@@ -13,10 +13,12 @@ entity regDstSelect is
 end entity regDstSelect;
 
 architecture behaviour of regDstSelect is
+	--link return address
 	constant c_ra : natural := 31;
 begin
-	instruction_o <= instruction_15_11_i when regDst_i = '1' ELSE 
-	                 instruction_20_16_i when regDst_i = '0' ELSE
-	                 std_logic_vector(to_unsigned(c_ra, 5));
+	instruction_o <= instruction_15_11_i when regDst_i = "01" ELSE 
+	                 instruction_20_16_i when regDst_i = "00" ELSE
+	                 std_logic_vector(to_unsigned(c_ra, 5)) when regDst_i = "10" else
+	                 "-----";
 
 end architecture behaviour;

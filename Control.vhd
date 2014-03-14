@@ -6,12 +6,12 @@ entity Control is
 	port(
 		rst_i         : in  std_logic;
 		op_i          : in  std_logic_vector(5 DOWNTO 0);
+		funct_i       : in  std_logic_vector(5 downto 0);
 
 		PCWriteCond_o : out std_logic;
 		PCWrite_o     : out std_logic;
 		IorD_o        : out std_logic;
 
-       --PCSource replace jump and branch in multicycle implementation (Page 324)
 		branch_o      : out std_logic;	
 		MemRead_o     : out std_logic;
 		MemWrite_o    : out std_logic;
@@ -20,12 +20,12 @@ entity Control is
 		branchCond_o  : out branch_condition;
 		ALUOp_o       : out std_logic_vector(1 DOWNTO 0);
 
-		IRWrite_o     : out std_logic;
-
+		--IRWrite_o     : out std_logic;
+		--IRWrite ist jetzt RegWrite
 		PCSource_o    : out std_logic_vector(1 downto 0);
 		ALUSrcB_o     : out std_logic_vector(1 DOWNTO 0);
 		ALUSrcA_o     : out std_logic;
-		RegDst_o      : out std_logic
+		RegDst_o      : out std_logic_vector(1 downto 0)
 	);
 end entity Control;
 
@@ -42,9 +42,11 @@ begin
 						"10" when op = c_xori else
 						"00" when op = c_lw else
 						"00" when op = c_sw else
-						"00" when op = c_jal else
+						"10" when op = c_jal else
+						"10" when op = c_j else
 						(others => '0');
-	ALUSrcB_o  <= "00" when op = "000000" else 
+	ALUSrcB_o  <= "01" when op = "000000" and funct_i = c_jalr.funct else
+	                    "00" when op = "000000" else 
 						"10" when op = c_addi else
 						"10" when op = c_addiu else
 						"10" when op = c_andi else
@@ -58,7 +60,8 @@ begin
 						"00" when op = c_bgtz.opcode else
 						"01" when op = c_jal else
 						(others => '0');
-	ALUSrcA_o  <= '1' when op = "000000" else
+	ALUSrcA_o  <= '0' when op = "000000" and funct_i = c_jalr.funct else
+				        '1' when op = "000000" else
 						'1' when op = c_addi else
 						'1' when op = c_addiu else
 						'1' when op = c_andi else
@@ -91,14 +94,14 @@ begin
 						'0' when op = c_sw else
 						'0';
 
-	PCSource_o <=       "01" when op = c_beq.opcode  else
-	                    "01" when op = c_bgez.opcode else
-	                    "01" when op = c_bgezal.opcode else
-	                    "01" when op = c_bgtz.opcode else
-	                    "01" when op = c_blez.opcode else
-	                    "01" when op = c_bltzal.opcode else
-	                    "01" when op = c_bne.opcode else
-	                    "01" when op = c_bltz.opcode else
+	PCSource_o <=       "10" when op = c_beq.opcode  else
+	                    "10" when op = c_bgez.opcode else
+	                    "10" when op = c_bgezal.opcode else
+	                    "10" when op = c_bgtz.opcode else
+	                    "10" when op = c_blez.opcode else
+	                    "10" when op = c_bltzal.opcode else
+	                    "10" when op = c_bne.opcode else
+	                    "10" when op = c_bltz.opcode else
 						"01" when op = c_addi else
 						"01" when op = c_addiu else
 						"01" when op = c_andi else
@@ -118,18 +121,19 @@ begin
 						"01" when op = c_sh else
 						"01" when op = c_swl else
 						"01" when op = c_swr else
-						"10" when op = c_j else --jump
-						"10" when op = c_jal else --jump and link
+						"10" when op = c_j else
+						"10" when op = c_jal else
+						"01" when op = "000000" else --jr and jalr
 						(others => '0');
-	RegDst_o   <= "11" when op = "000000" else 
-						"10" when op = c_addi else
-						"10" when op = c_addiu else
-						"10" when op = c_andi else
-						"10" when op = c_ori else
-						"10" when op = c_xori else	
-						"10" when op = c_lw else
-						"00" when op = c_sw else
-						"00" when op = c_jal else
+	RegDst_o   <= "01" when op = "000000" else 
+						"00" when op = c_addi else
+						"00" when op = c_addiu else
+						"00" when op = c_andi else
+						"00" when op = c_ori else
+						"00" when op = c_xori else	
+						"00" when op = c_lw else
+						"--" when op = c_sw else
+						"10" when op = c_jal else
 						"--";
 	regWrite_o <= '1' when op = "000000" else 
 						'1' when op = c_addi else

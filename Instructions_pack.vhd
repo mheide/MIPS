@@ -332,8 +332,7 @@ package Instructions_pack is
 	type alu_code is (	c_alu_add, c_alu_addu, c_alu_sub, c_alu_subu,
 						c_alu_and, c_alu_or, c_alu_nor, c_alu_xor,
 						c_alu_sllv, c_alu_srlv, c_alu_sll, c_alu_srl,
-						c_alu_sra, c_alu_srav, c_alu_jal, c_alu_jalr, 
-						c_alu_jr, c_alu_zero,
+						c_alu_sra, c_alu_srav, c_alu_zero,
 						c_alu_error --needed?
 						);
 	--when to branch 

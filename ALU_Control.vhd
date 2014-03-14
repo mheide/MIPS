@@ -39,8 +39,7 @@ begin
 						c_alu_sub  when op_i = c_bgtz.opcode else
 						c_alu_sub  when op_i = c_blez.opcode else
 						c_alu_sub  when op_i = c_bne.opcode else
-						--jump and link
-						c_alu_add  when op_i = c_jal  else
+						c_alu_addu  when op_i = c_jal  else
 						c_alu_zero;		--don't care
 
 
@@ -58,7 +57,6 @@ begin
 					  c_alu_srl  when functioncode_i = c_srl.funct  else
 					  c_alu_sra  when functioncode_i = c_sra.funct  else
 					  c_alu_srav when functioncode_i = c_srav.funct else
-					  c_alu_add  when functioncode_i = c_jalr.funct else
-					  c_alu_jr   when functioncode_i = c_jr.funct   else					  
+					  c_alu_addu  when functioncode_i = c_jalr.funct else					  
 		              c_alu_error;
 end architecture RTL;

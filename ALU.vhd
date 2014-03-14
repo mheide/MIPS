@@ -48,9 +48,6 @@ begin
 				when c_alu_srl  => C_temp <= std_logic_vector(shift_right(unsigned(B_i), to_integer(unsigned(shamt_i))));
 				when c_alu_sra  => C_temp <= std_logic_vector(shift_right(signed(A_i), to_integer(unsigned(B_i(4 downto 0)))));
 				when c_alu_srav => C_temp <= std_logic_vector(shift_right(signed(B_i), to_integer(unsigned(shamt_i))));
-				when c_alu_jal =>  C_temp <= std_logic_vector(unsigned(A_i) + unsigned(B_i));
-				when c_alu_jalr => C_temp <= std_logic_vector(unsigned(A_i) + unsigned(B_i));
-				when c_alu_jr   => C_temp <= A_i;
 				when others => C_temp <= c_alu_error;
 			end case;
 		end if;

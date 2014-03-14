@@ -9,7 +9,8 @@ architecture tb of tb_top_lvl is
 
 component TOP_Lvl
 	port(clk_i    : in std_logic;
-		 rst_i    : in std_logic);
+		 rst_i    : in std_logic;
+		 enable_i : in std_logic);
 end component TOP_Lvl;
 
 	signal CLK : std_logic := '0';
@@ -20,7 +21,8 @@ begin
 	dut : TOP_Lvl
 	port map(
 		clk_i    => CLK,
-		rst_i    => RST
+		rst_i    => RST,
+		enable_i => ENABLE
 	);
 	
 	RST <= '1', '0' after 15 ns;
