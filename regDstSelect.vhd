@@ -15,9 +15,8 @@ end entity regDstSelect;
 architecture behaviour of regDstSelect is
 	constant c_ra : natural := 31;
 begin
-	instruction_o <= instruction_15_11_i when regDst_i = "11" ELSE 
-	                 instruction_20_16_i when regDst_i = "10" ELSE
-	                 std_logic_vector(to_unsigned(c_ra, 5)) when regDst_i = "00" else
-	                 (others => 'X');
+	instruction_o <= instruction_15_11_i when regDst_i = '1' ELSE 
+	                 instruction_20_16_i when regDst_i = '0' ELSE
+	                 std_logic_vector(to_unsigned(c_ra, 5));
 
 end architecture behaviour;

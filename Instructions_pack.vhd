@@ -336,6 +336,8 @@ package Instructions_pack is
 						c_alu_jr, c_alu_zero,
 						c_alu_error --needed?
 						);
+	--when to branch 
+	type branch_condition is (bc_beq, bc_bgtz, bc_blez, bc_bne);
 
 end package Instructions_pack;
 

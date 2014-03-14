@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use work.Instructions_pack.all;
 
 entity EX_MEM is                        --first pipeline stage with instruction_register
 	port(
@@ -8,8 +9,8 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 		enable_i           : in  std_logic;
 		PC_exmem_i         : in  std_logic_vector(31 downto 0);
 		ALU_result_exmem_i : in  std_logic_vector(31 downto 0);
-		ALUdataA_exmem_i   : in  std_logic_vector(31 downto 0);
-		--B_data_exmem_i	   : in  std_logic_vector(31 downto 0);
+		B_data_exmem_i	   : in  std_logic_vector(31 downto 0);
+		neg_flag_exmem_i   : in  std_logic;
 		zero_flag_exmem_i  : in  std_logic;
 		dataAddr_exmem_i   : in  std_logic_vector(4 downto 0);
 		PCSource_exmem_i   : in  std_logic_vector(1 DOWNTO 0);
@@ -21,11 +22,12 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 
 		memToReg_exmem_i   : in  std_logic; --WB
 		regWrite_exmem_i   : in  std_logic;
+		branchCond_exmem_i : in  branch_condition;
 
 		PC_exmem_o         : out std_logic_vector(31 downto 0);
 		ALU_result_exmem_o : out std_logic_vector(31 downto 0);
-		ALUdataA_exmem_o    : out std_logic_vector(31 downto 0);
-		--B_data_exmem_o	   : out std_logic_vector(31 downto 0);		
+		B_data_exmem_o	   : out std_logic_vector(31 downto 0);	
+		neg_flag_exmem_o   : out std_logic;
 		zero_flag_exmem_o  : out std_logic;
 		dataAddr_exmem_o   : out std_logic_vector(4 downto 0);
 		PCSource_exmem_o   : out std_logic_vector(1 DOWNTO 0);
@@ -36,40 +38,43 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 		memWrite_exmem_o   : out std_logic;
 
 		memToReg_exmem_o   : out std_logic;
-		regWrite_exmem_o   : out std_logic
+		regWrite_exmem_o   : out std_logic;
+		branchCond_exmem_o : out branch_condition
 	);
 end entity EX_MEM;
 
 architecture behaviour of EX_MEM is
 	signal pc         : std_logic_vector(31 DOWNTO 0);
 	signal alu_result : std_logic_vector(31 DOWNTO 0);
-	signal alu_data_a  : std_logic_vector(31 downto 0);
 	signal dataAddr   : std_logic_vector(4 downto 0);
-	--signal bdata	  : std_logic_vector(31 downto 0);
+	signal bdata	  : std_logic_vector(31 downto 0);
+	signal neg_flag	  : std_logic;
 	signal zero_flag  : std_logic;
 	signal branch     : std_logic;
 	signal memRead    : std_logic;
 	signal memWrite   : std_logic;
 	signal memToReg   : std_logic;
 	signal regWrite   : std_logic;
+	signal branchC	  : branch_condition;
 	signal pcsource   : std_logic_vector(1 DOWNTO 0);
 	signal offset     : std_logic_vector(25 downto 0);
---TODO: do we need (commented) B_data_ ?
+
 begin
-	EX_MEM_reg : process(clk_i, rst_i) is
+	EX_MEM_reg : process(clk_i, rst_i, enable_i) is
 	begin
 		if rst_i = '1' then
 			pc         <= (others => '0');
 			alu_result <= (others => '0');
-			alu_data_a <= (others => '0');
 			dataAddr   <= (others => '0');
-			--bdata	   <= (others => '0');
+			bdata	   <= (others => '0');
+			neg_flag   <= '0';
 			zero_flag  <= '0';
 			branch     <= '0';
 			memRead    <= '0';
 			memWrite   <= '0';
 			memToReg   <= '0';
 			regWrite   <= '0';
+			branchC	   <= bc_bne;
 			pcsource   <= (others => '0');
 			offset     <= (others => '0');
 
@@ -77,8 +82,8 @@ begin
 			if enable_i = '1' then
 				pc         <= PC_exmem_i;
 				alu_result <= ALU_result_exmem_i;
-				alu_data_a  <= ALUdataA_exmem_i;
-				--bdata	   <= B_data_exmem_i;
+				bdata	   <= B_data_exmem_i;
+				neg_flag   <= neg_flag_exmem_i;
 				zero_flag  <= zero_flag_exmem_i;
 				dataAddr   <= dataAddr_exmem_i;
 				branch     <= branch_exmem_i;
@@ -86,6 +91,7 @@ begin
 				memWrite   <= memWrite_exmem_i;
 				memToReg   <= memToReg_exmem_i;
 				regWrite   <= regWrite_exmem_i;
+				branchC	   <= branchCond_exmem_i;
 				pcsource   <= PCSource_exmem_i;
 				offset     <= offset_exmem_i;
 			end if;
@@ -94,14 +100,15 @@ begin
 
 	PC_exmem_o         <= pc;
 	ALU_result_exmem_o <= alu_result;
-	ALUdataA_exmem_o    <= alu_data_a;
-	--B_data_exmem_o	   <= bdata;
+	B_data_exmem_o	   <= bdata;
+	neg_flag_exmem_o   <= neg_flag;
 	zero_flag_exmem_o  <= zero_flag;
 	branch_exmem_o     <= branch;
 	memRead_exmem_o    <= memRead;
 	memWrite_exmem_o   <= memWrite;
 	memToReg_exmem_o   <= memToReg;
 	regWrite_exmem_o   <= regWrite;
+	branchCond_exmem_o <= branchC;
 	dataAddr_exmem_o   <= dataAddr;
 	PCSource_exmem_o   <= pcsource;
 	offset_exmem_o 	   <= offset;

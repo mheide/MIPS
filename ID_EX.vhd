@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use work.Instructions_pack.all;
 
 entity ID_EX is                         --first pipeline stage with instruction_register
 	port(
@@ -21,12 +22,14 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		op_idex_i			 : in  std_logic_vector(5 downto 0);
 		instruction_25_16_idex_i : in std_logic_vector(9 downto 0);
 		instruction_25_0_i   : in std_logic_vector(25 downto 0);
-
+		
+		branch_idex_i        : in  std_logic; --M
 		memRead_idex_i       : in  std_logic;
 		memWrite_idex_i      : in  std_logic;
 
 		memToReg_idex_i      : in  std_logic; --WB
 		regWrite_idex_i      : in  std_logic;
+		branchCond_idex_i	 : in  branch_condition;
 
 		PCSource_idex_o      : out std_logic_vector(1 downto 0);
 		PC_idex_o            : out std_logic_vector(31 downto 0);
@@ -42,12 +45,14 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		op_idex_o 			 : out std_logic_vector(5 downto 0);
 		instruction_25_16_idex_o : out std_logic_vector(9 downto 0);
 		instruction_25_0_o   : out std_logic_vector(25 downto 0);	
-
+		
+		branch_idex_o        : out std_logic;
 		memRead_idex_o       : out std_logic;
 		memWrite_idex_o      : out std_logic;
 
 		memToReg_idex_o      : out std_logic; --WB
-		regWrite_idex_o      : out std_logic
+		regWrite_idex_o      : out std_logic;
+		branchCond_idex_o	 : out branch_condition
 	);
 end entity ID_EX;
 
@@ -61,18 +66,19 @@ architecture behaviour of ID_EX is
 	signal op			: std_logic_vector(5 downto 0);
 	signal instr25_16   : std_logic_vector(9 downto 0);
 	signal instr25_0    : std_logic_vector(25 downto 0);
-	
 
 	signal aluSrcA  : std_logic;
 	signal aluSrcB  : std_logic_vector(1 DOWNTO 0);
 	signal dataA, dataB : std_logic_vector(31 downto 0);
+	signal branch   : std_logic;
 	signal memRead  : std_logic;
 	signal memWrite : std_logic;
 	signal memToReg : std_logic;
 	signal regWrite : std_logic;
+	signal branchC 	: branch_condition;
 
 begin
-	ID_EX_reg : process(clk_i, rst_i, enable_i) is
+	ID_EX_reg : process(clk_i, rst_i) is
 	begin
 		if rst_i = '1' then
 			aluop        <= (others => '0');
@@ -89,10 +95,12 @@ begin
 			aluSrcA  <= '0';
 			dataA    <= (others => '0');
 			dataB    <= (others => '0');
+			branch   <= '0';
 			memRead  <= '0';
 			memWrite <= '0';
 			memToReg <= '0';
 			regWrite <= '0';
+			branchC	 <= bc_bne;
 
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
@@ -110,10 +118,12 @@ begin
 				aluSrcA  <= ALUSrcA_idex_i;
 				dataA    <= dataA_idex_i;
 				dataB    <= dataB_idex_i;
+				branch   <= branch_idex_i;
 				memRead  <= memRead_idex_i;
 				memWrite <= memWrite_idex_i;
 				memToReg <= memToReg_idex_i;
 				regWrite <= regWrite_idex_i;
+				branchC  <= branchCond_idex_i;
 
 			end if;
 		end if;
@@ -134,9 +144,11 @@ begin
 	instruction_25_16_idex_o <= instr25_16;
 	instruction_25_0_o   <= instr25_0;
 
+	branch_idex_o   <= branch;
 	memRead_idex_o  <= memRead;
 	memWrite_idex_o <= memWrite;
 	memToReg_idex_o <= memToReg;
 	regWrite_idex_o <= regWrite;
+	branchCond_idex_o <= branchC;
 
 end architecture;
