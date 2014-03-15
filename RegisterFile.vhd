@@ -63,7 +63,7 @@ architecture behaviour of RegisterFile is
 	signal dataA 		 : std_logic_vector(31 downto 0);
 	signal dataB 		 : std_logic_vector(31 downto 0);
 begin
-	registers(0) <= (others => '0');    --register $0
+	--registers(0) <= (others => '0');    --register $0
 
 	dataA <= registers(TO_INTEGER(UNSIGNED(dataA_Addr_i)));
 

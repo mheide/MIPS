@@ -7,7 +7,7 @@ use work.Instructions_pack.all;
 
 entity Instruction_Memory is
 	generic(
-		size : natural := 100 --number of instructions
+		size : natural := 25 --number of instructions
 	);
 	port(
 		pc_i  : in  std_logic_vector(31 DOWNTO 0);
