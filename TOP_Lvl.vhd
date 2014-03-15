@@ -330,6 +330,7 @@ architecture RTL of TOP_Lvl is
 			regWrite_i  : in std_logic; --4 cycles
 			link_flag_i : in std_logic; -- link
 			
+			jump_flag_o : out std_logic;
 			memWrite_o  : out std_logic;
 			regWrite_o  : out std_logic
 		);	
@@ -480,14 +481,17 @@ architecture RTL of TOP_Lvl is
 	signal dataA_os_alu : std_logic_vector(31 downto 0);
 	signal dataB_os_alu : std_logic_vector(31 downto 0);
 
-	--bcc --> pc
-	signal jump_flag_bcc_pc : std_logic;
+	--bcc --> mrl
+	signal jump_flag_bcc_mrl : std_logic;
 	
 	--mrl --> dm
 	signal memWrite_mrl_dm : std_logic;
 	
 	--mrl --> rf
 	signal regWrite_mrl_rf : std_logic;
+	
+	--mrl --> pc 
+	signal jump_flag_mrl_pc : std_logic;
 	
 	
 
@@ -514,7 +518,7 @@ begin
 			     rst_i       => reset,
 			     enable_i    => enable,
 			     PCWrite_i   => PCWrite_exmem_pc,
-			     jump_flag_i => '0',--jump_flag_bcc_pc
+			     jump_flag_i => '0',--jump_flag_mrl_pc
 			     jump_addr_i => jumpAddress_jas_pc,
 			     PC_o        => address_pc_ifid);
 
@@ -549,7 +553,7 @@ begin
 			     branchCond_i => branchCond_exmem_bcc,
 			     zero_i       => zero_exmem_pc,
 			     negative_i   => neg_exmem_pc,
-			     jump_flag_o  => jump_flag_bcc_pc);
+			     jump_flag_o  => jump_flag_bcc_mrl);
 
 	ifid : IF_ID
 		port map(clk_i         => clock,
@@ -730,10 +734,11 @@ begin
 		port map(clk_i 			=> clock,
 				rst_i 			=> reset,
 				enable_i 		=> enable,
-				jump_flag_i 	=> '0', --jump_flag_bcc_pc
+				jump_flag_i 	=> '0', --jump_flag_bcc_mrl
 				memWrite_i 		=> memWrite_exmem_mrl,
 				regWrite_i 		=> regWrite_memwb_mrl,
 				link_flag_i 	=> '0', --jump and link flag from between exmem/memwb
+				jump_flag_o  	=> jump_flag_mrl_pc,
 				memWrite_o      => memWrite_mrl_dm,
 				regWrite_o 		=> regWrite_mrl_rf);
 end architecture RTL;

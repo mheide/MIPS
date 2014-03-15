@@ -17,6 +17,7 @@ component MemRegLock is
 		regWrite_i  : in std_logic; --4 cycles
 		link_flag_i : in std_logic;
 		
+		jump_flag_o : out std_logic;
 		memWrite_o  : out std_logic;
 		regWrite_o  : out std_logic
 	);
@@ -30,7 +31,8 @@ end component MemRegLock;
 	signal JUMP_FLAG_I : std_logic := '0';
 	signal MEMWRITE_I : std_logic := '0';
 	signal REGWRITE_I : std_logic := '0';
-	signal LINKFLAG_I : std_logic := '0';	
+	signal LINKFLAG_I : std_logic := '0';
+	signal JUMP_FLAG_O : std_logic;
 	signal MEMWRITE_O : std_logic;
 	signal REGWRITE_O : std_logic;
 
@@ -46,6 +48,7 @@ begin
 		memWrite_i  => MEMWRITE_I,
 		regWrite_i  => REGWRITE_I,
 		link_flag_i => LINKFLAG_I,
+		jump_flag_o => JUMP_FLAG_O,
 		memWrite_o  => MEMWRITE_O,
 		regWrite_o  => REGWRITE_O
 	);

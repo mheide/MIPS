@@ -12,6 +12,7 @@ entity MemRegLock is
 		regWrite_i  : in std_logic; --4 cycles
 		link_flag_i : in std_logic; -- link
 		
+		jump_flag_o : out std_logic;
 		memWrite_o  : out std_logic;
 		regWrite_o  : out std_logic
 	);
@@ -26,8 +27,8 @@ architecture behaviour of MemRegLock is
 	
 	signal firstStageLinkFlag : std_logic := '0';
 	
-	signal memOut : std_logic := '0';
 	signal regOut : std_logic := '0';
+	signal memOut : std_logic := '0';
 
 begin
 
@@ -35,6 +36,8 @@ begin
 	regOut <= memOut or fourthStage;
 	
 	memWrite_o <= memWrite_i and (not memOut);
+	
+	jump_flag_o <= jump_flag_i and (not regOut); --regOut locks for 4 cycles
 	
 	--only if firstStage = 1 ==> previous instruction was jump and link
 	regWrite_o <= '1' when firstStageLinkFlag = '1' ELSE
