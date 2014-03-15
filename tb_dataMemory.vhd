@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use work.Instructions_pack.all;
 
 entity tb_dataMemory is
 
@@ -19,6 +20,7 @@ component DataMemory is
 		writeData_i  : in  std_logic_vector(31 DOWNTO 0);
 		memWrite_i   : in  std_logic;   --0 for arithmetic op's
 		memRead_i 	 : in  std_logic;
+		load_mode_flag_i : in load_mode;		
 		
 		readData_o   : out std_logic_vector(31 DOWNTO 0)
 	);
@@ -33,6 +35,7 @@ end component;
 	signal MEMWRITE : std_logic := '0';
 	signal MEMREAD : std_logic := '0';
 	signal READDATA : std_logic_vector(31 downto 0);
+	signal LOADMODE : load_mode := ld_lw;
 	
 	
 	
@@ -47,6 +50,7 @@ end component;
 			writeData_i => WRITEDATA,
 			memWrite_i => MEMWRITE,
 			memRead_i => MEMREAD,
+			load_mode_flag_i => LOADMODE,
 			readData_o => READDATA
 	);
 	
@@ -59,10 +63,12 @@ end component;
 	end process;
 
 	ALURESULT <= x"00000000" after 30 ns, x"00000004" after 70 ns, x"00000000" after 110 ns,
-	             x"33333333" after 130 ns;
+	             x"00000004" after 130 ns, x"00000004" after 150 ns;
 	WRITEDATA <= x"A05054F4" after 35 ns, x"DDDDDA6A" after 80 ns;
-	MEMWRITE <= '1' after 35 ns, '0' after 100 ns;
-	MEMREAD <= '1' after 95 ns, '0' after 120 ns;
+	MEMWRITE <= '0' after 35 ns, '0' after 100 ns;
+	MEMREAD <= '1' after 95 ns, '0' after 220 ns;
+	LOADMODE <= ld_lhu after 115 ns, ld_lh after 135 ns, ld_lb after 155 ns,
+				ld_lbu after 175 ns;
 	
 	
 		
