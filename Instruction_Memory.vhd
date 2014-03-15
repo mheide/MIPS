@@ -7,7 +7,7 @@ use work.Instructions_pack.all;
 
 entity Instruction_Memory is
 	generic(
-		size : natural := 41 --number of instructions
+		size : natural := 100 --number of instructions
 	);
 	port(
 		pc_i  : in  std_logic_vector(31 DOWNTO 0);
@@ -20,7 +20,7 @@ architecture behaviour of Instruction_Memory is
 	constant jump2 : J_Type := (opcode => c_j, address => "00" & x"000006"); --jump to pc = 24
 	constant jump : J_Type := (opcode => c_j, address => "00" & x"000001"); --jump to pc==4 (add normal)
 	constant jal : J_Type := (opcode => c_jal, address => "00" & x"000014"); --jump to pc80 and link to $ra
-	type memRegType is array (0 to 99) of std_logic_vector(7 downto 0);
+	type memRegType is array (0 to size2 - 1) of std_logic_vector(7 downto 0);
 	signal memReg : memRegType := (
 		
 		"00000000",	"00000000",	"00000000",	"00000000",	--nop pc=0
