@@ -69,7 +69,9 @@ architecture RTL of TOP_Lvl is
 			regWrite_o    : out std_logic;
 			branchCond_o  : out branch_condition;
 			ALUOp_o       : out std_logic_vector(1 DOWNTO 0);
-
+			loadMode_o 	  : out load_mode;
+			storeMode_o   : out store_mode;
+			
 			PCSource_o    : out std_logic_vector(1 downto 0);
 			ALUSrcB_o     : out std_logic_vector(1 DOWNTO 0);
 			ALUSrcA_o     : out std_logic;
@@ -109,6 +111,8 @@ architecture RTL of TOP_Lvl is
 			branch_idex_i            : in  std_logic; --M
 			memRead_idex_i           : in  std_logic;
 			memWrite_idex_i          : in  std_logic;
+			loadMode_idex_i	 	     : in  load_mode;
+			storeMode_idex_i	     : in  store_mode;			
 			PCWrite_idex_i           : in  std_logic;
 
 			memToReg_idex_i          : in  std_logic; --WB
@@ -131,6 +135,8 @@ architecture RTL of TOP_Lvl is
 			branch_idex_o            : out std_logic;
 			memRead_idex_o           : out std_logic;
 			memWrite_idex_o          : out std_logic;
+			loadMode_idex_o 	 	 : out load_mode;
+			storeMode_idex_o	 	 : out store_mode;			
 			PCWrite_idex_o           : out std_logic;
 
 			memToReg_idex_o          : out std_logic; --WB
@@ -157,6 +163,8 @@ architecture RTL of TOP_Lvl is
 			branch_exmem_i     : in  std_logic; --M
 			memRead_exmem_i    : in  std_logic;
 			memWrite_exmem_i   : in  std_logic;
+			loadMode_exmem_i   : in  load_mode;
+			storeMode_exmem_i  : in  store_mode;			
 			PCWrite_exmem_i    : in  std_logic;
 
 			memToReg_exmem_i   : in  std_logic; --WB
@@ -176,6 +184,8 @@ architecture RTL of TOP_Lvl is
 			branch_exmem_o     : out std_logic;
 			memRead_exmem_o    : out std_logic;
 			memWrite_exmem_o   : out std_logic;
+			loadMode_exmem_o   : out load_mode;
+			storeMode_exmem_o  : out store_mode;
 			PCWrite_exmem_o    : out std_logic;
 
 			memToReg_exmem_o   : out std_logic;
@@ -282,7 +292,8 @@ architecture RTL of TOP_Lvl is
 			writeData_i  		: in  std_logic_vector(31 DOWNTO 0);
 			memWrite_i   		: in  std_logic; 
 			memRead_i    		: in  std_logic;
-			load_mode_flag_i 	: in load_mode;
+			loadMode_i 	        : in  load_mode;
+			storeMode_i         : in  store_mode;
 
 			readData_o   : out std_logic_vector(31 DOWNTO 0)
 		);
@@ -350,8 +361,9 @@ architecture RTL of TOP_Lvl is
 
 	--exmem --> dataMemory
 	signal memRead_exmem_dm    : std_logic;
-	signal memWrite_exmem_dm   : std_logic;
 	signal ALU_result_exmem_dm : std_logic_vector(31 downto 0);
+	signal loadMode_exmem_dm   : load_mode;
+	signal storeMode_exmem_dm  : store_mode;
 	
 	--exmem --> mrl
 	signal memWrite_exmem_mrl   : std_logic;	
@@ -366,6 +378,8 @@ architecture RTL of TOP_Lvl is
 	signal memRead_idex_exmem           : std_logic;
 	signal memWrite_idex_exmem          : std_logic;
 	signal memToReg_idex_exmem          : std_logic;
+	signal loadMode_idex_exmem 			: load_mode;
+	signal storeMode_idex_exmem			: store_mode;
 	signal regWrite_idex_exmem          : std_logic;
 	signal branchCond_idex_exmem        : branch_condition;
 	signal dataAddr_idex_exmem          : std_logic_vector(4 downto 0);
@@ -417,6 +431,8 @@ architecture RTL of TOP_Lvl is
 	signal regWrite_ctrl_idex   : std_logic;
 	signal branchCond_ctrl_idex : branch_condition;
 	signal ALUop_ctrl_idex      : std_logic_vector(1 downto 0);
+	signal loadMode_ctrl_idex 	: load_mode;
+	signal storeMode_ctrl_idex	: store_mode;
 
 	--ctrl --> regDstSelect
 	signal regDst_ctrl_rds : std_logic_vector(1 downto 0);
@@ -561,6 +577,8 @@ begin
 			     branch_idex_i            => branch_ctrl_idex,
 			     memRead_idex_i           => memRead_ctrl_idex,
 			     memWrite_idex_i          => memWrite_ctrl_idex,
+				 loadMode_idex_i		  => loadMode_ctrl_idex,
+				 storeMode_idex_i		  => storeMode_ctrl_idex,
 			     PCWrite_idex_i           => PCWrite_ctrl_idex,
 			     memToReg_idex_i          => memToReg_ctrl_idex,
 			     regWrite_idex_i          => regWrite_ctrl_idex,
@@ -579,6 +597,8 @@ begin
 			     branch_idex_o            => branch_idex_exmem,
 			     memRead_idex_o           => memRead_idex_exmem,
 			     memWrite_idex_o          => memWrite_idex_exmem,
+				 loadMode_idex_o		  => loadMode_idex_exmem,
+				 storeMode_idex_o		  => storeMode_idex_exmem,
 			     PCWrite_idex_o           => PCWrite_idex_exmem,
 			     memToReg_idex_o          => memToReg_idex_exmem,
 			     regWrite_idex_o          => regWrite_idex_exmem,
@@ -604,6 +624,8 @@ begin
 			     regWrite_o    => regWrite_ctrl_idex,
 			     branchCond_o  => branchCond_ctrl_idex,
 			     ALUOp_o       => ALUop_ctrl_idex,
+				 loadMode_o    => loadMode_ctrl_idex,
+				 storeMode_o   => storeMode_ctrl_idex,
 			     PCSource_o    => PCSource_ctrl_idex,
 			     ALUSrcB_o     => ALUSrcB_ctrl_idex,
 			     ALUSrcA_o     => ALUSrcA_ctrl_idex,
@@ -636,6 +658,8 @@ begin
 			     branch_exmem_i     => branch_idex_exmem,
 			     memRead_exmem_i    => memRead_idex_exmem,
 			     memWrite_exmem_i   => memWrite_idex_exmem,
+				 loadMode_exmem_i   => loadMode_idex_exmem,
+				 storeMode_exmem_i  => storeMode_idex_exmem,
 			     PCWrite_exmem_i    => PCWrite_idex_exmem,
 			     memToReg_exmem_i   => memToReg_idex_exmem,
 			     regWrite_exmem_i   => regWrite_idex_exmem,
@@ -652,6 +676,8 @@ begin
 			     branch_exmem_o     => branch_exmem_pc,
 			     memRead_exmem_o    => memRead_exmem_dm,
 			     memWrite_exmem_o   => memWrite_exmem_mrl,
+				 loadMode_exmem_o   => loadMode_exmem_dm,
+				 storeMode_exmem_o  => storeMode_exmem_dm,
 			     PCWrite_exmem_o    => PCWrite_exmem_pc,
 			     memToReg_exmem_o   => memToReg_exmem_memwb,
 			     regWrite_exmem_o   => regWrite_exmem_memwb,
@@ -696,7 +722,8 @@ begin
 			     writeData_i  => B_data_exmem_dm,
 			     memWrite_i   => memWrite_mrl_dm,
 			     memRead_i    => memRead_exmem_dm,
-				 load_mode_flag_i => ld_lw, --has to be generated by control
+				 loadMode_i => loadMode_exmem_dm,
+				 storeMode_i => storeMode_exmem_dm,
 			     readData_o   => memData_dm_jas);
 				 
 	mrl : MemRegLock

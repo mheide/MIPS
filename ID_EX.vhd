@@ -24,6 +24,8 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		branch_idex_i        : in  std_logic; --M
 		memRead_idex_i       : in  std_logic;
 		memWrite_idex_i      : in  std_logic;
+		loadMode_idex_i	 	 : in  load_mode;
+		storeMode_idex_i	 : in  store_mode;
 		PCWrite_idex_i       : in  std_logic;
 
 		memToReg_idex_i      : in  std_logic; --WB
@@ -46,6 +48,8 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		branch_idex_o        : out std_logic;
 		memRead_idex_o       : out std_logic;
 		memWrite_idex_o      : out std_logic;
+		loadMode_idex_o 	 : out load_mode;
+		storeMode_idex_o	 : out store_mode;
 		PCWrite_idex_o       : out std_logic;
 
 		memToReg_idex_o      : out std_logic; --WB
@@ -74,6 +78,8 @@ architecture behaviour of ID_EX is
 	signal memToReg : std_logic;
 	signal regWrite : std_logic;
 	signal branchC 	: branch_condition;
+	signal loadM 	: load_mode;
+	signal storeM	: store_mode;
 
 begin
 	ID_EX_reg : process(clk_i, rst_i) is
@@ -98,6 +104,8 @@ begin
 			memToReg <= '0';
 			regWrite <= '0';
 			branchC	 <= bc_bne;
+			loadM	 <= ld_lw;
+			storeM	 <= st_sw;
 
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
@@ -116,6 +124,8 @@ begin
 				branch   <= branch_idex_i;
 				memRead  <= memRead_idex_i;
 				memWrite <= memWrite_idex_i;
+				loadM	 <= loadMode_idex_i;
+				storeM	 <= storeMode_idex_i;
 				pcWrite  <= PCWrite_idex_i;
 				memToReg <= memToReg_idex_i;
 				regWrite <= regWrite_idex_i;
@@ -141,6 +151,8 @@ begin
 	branch_idex_o   <= branch;
 	memRead_idex_o  <= memRead;
 	memWrite_idex_o <= memWrite;
+	loadMode_idex_o <= loadM;
+	storeMode_idex_o<= storeM;
 	PCWrite_idex_o  <= pcWrite;
 	memToReg_idex_o <= memToReg;
 	regWrite_idex_o <= regWrite;

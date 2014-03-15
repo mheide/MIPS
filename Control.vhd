@@ -19,6 +19,8 @@ entity Control is
 		regWrite_o    : out std_logic;
 		branchCond_o  : out branch_condition;
 		ALUOp_o       : out std_logic_vector(1 DOWNTO 0);
+		loadMode_o 	  : out load_mode;
+		storeMode_o   : out store_mode;
 
 		--IRWrite_o     : out std_logic;
 		--IRWrite ist jetzt RegWrite
@@ -47,10 +49,16 @@ begin
 						"10" when op = c_blez.opcode else
 						"10" when op = c_bgtz.opcode else						
 						"00" when op = c_lw else
+						"00" when op = c_lh else
+						"00" when op = c_lb else
+						"00" when op = c_lhu else
+						"00" when op = c_lbu else
 						"00" when op = c_sw else
+						"00" when op = c_sh else
+						"00" when op = c_sb else
 						"10" when op = c_jal else
 						"10" when op = c_j else						
-						(others => '0');
+						(others => '0');						
 	ALUSrcB_o  <= "01" when op = "000000" and funct_i = c_jalr.funct else
 	                    "00" when op = "000000" else 
 						"10" when op = c_addi else
@@ -59,7 +67,13 @@ begin
 						"10" when op = c_ori else
 						"10" when op = c_xori else	
 						"10" when op = c_lw else
+						"10" when op = c_lh else
+						"10" when op = c_lb else
+						"10" when op = c_lhu else
+						"10" when op = c_lbu else
 						"10" when op = c_sw else
+						"10" when op = c_sh else
+						"10" when op = c_sb else
 						"00" when op = c_beq.opcode else
 						"00" when op = c_bne.opcode else
 						"00" when op = c_blez.opcode else
@@ -74,7 +88,13 @@ begin
 						'1' when op = c_ori else
 						'1' when op = c_xori else						
 						'1' when op = c_lw else
+						'1' when op = c_lh else
+						'1' when op = c_lb else
+						'1' when op = c_lhu else
+						'1' when op = c_lbu else
 						'1' when op = c_sw else
+						'1' when op = c_sh else
+						'1' when op = c_sb else
 						'1' when op = c_beq.opcode else
 						'1' when op = c_bne.opcode else
 						'1' when op = c_blez.opcode else
@@ -88,7 +108,13 @@ begin
 						'0' when op = c_ori else
 						'0' when op = c_xori else	
 						'0' when op = c_lw else
+						'0' when op = c_lh else
+						'0' when op = c_lb else
+						'0' when op = c_lhu else
+						'0' when op = c_lbu else
 						'1' when op = c_sw else
+						'1' when op = c_sh else
+						'1' when op = c_sb else
 						'0';
 	MemRead_o <= '0'  when op = "000000" else
 						'0' when op = c_addi else
@@ -97,7 +123,13 @@ begin
 						'0' when op = c_ori else
 						'0' when op = c_xori else	
 						'1' when op = c_lw else
+						'1' when op = c_lh else
+						'1' when op = c_lb else
+						'1' when op = c_lhu else
+						'1' when op = c_lbu else
 						'0' when op = c_sw else
+						'0' when op = c_sh else
+						'0' when op = c_sb else
 						'0';
 
 	PCSource_o <=       "10" when op = c_beq.opcode  else
@@ -138,7 +170,13 @@ begin
 						"00" when op = c_ori else
 						"00" when op = c_xori else	
 						"00" when op = c_lw else
+						"00" when op = c_lh else
+						"00" when op = c_lb else
+						"00" when op = c_lhu else
+						"00" when op = c_lbu else						
 						"--" when op = c_sw else
+						"10" when op = c_sh else
+						"10" when op = c_sb else						
 						"10" when op = c_jal else
 						"--";
 	regWrite_o <= '1' when op = "000000" else 
@@ -148,8 +186,14 @@ begin
 						'1' when op = c_ori else
 						'1' when op = c_xori else		
 						'1' when op = c_lw else
+						'1' when op = c_lh else
+						'1' when op = c_lb else
+						'1' when op = c_lhu else
+						'1' when op = c_lbu else						
 						'1' when op = c_jal else
 						'0' when op = c_sw else
+						'0' when op = c_sh else
+						'0' when op = c_sb else						
 						'0' when op = c_j  else
 						'0';
 	MemToReg_o <= '0' when op = "000000" else
@@ -160,7 +204,13 @@ begin
 						'0' when op = c_xori else
 						'0' when op = c_jal else	
 						'1' when op = c_lw else
+						'1' when op = c_lh else
+						'1' when op = c_lb else
+						'1' when op = c_lhu else
+						'1' when op = c_lbu else							
 						'-' when op = c_sw else
+						'-' when op = c_sh else
+						'-' when op = c_sb else							
 						'0';
 	branchCond_o <= bc_beq 	when op = c_beq.opcode else --right know not needed, 
 						bc_bgtz when op = c_bgtz.opcode else
@@ -177,5 +227,16 @@ begin
 	             '1' when op = c_jr.opcode and funct = c_jr.funct else
 	             '1' when op = c_jalr.opcode and funct = c_jalr.funct else
 	             '0';
+	
+	loadMode_o <= ld_lw when op = c_lw else
+						ld_lh when op = c_lh else
+						ld_lb when op = c_lb else
+						ld_lhu when op = c_lhu else
+						ld_lbu;
 
+	storeMode_o <= 	st_sw when op = c_sw else
+							st_sh when op = c_sh else
+							st_sb;
+	
+	
 end architecture;

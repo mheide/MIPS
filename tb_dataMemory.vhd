@@ -20,7 +20,8 @@ component DataMemory is
 		writeData_i  : in  std_logic_vector(31 DOWNTO 0);
 		memWrite_i   : in  std_logic;   --0 for arithmetic op's
 		memRead_i 	 : in  std_logic;
-		load_mode_flag_i : in load_mode;		
+		loadMode_i   : in load_mode;	
+		storeMode_i  : in store_mode;
 		
 		readData_o   : out std_logic_vector(31 DOWNTO 0)
 	);
@@ -36,9 +37,7 @@ end component;
 	signal MEMREAD : std_logic := '0';
 	signal READDATA : std_logic_vector(31 downto 0);
 	signal LOADMODE : load_mode := ld_lw;
-	
-	
-	
+	signal STOREMODE : store_mode:= st_sw;
 	
 	begin
 	
@@ -50,7 +49,8 @@ end component;
 			writeData_i => WRITEDATA,
 			memWrite_i => MEMWRITE,
 			memRead_i => MEMREAD,
-			load_mode_flag_i => LOADMODE,
+			loadMode_i => LOADMODE,
+			storeMode_i => STOREMODE,
 			readData_o => READDATA
 	);
 	

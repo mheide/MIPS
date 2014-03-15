@@ -20,6 +20,8 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 		branch_exmem_i     : in  std_logic; --M
 		memRead_exmem_i    : in  std_logic;
 		memWrite_exmem_i   : in  std_logic;
+		loadMode_exmem_i   : in  load_mode;
+		storeMode_exmem_i  : in  store_mode;
 		PCWrite_exmem_i    : in  std_logic;
 
 		memToReg_exmem_i   : in  std_logic; --WB
@@ -39,6 +41,8 @@ entity EX_MEM is                        --first pipeline stage with instruction_
 		branch_exmem_o     : out std_logic;
 		memRead_exmem_o    : out std_logic;
 		memWrite_exmem_o   : out std_logic;
+		loadMode_exmem_o   : out load_mode;
+		storeMode_exmem_o  : out store_mode;
 		PCWrite_exmem_o    : out std_logic;
 
 		memToReg_exmem_o   : out std_logic;
@@ -58,6 +62,8 @@ architecture behaviour of EX_MEM is
 	signal branch     : std_logic;
 	signal memRead    : std_logic;
 	signal memWrite   : std_logic;
+	signal loadM	  : load_mode;
+	signal storeM	  : store_mode;
 	signal pcWrite    : std_logic;
 	signal memToReg   : std_logic;
 	signal regWrite   : std_logic;
@@ -85,6 +91,8 @@ begin
 			branchC	   <= bc_bne;
 			pcsource   <= (others => '0');
 			jaddr      <= (others => '0');
+			loadM	   <= ld_lw;
+			storeM	   <= st_sw;
 
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
@@ -98,6 +106,8 @@ begin
 				branch     <= branch_exmem_i;
 				memRead    <= memRead_exmem_i;
 				memWrite   <= memWrite_exmem_i;
+				loadM	   <= loadMode_exmem_i;
+				storeM	   <= storeMode_exmem_i;
 				pcWrite    <= PCWrite_exmem_i;
 				memToReg   <= memToReg_exmem_i;
 				regWrite   <= regWrite_exmem_i;
@@ -117,6 +127,8 @@ begin
 	branch_exmem_o     <= branch;
 	memRead_exmem_o    <= memRead;
 	memWrite_exmem_o   <= memWrite;
+	loadMode_exmem_o   <= loadM;
+	storeMode_exmem_o  <= storeM;
 	PCWrite_exmem_o    <= pcWrite;
 	memToReg_exmem_o   <= memToReg;
 	regWrite_exmem_o   <= regWrite;

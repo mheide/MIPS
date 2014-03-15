@@ -337,8 +337,12 @@ package Instructions_pack is
 						);
 	--when to branch 
 	type branch_condition is (bc_beq, bc_bgtz, bc_blez, bc_bne);
+	
 	--how much data to load
 	type load_mode is (ld_lb, ld_lbu, ld_lh, ld_lhu, ld_lw);
+	
+	--how much data to store
+	type store_mode is (st_sb, st_sh, st_sw);
 
 end package Instructions_pack;
 
