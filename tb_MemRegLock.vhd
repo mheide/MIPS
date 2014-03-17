@@ -53,10 +53,11 @@ begin
 		regWrite_o  => REGWRITE_O
 	);
 
-	JUMP_FLAG_I <= '1' after 25 ns, '0' after 45 ns, '1' after 70 ns, '0' after 110 ns,
-	'1' after 150 ns, '0' after 190 ns;
+	JUMP_FLAG_I <= '1' after 25 ns, '0' after 45 ns, '1' after 65 ns, '0' after 105 ns,
+	'1' after 145 ns, '0' after 185 ns;
 	MEMWRITE_I <= '1' after 43 ns, '0' after 102 ns;
 	REGWRITE_I <= '1' after 43 ns, '0' after 130 ns;
+	LINKFLAG_I <= '1' after 145 ns;
 	
 
 	clock_generator : process is

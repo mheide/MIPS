@@ -20,53 +20,60 @@ end MemRegLock;
 	
 architecture behaviour of MemRegLock is
 
-	signal firstStage : std_logic := '0';
-	signal secondStage : std_logic := '0';
-	signal thirdStage : std_logic := '0';
-	signal fourthStage : std_logic := '0';
-	
-	signal firstStageLinkFlag : std_logic := '0';
-	
-	signal regOut : std_logic := '0';
-	signal memOut : std_logic := '0';
+	type lock_states is (unlocked, lock1, lock2, lock3);
+	signal state : lock_states := unlocked;
 
+	signal noLock : std_logic := '1';
+	signal noLockLink : std_logic := '1';
+	
 begin
 
-	memOut <= firstStage or secondStage or thirdStage;
-	regOut <= memOut or fourthStage;
-	
-	memWrite_o <= memWrite_i and (not memOut);
-	
-	jump_flag_o <= jump_flag_i and (not regOut); --regOut locks for 4 cycles
-	
-	--only if firstStage = 1 ==> previous instruction was jump and link
-	regWrite_o <= '1' when firstStageLinkFlag = '1' ELSE
-					regWrite_i and (not regOut);
-	--regWrite_o <= regWrite_i and (not regOut);	--without link
 
-	lock : process(clk_i, rst_i) is
+
+	lock_machine : process(clk_i, rst_i, jump_flag_i, link_flag_i) is
 	begin
-		if rst_i = '1' then
-			firstStage <= '0';
-			secondStage <= '0';
-			thirdStage <= '0';
-			fourthStage <= '0';
-			firstStageLinkFlag <= '0';
-		elsif rising_edge(clk_i) then
-			if enable_i = '1' then
-				if memOut = '0' then --new valid instruction possible
-					firstStage <= jump_flag_i;
-					firstStageLinkFlag <= link_flag_i;
-				else
-					firstStage <= '0';
-					firstStageLinkFlag <= '0';
-				end if;
-				secondStage <= firstStage;
-				thirdStage <= secondStage;
-				fourthStage <= thirdStage;
+		if rising_edge(clk_i) then
+			if rst_i = '1' then 
+				state <= unlocked;
+				noLock <= '1';				
+			else
+				case state is
+					when unlocked =>
+						if jump_flag_i = '1' then 
+							if link_flag_i = '1' then 
+								noLockLink <= '1';							
+							else							
+								noLockLink <= '0';
+							end if;
+							
+							state <= lock1;
+							noLock <= '0';
+						end if;
+						
+					when lock1 => 
+						noLock <= '0';
+						noLockLink <= '0';
+						state <= lock2;
+					
+					
+					when lock2 => 
+						noLock <= '0';
+						noLockLink <= '0';
+						state <= lock3;	
+
+					when lock3 => 
+						noLock <= '1';
+						noLockLink <= '1';
+						state <= unlocked;
+				end case;
 			end if;
 		end if;
-	end process lock;
+	end process lock_machine;
+	
+	
+	jump_flag_o <= jump_flag_i and noLock;
+	memWrite_o <= memWrite_i and noLock;
+	regWrite_o <= regWrite_i and noLockLink;
 
 end architecture behaviour;
 
