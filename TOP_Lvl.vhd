@@ -235,7 +235,6 @@ architecture RTL of TOP_Lvl is
 			clk_i       : in  std_logic;
 			rst_i       : in  std_logic;
 			enable_i    : in  std_logic;
-			PCWrite_i   : in  std_logic;
 			jump_flag_i : in  std_logic;
 			jump_addr_i : in  std_logic_vector(31 downto 0);
 			PC_o        : out std_logic_vector(31 downto 0)
@@ -319,6 +318,7 @@ architecture RTL of TOP_Lvl is
 			branchCond_i : in  branch_condition;
 			zero_i       : in  std_logic;
 			negative_i   : in  std_logic;
+			PCWrite_i 	 : in  std_logic;
 
 			jump_flag_o  : out std_logic
 		);
@@ -331,8 +331,7 @@ architecture RTL of TOP_Lvl is
 			enable_i 	: in std_logic;
 			jump_flag_i : in std_logic;
 			memWrite_i  : in std_logic; --3 cycles
-			regWrite_i  : in std_logic; --4 cycles
-			link_flag_i : in std_logic; -- link
+			regWrite_i  : in std_logic; --3 cycles
 			
 			jump_flag_o : out std_logic;
 			memWrite_o  : out std_logic;
@@ -344,17 +343,18 @@ architecture RTL of TOP_Lvl is
 	signal clock  : std_logic;
 	signal enable : std_logic;
 
+	--TODO: rename
 	--exmem --> pc --beide nicht angekommen
 	signal neg_exmem_pc     : std_logic; --fuer branch
 	signal zero_exmem_pc    : std_logic; --fuer branch
 	signal branch_exmem_pc  : std_logic; -- noch mal sichergehen wie genau (PCSource?)
 	signal B_data_exmem_dm  : std_logic_vector(31 downto 0);
-	signal PCWrite_exmem_pc : std_logic;
+	
 
 	--exmem --> memwb
 	signal PC_exmem_memwb       : std_logic_vector(31 downto 0);
 	signal memToReg_exmem_memwb : std_logic;
-	signal regWrite_exmem_memwb : std_logic;
+
 
 	--exmem --> jas
 	signal PCSrc_exmem_jas    : std_logic_vector(1 downto 0);
@@ -363,7 +363,8 @@ architecture RTL of TOP_Lvl is
 
 	--exmem --> bcc
 	signal branchCond_exmem_bcc : branch_condition;
-
+	signal PCWrite_exmem_bcc : std_logic;
+	
 	--exmem --> dataMemory
 	signal memRead_exmem_dm    : std_logic;
 	signal ALU_result_exmem_dm : std_logic_vector(31 downto 0);
@@ -372,7 +373,8 @@ architecture RTL of TOP_Lvl is
 	
 	--exmem --> mrl
 	signal memWrite_exmem_mrl   : std_logic;	
-
+	signal regWrite_exmem_mrl   : std_logic;
+	
 	--exmem --> regDstSelect, memwb
 	signal dataAddr_exmem_rds : std_logic_vector(4 downto 0);
 
@@ -473,8 +475,8 @@ architecture RTL of TOP_Lvl is
 	--memwb --> ds		
 	signal memToReg_memwb_ds : std_logic;
 
-	--memwb --> mrl
-	signal regWrite_memwb_mrl : std_logic;
+	--memwb --> rf
+	signal regWrite_memwb_rf : std_logic;	
 
 	--jas --> PC
 	signal jumpAddress_jas_pc : std_logic_vector(31 downto 0);
@@ -495,8 +497,8 @@ architecture RTL of TOP_Lvl is
 	--mrl --> dm
 	signal memWrite_mrl_dm : std_logic;
 	
-	--mrl --> rf
-	signal regWrite_mrl_rf : std_logic;
+	--mrl --> memwb
+	signal regWrite_mrl_memwb : std_logic;
 	
 	--mrl --> pc 
 	signal jump_flag_mrl_pc : std_logic;
@@ -525,7 +527,6 @@ begin
 		port map(clk_i       => clock,
 			     rst_i       => reset,
 			     enable_i    => enable,
-			     PCWrite_i   => PCWrite_exmem_pc,
 			     jump_flag_i => '0',--jump_flag_mrl_pc
 			     jump_addr_i => jumpAddress_jas_pc,
 			     PC_o        => address_pc_ifid);
@@ -543,11 +544,11 @@ begin
 			     ALU_result_memwb_i => ALU_result_exmem_dm,
 			     dataAddr_memwb_i   => dataAddr_exmem_rds,
 			     memToReg_memwb_i   => memToReg_exmem_memwb,
-			     regWrite_memwb_i   => regWrite_exmem_memwb,
+			     regWrite_memwb_i   => regWrite_mrl_memwb,
 			     ALU_result_memwb_o => ALU_result_memwb_ds,
 			     dataAddr_memwb_o   => dataAddr_memwb_rf,
 			     memToReg_memwb_o   => memToReg_memwb_ds,
-			     regWrite_memwb_o   => regWrite_memwb_mrl);
+			     regWrite_memwb_o   => regWrite_memwb_rf);
 
 	jac : JumpAddrCompute
 		port map(branch_i      => branch_idex_exmem,
@@ -561,6 +562,7 @@ begin
 			     branchCond_i => branchCond_exmem_bcc,
 			     zero_i       => zero_exmem_pc,
 			     negative_i   => neg_exmem_pc,
+				 PCWrite_i 	  => PCWrite_exmem_bcc,
 			     jump_flag_o  => jump_flag_bcc_mrl);
 
 	ifid : IF_ID
@@ -653,7 +655,7 @@ begin
 			     dataAddr_i   => dataAddr_memwb_rf,
 			     dataA_Addr_i => data_ifid_rf(25 downto 21),
 			     dataB_Addr_i => data_ifid_rf(20 downto 16),
-			     regWrite_i   => regWrite_mrl_rf,
+			     regWrite_i   => regWrite_memwb_rf,
 			     dataA_o      => dataA_rf_alu,
 			     dataB_o      => dataB_rf_alu);
 
@@ -693,9 +695,9 @@ begin
 			     memWrite_exmem_o   => memWrite_exmem_mrl,
 				 loadMode_exmem_o   => loadMode_exmem_dm,
 				 storeMode_exmem_o  => storeMode_exmem_dm,
-			     PCWrite_exmem_o    => PCWrite_exmem_pc,
+			     PCWrite_exmem_o    => PCWrite_exmem_bcc,
 			     memToReg_exmem_o   => memToReg_exmem_memwb,
-			     regWrite_exmem_o   => regWrite_exmem_memwb,
+			     regWrite_exmem_o   => regWrite_exmem_mrl,
 			     branchCond_exmem_o => branchCond_exmem_bcc);
 
 	ac : ALU_Control
@@ -748,9 +750,8 @@ begin
 				enable_i 		=> enable,
 				jump_flag_i 	=> jump_flag_bcc_mrl, --jump_flag_bcc_mrl
 				memWrite_i 		=> memWrite_exmem_mrl,
-				regWrite_i 		=> regWrite_memwb_mrl,
-				link_flag_i 	=> '0', --jump and link flag from between exmem/memwb
+				regWrite_i 		=> regWrite_exmem_mrl,
 				jump_flag_o  	=> jump_flag_mrl_pc,
 				memWrite_o      => memWrite_mrl_dm,
-				regWrite_o 		=> regWrite_mrl_rf);
+				regWrite_o 		=> regWrite_mrl_memwb);
 end architecture RTL;
