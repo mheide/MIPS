@@ -18,14 +18,16 @@ end entity Instruction_Memory;
 architecture behaviour of Instruction_Memory is
 	constant size2 : integer := size * 4;
 	constant jump2 : J_Type := (opcode => c_j, address => "00" & x"000006"); --jump to pc = 24
-	constant jump : J_Type := (opcode => c_j, address => "00" & x"000001"); --jump to pc==4 (add normal)
-	constant jal : J_Type := (opcode => c_jal, address => "00" & x"000014"); --jump to pc80 and link to $ra
+	constant jump : J_Type := (opcode => c_j, address => "00" & x"000001"); --jump to pc==4
+	constant jal : J_Type := (opcode => c_jal, address => "00" & x"000013"); --jump to pc76 and link to $ra
+	constant jalr : R_Type := (opcode => c_jalr.opcode, rs => '1'&x"F", rt => c_jalr.rt, rd => '1'&x"F", shamt => '0'&x"0", funct => c_jalr.funct);
+	constant jr   : R_Type := (opcode => c_jr.opcode, rs => '1'&x"F", rt => c_jr.rt, rd => '0'&x"0", shamt => '0'&x"0", funct => c_jr.funct);
 	type memRegType is array (0 to size2 - 1) of std_logic_vector(7 downto 0);
 	signal memReg : memRegType := (
 		
 		"00000000",	"00000000",	"00000000",	"00000000",	--nop pc=0
 		
-		jump2.opcode & jump2.address(25 downto 24), jump2.address(23 downto 16), jump2.address(15 downto 8), jump2.address(7 downto 0), --jump to pc64, pc=4
+		jump2.opcode & jump2.address(25 downto 24), jump2.address(23 downto 16), jump2.address(15 downto 8), jump2.address(7 downto 0), --jump to pc24, pc=4
 		
 		x"00", x"00", x"00", x"00",	--nop pc=8
 		
@@ -37,7 +39,7 @@ architecture behaviour of Instruction_Memory is
 		
 		jal.opcode & jal.address(25 downto 24), jal.address(23 downto 16), jal.address(15 downto 8), jal.address(7 downto 0),	--pc=24
 
-		x"00",	x"00",	x"00",	x"00",	--pc=28 nop
+		jr.opcode & jr.rs(4 downto 3), jr.rs(2 downto 0) & jr.rt, jr.rd & jr.shamt(4 downto 2), jr.shamt(1 downto 0) & jr.funct,	--pc=28 nop
 
 		"00000000",	"00000000", "00000000",	"00000000", --nop pc=32
 
@@ -61,16 +63,15 @@ architecture behaviour of Instruction_Memory is
 		
 		"00000000", "01100110",	"01111000",	"00100000",	--pc=72
 		
-		"00000000", "01100110",	"11111000",	"00100010",	--sub pc=76
+		jalr.opcode & jalr.rs(4 downto 3), jalr.rs(2 downto 0) & jalr.rt, jalr.rd & jalr.shamt(4 downto 2), jalr.shamt(1 downto 0) & jalr.funct,	--sub pc=76
 		
-		 jump.opcode & jump.address(25 downto 24), jump.address(23 downto 16), jump.address(15 downto 8), jump.address(7 downto 0),--jump pc=80
+		jump.opcode & jump.address(25 downto 24), jump.address(23 downto 16), jump.address(15 downto 8), jump.address(7 downto 0),--jump pc=80
 		 
-		 x"00", x"00", x"00", x"00", --pc84
-		 x"00", x"00", x"00", x"00", --pc88
-		 x"00", x"00", x"00", x"00", --pc92
-		 x"00", x"00", x"00", x"00" --pc96
-
-		
+		x"00", x"00", x"00", x"00", --pc84
+		x"00", x"00", x"00", x"00", --pc88
+		x"00", x"00", x"00", x"00", --pc92
+		x"00", x"00", x"00", x"00" --pc96
+	
 	);
 	signal output : std_logic_vector(31 DOWNTO 0);
 	

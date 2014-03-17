@@ -194,7 +194,7 @@ begin
 						"10" when op = c_sb else						
 						"10" when op = c_jal else
 						"--";
-	regWrite_o <= '1' when op = "000000" else 
+	regWrite_o <= '1' when op = "000000" and funct /= "000000" else 
 						'1' when op = c_addi else
 						'1' when op = c_addiu else
 						'1' when op = c_andi else
@@ -208,6 +208,7 @@ begin
 						'1' when op = c_lhu else
 						'1' when op = c_lbu else						
 						'1' when op = c_jal else
+						'1' when op = c_jalr.opcode and funct = c_jalr.funct else
 						'0' when op = c_sw else
 						'0' when op = c_sh else
 						'0' when op = c_sb else						

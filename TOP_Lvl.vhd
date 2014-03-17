@@ -527,7 +527,7 @@ begin
 		port map(clk_i       => clock,
 			     rst_i       => reset,
 			     enable_i    => enable,
-			     jump_flag_i => '0',--jump_flag_mrl_pc
+			     jump_flag_i => jump_flag_mrl_pc,
 			     jump_addr_i => jumpAddress_jas_pc,
 			     PC_o        => address_pc_ifid);
 
