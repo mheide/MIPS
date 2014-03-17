@@ -7,11 +7,11 @@ entity TOP_Lvl_xilinx is
 		clk_i    : in std_logic;
 		rst_i    : in std_logic;
 		enable_i : in std_logic;
-		Led  : out std_logic_vector(7 downto 0)
+		Led      : out std_logic_vector(7 downto 0)
 	);
 end entity TOP_Lvl_xilinx;
 
-architecture behavioral of TOP_Lvl_xilinx is
+architecture RTL of TOP_Lvl_xilinx is
 	component ALU
 		port(
 			rst_i      : in  std_logic;
@@ -19,6 +19,7 @@ architecture behavioral of TOP_Lvl_xilinx is
 			B_i        : in  std_logic_vector(31 downto 0);
 			ALU_ctrl_i : in  alu_code;
 			shamt_i    : in  std_logic_vector(4 downto 0); --needed for bitshifts
+			compare_i  : in  std_logic;
 			C_o        : out std_logic_vector(31 downto 0);
 			negative_o : out std_logic;
 			zero_o     : out std_logic
@@ -72,7 +73,8 @@ architecture behavioral of TOP_Lvl_xilinx is
 			ALUOp_o       : out std_logic_vector(1 DOWNTO 0);
 			loadMode_o 	  : out load_mode;
 			storeMode_o   : out store_mode;
-
+			compare_o     : out std_logic;
+			
 			PCSource_o    : out std_logic_vector(1 downto 0);
 			ALUSrcB_o     : out std_logic_vector(1 DOWNTO 0);
 			ALUSrcA_o     : out std_logic;
@@ -90,7 +92,7 @@ architecture behavioral of TOP_Lvl_xilinx is
 		);
 	end component;
 
-		component ID_EX
+	component ID_EX
 		port(
 			clk_i                    : in  std_logic;
 			rst_i                    : in  std_logic;
@@ -115,7 +117,8 @@ architecture behavioral of TOP_Lvl_xilinx is
 			loadMode_idex_i	 	     : in  load_mode;
 			storeMode_idex_i	     : in  store_mode;			
 			PCWrite_idex_i           : in  std_logic;
-
+			compare_idex_i		 	 : in  std_logic;
+		
 			memToReg_idex_i          : in  std_logic; --WB
 			regWrite_idex_i          : in  std_logic;
 			branchCond_idex_i        : in  branch_condition;
@@ -139,6 +142,7 @@ architecture behavioral of TOP_Lvl_xilinx is
 			loadMode_idex_o 	 	 : out load_mode;
 			storeMode_idex_o	 	 : out store_mode;			
 			PCWrite_idex_o           : out std_logic;
+			compare_idex_o 		 	 : out std_logic;
 
 			memToReg_idex_o          : out std_logic; --WB
 			regWrite_idex_o          : out std_logic;
@@ -232,7 +236,6 @@ architecture behavioral of TOP_Lvl_xilinx is
 			clk_i       : in  std_logic;
 			rst_i       : in  std_logic;
 			enable_i    : in  std_logic;
-			PCWrite_i   : in  std_logic;
 			jump_flag_i : in  std_logic;
 			jump_addr_i : in  std_logic_vector(31 downto 0);
 			PC_o        : out std_logic_vector(31 downto 0)
@@ -316,6 +319,7 @@ architecture behavioral of TOP_Lvl_xilinx is
 			branchCond_i : in  branch_condition;
 			zero_i       : in  std_logic;
 			negative_i   : in  std_logic;
+			PCWrite_i 	 : in  std_logic;
 
 			jump_flag_o  : out std_logic
 		);
@@ -328,8 +332,7 @@ architecture behavioral of TOP_Lvl_xilinx is
 			enable_i 	: in std_logic;
 			jump_flag_i : in std_logic;
 			memWrite_i  : in std_logic; --3 cycles
-			regWrite_i  : in std_logic; --4 cycles
-			link_flag_i : in std_logic; -- link
+			regWrite_i  : in std_logic; --3 cycles
 			
 			jump_flag_o : out std_logic;
 			memWrite_o  : out std_logic;
@@ -341,17 +344,18 @@ architecture behavioral of TOP_Lvl_xilinx is
 	signal clock  : std_logic;
 	signal enable : std_logic;
 
+	--TODO: rename
 	--exmem --> pc --beide nicht angekommen
 	signal neg_exmem_pc     : std_logic; --fuer branch
 	signal zero_exmem_pc    : std_logic; --fuer branch
 	signal branch_exmem_pc  : std_logic; -- noch mal sichergehen wie genau (PCSource?)
 	signal B_data_exmem_dm  : std_logic_vector(31 downto 0);
-	signal PCWrite_exmem_pc : std_logic;
+	
 
 	--exmem --> memwb
 	signal PC_exmem_memwb       : std_logic_vector(31 downto 0);
 	signal memToReg_exmem_memwb : std_logic;
-	signal regWrite_exmem_memwb : std_logic;
+
 
 	--exmem --> jas
 	signal PCSrc_exmem_jas    : std_logic_vector(1 downto 0);
@@ -360,7 +364,8 @@ architecture behavioral of TOP_Lvl_xilinx is
 
 	--exmem --> bcc
 	signal branchCond_exmem_bcc : branch_condition;
-
+	signal PCWrite_exmem_bcc : std_logic;
+	
 	--exmem --> dataMemory
 	signal memRead_exmem_dm    : std_logic;
 	signal ALU_result_exmem_dm : std_logic_vector(31 downto 0);
@@ -369,7 +374,8 @@ architecture behavioral of TOP_Lvl_xilinx is
 	
 	--exmem --> mrl
 	signal memWrite_exmem_mrl   : std_logic;	
-
+	signal regWrite_exmem_mrl   : std_logic;
+	
 	--exmem --> regDstSelect, memwb
 	signal dataAddr_exmem_rds : std_logic_vector(4 downto 0);
 
@@ -391,6 +397,9 @@ architecture behavioral of TOP_Lvl_xilinx is
 	--idex --> jac
 	signal offset_idex_jac     : std_logic_vector(25 downto 0);
 	signal instr_25_0_idex_jac : std_logic_vector(25 downto 0);
+	
+	--idex --> alu
+	signal compare_idex_alu		: std_logic;
 
 	--alu --> exmem
 	signal neg_alu_exmem  : std_logic;
@@ -435,6 +444,7 @@ architecture behavioral of TOP_Lvl_xilinx is
 	signal ALUop_ctrl_idex      : std_logic_vector(1 downto 0);
 	signal loadMode_ctrl_idex 	: load_mode;
 	signal storeMode_ctrl_idex	: store_mode;
+	signal compare_ctrl_idex	: std_logic;
 
 	--ctrl --> regDstSelect
 	signal regDst_ctrl_rds : std_logic_vector(1 downto 0);
@@ -466,8 +476,8 @@ architecture behavioral of TOP_Lvl_xilinx is
 	--memwb --> ds		
 	signal memToReg_memwb_ds : std_logic;
 
-	--memwb --> mrl
-	signal regWrite_memwb_mrl : std_logic;
+	--memwb --> rf
+	signal regWrite_memwb_rf : std_logic;	
 
 	--jas --> PC
 	signal jumpAddress_jas_pc : std_logic_vector(31 downto 0);
@@ -482,17 +492,18 @@ architecture behavioral of TOP_Lvl_xilinx is
 	signal dataA_os_alu : std_logic_vector(31 downto 0);
 	signal dataB_os_alu : std_logic_vector(31 downto 0);
 
-	--bcc --> pc
-	signal jump_flag_bcc_pc : std_logic;
+	--bcc --> mrl
+	signal jump_flag_bcc_mrl : std_logic;
 	
 	--mrl --> dm
 	signal memWrite_mrl_dm : std_logic;
 	
-	--mrl --> rf
-	signal regWrite_mrl_rf : std_logic;
+	--mrl --> memwb
+	signal regWrite_mrl_memwb : std_logic;
 	
 	--mrl --> pc 
 	signal jump_flag_mrl_pc : std_logic;
+	
 	
 
 begin
@@ -501,8 +512,8 @@ begin
 	clock  <= clk_i;
 	reset  <= rst_i;
 	enable <= enable_i;
-	Led(3 downto 0) <= dataA_rf_alu(3 downto 0);
-	Led(7 downto 4) <= dataB_rf_alu(7 downto 4);
+	Led(5 downto 0) <= C_alu_exmem(5 downto 0);
+	Led(7 downto 6) <= neg_alu_exmem & zero_alu_exmem;
 	--nice to have: make it clearer
 	signExtAddr_complete_idex_se <= signExtAddr_idex_se & functioncode_idex_ac;
 	offset_idex_jac              <= instruction_25_16_idex_exmem & signExtAddr_complete_idex_se;
@@ -518,7 +529,6 @@ begin
 		port map(clk_i       => clock,
 			     rst_i       => reset,
 			     enable_i    => enable,
-			     PCWrite_i   => PCWrite_exmem_pc,
 			     jump_flag_i => '0',--jump_flag_mrl_pc
 			     jump_addr_i => jumpAddress_jas_pc,
 			     PC_o        => address_pc_ifid);
@@ -536,11 +546,11 @@ begin
 			     ALU_result_memwb_i => ALU_result_exmem_dm,
 			     dataAddr_memwb_i   => dataAddr_exmem_rds,
 			     memToReg_memwb_i   => memToReg_exmem_memwb,
-			     regWrite_memwb_i   => regWrite_exmem_memwb,
+			     regWrite_memwb_i   => regWrite_mrl_memwb,
 			     ALU_result_memwb_o => ALU_result_memwb_ds,
 			     dataAddr_memwb_o   => dataAddr_memwb_rf,
 			     memToReg_memwb_o   => memToReg_memwb_ds,
-			     regWrite_memwb_o   => regWrite_memwb_mrl);
+			     regWrite_memwb_o   => regWrite_memwb_rf);
 
 	jac : JumpAddrCompute
 		port map(branch_i      => branch_idex_exmem,
@@ -554,7 +564,8 @@ begin
 			     branchCond_i => branchCond_exmem_bcc,
 			     zero_i       => zero_exmem_pc,
 			     negative_i   => neg_exmem_pc,
-			     jump_flag_o  => jump_flag_bcc_pc);
+				 PCWrite_i 	  => PCWrite_exmem_bcc,
+			     jump_flag_o  => jump_flag_bcc_mrl);
 
 	ifid : IF_ID
 		port map(clk_i         => clock,
@@ -585,6 +596,7 @@ begin
 				 loadMode_idex_i		  => loadMode_ctrl_idex,
 				 storeMode_idex_i		  => storeMode_ctrl_idex,
 			     PCWrite_idex_i           => PCWrite_ctrl_idex,
+				 compare_idex_i			  => compare_ctrl_idex,
 			     memToReg_idex_i          => memToReg_ctrl_idex,
 			     regWrite_idex_i          => regWrite_ctrl_idex,
 			     branchCond_idex_i        => branchCond_ctrl_idex,
@@ -605,6 +617,7 @@ begin
 				 loadMode_idex_o		  => loadMode_idex_exmem,
 				 storeMode_idex_o		  => storeMode_idex_exmem,
 			     PCWrite_idex_o           => PCWrite_idex_exmem,
+				 compare_idex_o 		  => compare_idex_alu,
 			     memToReg_idex_o          => memToReg_idex_exmem,
 			     regWrite_idex_o          => regWrite_idex_exmem,
 			     branchCond_idex_o        => branchCond_idex_exmem);
@@ -631,6 +644,7 @@ begin
 			     ALUOp_o       => ALUop_ctrl_idex,
 				 loadMode_o    => loadMode_ctrl_idex,
 				 storeMode_o   => storeMode_ctrl_idex,
+				 compare_o 	   => compare_ctrl_idex,
 			     PCSource_o    => PCSource_ctrl_idex,
 			     ALUSrcB_o     => ALUSrcB_ctrl_idex,
 			     ALUSrcA_o     => ALUSrcA_ctrl_idex,
@@ -643,7 +657,7 @@ begin
 			     dataAddr_i   => dataAddr_memwb_rf,
 			     dataA_Addr_i => data_ifid_rf(25 downto 21),
 			     dataB_Addr_i => data_ifid_rf(20 downto 16),
-			     regWrite_i   => regWrite_mrl_rf,
+			     regWrite_i   => regWrite_memwb_rf,
 			     dataA_o      => dataA_rf_alu,
 			     dataB_o      => dataB_rf_alu);
 
@@ -683,9 +697,9 @@ begin
 			     memWrite_exmem_o   => memWrite_exmem_mrl,
 				 loadMode_exmem_o   => loadMode_exmem_dm,
 				 storeMode_exmem_o  => storeMode_exmem_dm,
-			     PCWrite_exmem_o    => PCWrite_exmem_pc,
+			     PCWrite_exmem_o    => PCWrite_exmem_bcc,
 			     memToReg_exmem_o   => memToReg_exmem_memwb,
-			     regWrite_exmem_o   => regWrite_exmem_memwb,
+			     regWrite_exmem_o   => regWrite_exmem_mrl,
 			     branchCond_exmem_o => branchCond_exmem_bcc);
 
 	ac : ALU_Control
@@ -702,6 +716,7 @@ begin
 			     B_i        => dataB_os_alu,
 			     ALU_ctrl_i => alu_code_ac_alu,
 			     shamt_i    => signExtAddr_idex_se(4 downto 0),
+				 compare_i  => compare_idex_alu,
 			     C_o        => C_alu_exmem,
 			     negative_o => neg_alu_exmem,
 			     zero_o     => zero_alu_exmem);
@@ -735,10 +750,10 @@ begin
 		port map(clk_i 			=> clock,
 				rst_i 			=> reset,
 				enable_i 		=> enable,
-				jump_flag_i 	=> '0', --jump_flag_bcc_pc
+				jump_flag_i 	=> jump_flag_bcc_mrl, --jump_flag_bcc_mrl
 				memWrite_i 		=> memWrite_exmem_mrl,
-				regWrite_i 		=> regWrite_memwb_mrl,
-				link_flag_i 	=> '0', --jump and link flag from between exmem/memwb
+				regWrite_i 		=> regWrite_exmem_mrl,
+				jump_flag_o  	=> jump_flag_mrl_pc,
 				memWrite_o      => memWrite_mrl_dm,
-				regWrite_o 		=> regWrite_mrl_rf);
-end architecture behavioral;
+				regWrite_o 		=> regWrite_mrl_memwb);
+end architecture RTL;

@@ -29,13 +29,12 @@ begin
 
 
 
-	lock_machine : process(clk_i, rst_i, jump_flag_i, regWrite_i) is
+	lock_machine : process(clk_i, rst_i) is
 	begin
-		if rising_edge(clk_i) then
 			if rst_i = '1' then 
 				state <= unlocked;
 				noLock <= '1';				
-			else
+			elsif rising_edge(clk_i) then
 				case state is
 					when unlocked =>
 						if jump_flag_i = '1' then 
@@ -66,7 +65,6 @@ begin
 						noLockLink <= '1';
 						state <= unlocked;
 				end case;
-			end if;
 		end if;
 	end process lock_machine;
 	
