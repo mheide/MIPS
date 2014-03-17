@@ -9,8 +9,7 @@ entity MemRegLock is
 		enable_i 	: in std_logic;
 		jump_flag_i : in std_logic;
 		memWrite_i  : in std_logic; --3 cycles
-		regWrite_i  : in std_logic; --4 cycles
-		link_flag_i : in std_logic; -- link
+		regWrite_i  : in std_logic; --3 cycles
 		
 		jump_flag_o : out std_logic;
 		memWrite_o  : out std_logic;
@@ -30,7 +29,7 @@ begin
 
 
 
-	lock_machine : process(clk_i, rst_i, jump_flag_i, link_flag_i) is
+	lock_machine : process(clk_i, rst_i, jump_flag_i, regWrite_i) is
 	begin
 		if rising_edge(clk_i) then
 			if rst_i = '1' then 
@@ -40,7 +39,8 @@ begin
 				case state is
 					when unlocked =>
 						if jump_flag_i = '1' then 
-							if link_flag_i = '1' then 
+							--if regwrite_i = 1 then link 
+							if regWrite_i = '1' then 
 								noLockLink <= '1';							
 							else							
 								noLockLink <= '0';
