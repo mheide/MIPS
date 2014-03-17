@@ -18,6 +18,7 @@ architecture RTL of TOP_Lvl is
 			B_i        : in  std_logic_vector(31 downto 0);
 			ALU_ctrl_i : in  alu_code;
 			shamt_i    : in  std_logic_vector(4 downto 0); --needed for bitshifts
+			compare_i  : in  std_logic;
 			C_o        : out std_logic_vector(31 downto 0);
 			negative_o : out std_logic;
 			zero_o     : out std_logic
@@ -71,6 +72,7 @@ architecture RTL of TOP_Lvl is
 			ALUOp_o       : out std_logic_vector(1 DOWNTO 0);
 			loadMode_o 	  : out load_mode;
 			storeMode_o   : out store_mode;
+			compare_o     : out std_logic;
 			
 			PCSource_o    : out std_logic_vector(1 downto 0);
 			ALUSrcB_o     : out std_logic_vector(1 DOWNTO 0);
@@ -114,7 +116,8 @@ architecture RTL of TOP_Lvl is
 			loadMode_idex_i	 	     : in  load_mode;
 			storeMode_idex_i	     : in  store_mode;			
 			PCWrite_idex_i           : in  std_logic;
-
+			compare_idex_i		 	 : in  std_logic;
+		
 			memToReg_idex_i          : in  std_logic; --WB
 			regWrite_idex_i          : in  std_logic;
 			branchCond_idex_i        : in  branch_condition;
@@ -138,6 +141,7 @@ architecture RTL of TOP_Lvl is
 			loadMode_idex_o 	 	 : out load_mode;
 			storeMode_idex_o	 	 : out store_mode;			
 			PCWrite_idex_o           : out std_logic;
+			compare_idex_o 		 	 : out std_logic;
 
 			memToReg_idex_o          : out std_logic; --WB
 			regWrite_idex_o          : out std_logic;
@@ -390,6 +394,9 @@ architecture RTL of TOP_Lvl is
 	--idex --> jac
 	signal offset_idex_jac     : std_logic_vector(25 downto 0);
 	signal instr_25_0_idex_jac : std_logic_vector(25 downto 0);
+	
+	--idex --> alu
+	signal compare_idex_alu		: std_logic;
 
 	--alu --> exmem
 	signal neg_alu_exmem  : std_logic;
@@ -434,6 +441,7 @@ architecture RTL of TOP_Lvl is
 	signal ALUop_ctrl_idex      : std_logic_vector(1 downto 0);
 	signal loadMode_ctrl_idex 	: load_mode;
 	signal storeMode_ctrl_idex	: store_mode;
+	signal compare_ctrl_idex	: std_logic;
 
 	--ctrl --> regDstSelect
 	signal regDst_ctrl_rds : std_logic_vector(1 downto 0);
@@ -584,6 +592,7 @@ begin
 				 loadMode_idex_i		  => loadMode_ctrl_idex,
 				 storeMode_idex_i		  => storeMode_ctrl_idex,
 			     PCWrite_idex_i           => PCWrite_ctrl_idex,
+				 compare_idex_i			  => compare_ctrl_idex,
 			     memToReg_idex_i          => memToReg_ctrl_idex,
 			     regWrite_idex_i          => regWrite_ctrl_idex,
 			     branchCond_idex_i        => branchCond_ctrl_idex,
@@ -604,6 +613,7 @@ begin
 				 loadMode_idex_o		  => loadMode_idex_exmem,
 				 storeMode_idex_o		  => storeMode_idex_exmem,
 			     PCWrite_idex_o           => PCWrite_idex_exmem,
+				 compare_idex_o 		  => compare_idex_alu,
 			     memToReg_idex_o          => memToReg_idex_exmem,
 			     regWrite_idex_o          => regWrite_idex_exmem,
 			     branchCond_idex_o        => branchCond_idex_exmem);
@@ -630,6 +640,7 @@ begin
 			     ALUOp_o       => ALUop_ctrl_idex,
 				 loadMode_o    => loadMode_ctrl_idex,
 				 storeMode_o   => storeMode_ctrl_idex,
+				 compare_o 	   => compare_ctrl_idex,
 			     PCSource_o    => PCSource_ctrl_idex,
 			     ALUSrcB_o     => ALUSrcB_ctrl_idex,
 			     ALUSrcA_o     => ALUSrcA_ctrl_idex,
@@ -701,6 +712,7 @@ begin
 			     B_i        => dataB_os_alu,
 			     ALU_ctrl_i => alu_code_ac_alu,
 			     shamt_i    => signExtAddr_idex_se(4 downto 0),
+				 compare_i  => compare_idex_alu,
 			     C_o        => C_alu_exmem,
 			     negative_o => neg_alu_exmem,
 			     zero_o     => zero_alu_exmem);
@@ -734,7 +746,7 @@ begin
 		port map(clk_i 			=> clock,
 				rst_i 			=> reset,
 				enable_i 		=> enable,
-				jump_flag_i 	=> '0', --jump_flag_bcc_mrl
+				jump_flag_i 	=> jump_flag_bcc_mrl, --jump_flag_bcc_mrl
 				memWrite_i 		=> memWrite_exmem_mrl,
 				regWrite_i 		=> regWrite_memwb_mrl,
 				link_flag_i 	=> '0', --jump and link flag from between exmem/memwb

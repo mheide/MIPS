@@ -39,6 +39,8 @@ begin
 						c_alu_sub  when op_i = c_bgtz.opcode else
 						c_alu_sub  when op_i = c_blez.opcode else
 						c_alu_sub  when op_i = c_bne.opcode else
+						c_alu_sub  when op_i = c_slti else
+						c_alu_subu when op_i = c_sltiu else
 						c_alu_addu  when op_i = c_jal  else
 						c_alu_zero;		--don't care
 
@@ -51,6 +53,8 @@ begin
 		              c_alu_or   when functioncode_i = c_or.funct   else
 		              c_alu_nor  when functioncode_i = c_nor.funct  else
 		              c_alu_xor  when functioncode_i = c_xor.funct  else
+					  c_alu_sub  when functioncode_i = c_slt.funct  else
+					  c_alu_subu when functioncode_i = c_sltu.funct else
 					  c_alu_sllv when functioncode_i = c_sllv.funct else
 					  c_alu_srlv when functioncode_i = c_srlv.funct else
 					  c_alu_sll  when functioncode_i = c_sll.funct  else

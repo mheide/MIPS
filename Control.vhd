@@ -21,6 +21,7 @@ entity Control is
 		ALUOp_o       : out std_logic_vector(1 DOWNTO 0);
 		loadMode_o 	  : out load_mode;
 		storeMode_o   : out store_mode;
+		compare_o     : out std_logic;
 
 		--IRWrite_o     : out std_logic;
 		--IRWrite ist jetzt RegWrite
@@ -44,6 +45,8 @@ begin
 						"10" when op = c_andi else
 						"10" when op = c_ori else
 						"10" when op = c_xori else
+						"10" when op = c_slti else
+						"10" when op = c_sltiu else
 						"10" when op = c_beq.opcode else
 						"10" when op = c_bne.opcode else
 						"10" when op = c_blez.opcode else
@@ -66,6 +69,8 @@ begin
 						"10" when op = c_andi else
 						"10" when op = c_ori else
 						"10" when op = c_xori else	
+						"10" when op = c_slti else
+						"10" when op = c_sltiu else
 						"10" when op = c_lw else
 						"10" when op = c_lh else
 						"10" when op = c_lb else
@@ -86,7 +91,9 @@ begin
 						'1' when op = c_addiu else
 						'1' when op = c_andi else
 						'1' when op = c_ori else
-						'1' when op = c_xori else						
+						'1' when op = c_xori else	
+						'1' when op = c_slti else
+						'1' when op = c_sltiu else						
 						'1' when op = c_lw else
 						'1' when op = c_lh else
 						'1' when op = c_lb else
@@ -107,6 +114,8 @@ begin
 						'0' when op = c_andi else
 						'0' when op = c_ori else
 						'0' when op = c_xori else	
+						'0' when op = c_slti else
+						'0' when op = c_sltiu else						
 						'0' when op = c_lw else
 						'0' when op = c_lh else
 						'0' when op = c_lb else
@@ -122,6 +131,8 @@ begin
 						'0' when op = c_andi else
 						'0' when op = c_ori else
 						'0' when op = c_xori else	
+						'0' when op = c_slti else
+						'0' when op = c_sltiu else						
 						'1' when op = c_lw else
 						'1' when op = c_lh else
 						'1' when op = c_lb else
@@ -144,7 +155,9 @@ begin
 						"01" when op = c_addiu else
 						"01" when op = c_andi else
 						"01" when op = c_ori else
-						"01" when op = c_xori else						
+						"01" when op = c_xori else
+						"01" when op = c_slti else
+						"01" when op = c_sltiu else						
 						"01" when op = c_lw else
 						"01" when op = c_lwl else
 						"01" when op = c_lwr else
@@ -169,6 +182,8 @@ begin
 						"00" when op = c_andi else
 						"00" when op = c_ori else
 						"00" when op = c_xori else	
+						"00" when op = c_slti else
+						"00" when op = c_sltiu else						
 						"00" when op = c_lw else
 						"00" when op = c_lh else
 						"00" when op = c_lb else
@@ -184,7 +199,9 @@ begin
 						'1' when op = c_addiu else
 						'1' when op = c_andi else
 						'1' when op = c_ori else
-						'1' when op = c_xori else		
+						'1' when op = c_xori else
+						'1' when op = c_slti else
+						'1' when op = c_sltiu else						
 						'1' when op = c_lw else
 						'1' when op = c_lh else
 						'1' when op = c_lb else
@@ -202,6 +219,8 @@ begin
 						'0' when op = c_andi else
 						'0' when op = c_ori else
 						'0' when op = c_xori else
+						'0' when op = c_slti else
+						'0' when op = c_sltiu else						
 						'0' when op = c_jal else	
 						'1' when op = c_lw else
 						'1' when op = c_lh else
@@ -238,5 +257,12 @@ begin
 							st_sh when op = c_sh else
 							st_sb;
 	
+	compare_o <= 	'1' when op = "000000" 	and ((funct = c_slt.funct) 
+											or 	(funct = c_sltu.funct)) else
+					'1' when op = c_slti else
+					'1' when op = c_sltiu else
+					'0';
+				
+						
 	
 end architecture;

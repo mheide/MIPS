@@ -15,7 +15,9 @@ architecture tb of tb_alu is
 			B_i        : in  std_logic_vector(31 downto 0);
 			ALU_ctrl_i : in  std_logic_vector(3 downto 0);
 			shamt_i	   : in  std_logic_vector(4 downto 0);  	--needed for bitshifts
+			compare_i  : in  std_logic;
 			C_o        : out std_logic_vector(31 downto 0);
+			negative_o : out std_logic;
 			zero_o     : out std_logic
 		);
 	end component ALU;
@@ -25,8 +27,11 @@ architecture tb of tb_alu is
 	signal B 		: std_logic_vector(31 downto 0)		:= x"8000000a";
 	signal ALU_CTRL	: std_logic_vector(3 downto 0)		:= "0000";
 	signal SHAMT	: std_logic_vector(4 downto 0)		:= "00100";
+	signal COMPARE  : std_logic							:= '0';
 	signal C		: std_logic_vector(31 downto 0);
+	signal NEGATIVE : std_logic;
 	signal ZERO	: std_logic;
+	
 	
 	
 	
@@ -38,7 +43,9 @@ begin
 				B_i			=> B,
 				ALU_ctrl_i 	=> ALU_CTRL,
 				shamt_i		=> SHAMT,
+				compare_i   => COMPARE,
 				C_o 		=> C,
+				negative_o  => NEGATIVE,
 				zero_o 		=> ZERO);
 	
 
