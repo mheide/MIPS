@@ -512,8 +512,8 @@ begin
 	clock  <= clk_i;
 	reset  <= rst_i;
 	enable <= enable_i;
-	Led(5 downto 0) <= C_alu_exmem(5 downto 0);
-	Led(7 downto 6) <= neg_alu_exmem & zero_alu_exmem;
+	Led(7 downto 0) <= ALU_result_memwb_ds(7 downto 0);
+
 	--nice to have: make it clearer
 	signExtAddr_complete_idex_se <= signExtAddr_idex_se & functioncode_idex_ac;
 	offset_idex_jac              <= instruction_25_16_idex_exmem & signExtAddr_complete_idex_se;
