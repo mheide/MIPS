@@ -29,7 +29,7 @@ begin
 	mem : Instruction_Memory
 		port map(pc_i => PC_ifid_i, out_o => instruction);
 
-	IF_ID_reg : process(clk_i, rst_i, enable_i) is
+	IF_ID_reg : process(clk_i, rst_i) is
 	begin
 		if rst_i = '1' then
 			Instruction_o <= (others => '0');

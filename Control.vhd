@@ -4,13 +4,10 @@ use work.Instructions_pack.all;
 
 entity Control is
 	port(
-		rst_i         : in  std_logic;
 		op_i          : in  std_logic_vector(5 DOWNTO 0);
 		funct_i       : in  std_logic_vector(5 downto 0);
 
-		PCWriteCond_o : out std_logic;
 		PCWrite_o     : out std_logic;
-		IorD_o        : out std_logic;
 
 		branch_o      : out std_logic;	
 		MemRead_o     : out std_logic;

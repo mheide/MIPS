@@ -12,7 +12,6 @@ entity MEM_WB is                        --first pipeline stage with instruction_
 		memToReg_memwb_i       : in  std_logic; --WB
 		regWrite_memwb_i       : in  std_logic;
 
-		memoryReadData_memwb_o : out std_logic_vector(31 downto 0);
 		ALU_result_memwb_o     : out std_logic_vector(31 downto 0);
 		dataAddr_memwb_o       : out std_logic_vector(4 downto 0);
 
@@ -30,7 +29,7 @@ architecture behaviour of MEM_WB is
 	signal regWrite : std_logic;
 
 begin
-	MEM_WB_reg : process(clk_i, rst_i, enable_i) is
+	MEM_WB_reg : process(clk_i, rst_i) is
 	begin
 		if rst_i = '1' then
 			dataAddr       <= (others => '0');

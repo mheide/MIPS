@@ -6,7 +6,6 @@ entity MemRegLock is
 	port(
 		clk_i 		: in std_logic;
 		rst_i 		: in std_logic;
-		enable_i 	: in std_logic;
 		jump_flag_i : in std_logic;
 		memWrite_i  : in std_logic; --3 cycles
 		regWrite_i  : in std_logic; --3 cycles
@@ -18,7 +17,7 @@ entity MemRegLock is
 end MemRegLock;	
 	
 architecture behaviour of MemRegLock is
-
+	
 	type lock_states is (unlocked, lock1, lock2, lock3);
 	signal state : lock_states := unlocked;
 

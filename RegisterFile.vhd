@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-library work;
+
 use work.Instructions_pack.all;
 
 entity RegisterFile is
@@ -59,7 +59,6 @@ architecture behaviour of RegisterFile is
 		"00000000" & "00000000" & "01001100" & "00000010"
 	);
 	signal regWrite      : std_logic;
-	signal writeDataAddr : std_logic_vector(4 DOWNTO 0);
 	signal dataA 		 : std_logic_vector(31 downto 0);
 	signal dataB 		 : std_logic_vector(31 downto 0);
 begin

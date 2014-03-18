@@ -27,7 +27,6 @@ architecture RTL of TOP_Lvl is
 
 	component ALU_Control
 		port(
-			rst_i          : in  std_logic;
 			ALU_Op_i       : in  std_logic_vector(1 downto 0);
 			functioncode_i : in  std_logic_vector(5 downto 0);
 			op_i           : in  std_logic_vector(5 downto 0);
@@ -55,13 +54,10 @@ architecture RTL of TOP_Lvl is
 
 	component Control
 		port(
-			rst_i         : in  std_logic;
 			op_i          : in  std_logic_vector(5 DOWNTO 0);
 			funct_i       : in  std_logic_vector(5 downto 0);
 
-			PCWriteCond_o : out std_logic;
 			PCWrite_o     : out std_logic;
-			IorD_o        : out std_logic;
 
 			branch_o      : out std_logic;
 			MemRead_o     : out std_logic;
@@ -157,7 +153,6 @@ architecture RTL of TOP_Lvl is
 			clk_i              : in  std_logic;
 			rst_i              : in  std_logic;
 			enable_i           : in  std_logic;
-			PC_exmem_i         : in  std_logic_vector(31 downto 0);
 			ALU_result_exmem_i : in  std_logic_vector(31 downto 0);
 			A_data_exmem_i     : in  std_logic_vector(31 downto 0);
 			B_data_exmem_i     : in  std_logic_vector(31 downto 0);
@@ -178,7 +173,6 @@ architecture RTL of TOP_Lvl is
 			regWrite_exmem_i   : in  std_logic;
 			branchCond_exmem_i : in  branch_condition;
 
-			PC_exmem_o         : out std_logic_vector(31 downto 0);
 			ALU_result_exmem_o : out std_logic_vector(31 downto 0);
 			A_data_exmem_o     : out std_logic_vector(31 downto 0);
 			B_data_exmem_o     : out std_logic_vector(31 downto 0);
@@ -212,7 +206,6 @@ architecture RTL of TOP_Lvl is
 			memToReg_memwb_i       : in  std_logic; --WB
 			regWrite_memwb_i       : in  std_logic;
 
-			memoryReadData_memwb_o : out std_logic_vector(31 downto 0);
 			ALU_result_memwb_o     : out std_logic_vector(31 downto 0);
 			dataAddr_memwb_o       : out std_logic_vector(4 downto 0);
 
@@ -332,7 +325,6 @@ architecture RTL of TOP_Lvl is
 		port(
 			clk_i 		: in std_logic;
 			rst_i 		: in std_logic;
-			enable_i 	: in std_logic;
 			jump_flag_i : in std_logic;
 			memWrite_i  : in std_logic; --3 cycles
 			regWrite_i  : in std_logic; --3 cycles
@@ -348,15 +340,14 @@ architecture RTL of TOP_Lvl is
 	signal enable : std_logic;
 
 
-	--exmem --> pc --beide nicht angekommen
-	signal neg_exmem_pc     : std_logic; --fuer branch
-	signal zero_exmem_pc    : std_logic; --fuer branch
-	signal branch_exmem_pc  : std_logic; -- noch mal sichergehen wie genau (PCSource?)
+	--exmem --> bcc
+	signal neg_exmem_bcc     : std_logic;
+	signal zero_exmem_bcc    : std_logic;
+	signal branch_exmem_bcc  : std_logic;
 	signal B_data_exmem_dm  : std_logic_vector(31 downto 0);
 	
 
 	--exmem --> memwb
-	signal PC_exmem_memwb       : std_logic_vector(31 downto 0);
 	signal memToReg_exmem_memwb : std_logic;
 
 
@@ -565,10 +556,10 @@ begin
 			     pc_o          => PC_jac_exmem);
 
 	bcc : branchCondCheck
-		port map(branch_i     => branch_exmem_pc,
+		port map(branch_i     => branch_exmem_bcc,
 			     branchCond_i => branchCond_exmem_bcc,
-			     zero_i       => zero_exmem_pc,
-			     negative_i   => neg_exmem_pc,
+			     zero_i       => zero_exmem_bcc,
+			     negative_i   => neg_exmem_bcc,
 				 PCWrite_i 	  => PCWrite_exmem_bcc,
 			     jump_flag_o  => jump_flag_bcc_mrl);
 
@@ -636,12 +627,10 @@ begin
 			     instruction_o       => dst_Addr_rds_rf);
 
 	ctrl : Control
-		port map(rst_i         => reset,
+		port map(
 			     op_i          => data_ifid_rf(31 downto 26),
 			     funct_i       => data_ifid_rf(5 downto 0),
-			     PCWriteCond_o => open, --PCWriteCond_ctrl_pc,
 			     PCWrite_o     => PCWrite_ctrl_idex,
-			     IorD_o        => open, --IorD_ctrl_pc,
 			     branch_o      => branch_ctrl_idex,
 			     MemRead_o     => memRead_ctrl_idex,
 			     MemWrite_o    => memWrite_ctrl_idex,
@@ -673,7 +662,6 @@ begin
 		port map(clk_i              => clock,
 			     rst_i              => reset,
 			     enable_i           => enable,
-			     PC_exmem_i         => PC_idex_exmem,
 			     PCSource_exmem_i   => PCSrc_idex_exmem,
 			     jumpAddr_exmem_i   => pc_jac_exmem,
 			     ALU_result_exmem_i => C_alu_exmem,
@@ -691,16 +679,15 @@ begin
 			     memToReg_exmem_i   => memToReg_idex_exmem,
 			     regWrite_exmem_i   => regWrite_idex_exmem,
 			     branchCond_exmem_i => branchCond_idex_exmem,
-			     PC_exmem_o         => PC_exmem_memwb,
 			     ALU_result_exmem_o => ALU_result_exmem_dm,
 			     A_data_exmem_o     => A_data_exmem_jas,
 			     B_data_exmem_o     => B_data_exmem_dm,
-			     neg_flag_exmem_o   => neg_exmem_pc,
-			     zero_flag_exmem_o  => zero_exmem_pc,
+			     neg_flag_exmem_o   => neg_exmem_bcc,
+			     zero_flag_exmem_o  => zero_exmem_bcc,
 			     dataAddr_exmem_o   => dataAddr_exmem_rds,
 			     PCSource_exmem_o   => PCSrc_exmem_jas,
 			     jumpAddr_exmem_o   => jumpAddr_exmem_jas,
-			     branch_exmem_o     => branch_exmem_pc,
+			     branch_exmem_o     => branch_exmem_bcc,
 			     memRead_exmem_o    => memRead_exmem_dm,
 			     memWrite_exmem_o   => memWrite_exmem_mrl,
 				 loadMode_exmem_o   => loadMode_exmem_dm,
@@ -711,7 +698,7 @@ begin
 			     branchCond_exmem_o => branchCond_exmem_bcc);
 
 	ac : ALU_Control
-		port map(rst_i          => reset,
+		port map(
 			     ALU_Op_i       => alu_op_idex_ac,
 			     functioncode_i => functioncode_idex_ac,
 			     op_i           => op_idex_ac,
@@ -758,8 +745,7 @@ begin
 	mrl : MemRegLock
 		port map(clk_i 			=> clock,
 				rst_i 			=> reset,
-				enable_i 		=> enable,
-				jump_flag_i 	=> jump_flag_bcc_mrl, --jump_flag_bcc_mrl
+				jump_flag_i 	=> jump_flag_bcc_mrl,
 				memWrite_i 		=> memWrite_exmem_mrl,
 				regWrite_i 		=> regWrite_exmem_mrl,
 				jump_flag_o  	=> jump_flag_mrl_pc,

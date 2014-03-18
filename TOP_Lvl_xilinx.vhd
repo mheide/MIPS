@@ -28,7 +28,6 @@ architecture RTL of TOP_Lvl_xilinx is
 
 	component ALU_Control
 		port(
-			rst_i          : in  std_logic;
 			ALU_Op_i       : in  std_logic_vector(1 downto 0);
 			functioncode_i : in  std_logic_vector(5 downto 0);
 			op_i           : in  std_logic_vector(5 downto 0);
@@ -56,13 +55,10 @@ architecture RTL of TOP_Lvl_xilinx is
 
 	component Control
 		port(
-			rst_i         : in  std_logic;
 			op_i          : in  std_logic_vector(5 DOWNTO 0);
 			funct_i       : in  std_logic_vector(5 downto 0);
 
-			PCWriteCond_o : out std_logic;
 			PCWrite_o     : out std_logic;
-			IorD_o        : out std_logic;
 
 			branch_o      : out std_logic;
 			MemRead_o     : out std_logic;
@@ -74,6 +70,7 @@ architecture RTL of TOP_Lvl_xilinx is
 			loadMode_o 	  : out load_mode;
 			storeMode_o   : out store_mode;
 			compare_o     : out std_logic;
+			signed_o	  : out std_logic;
 			
 			PCSource_o    : out std_logic_vector(1 downto 0);
 			ALUSrcB_o     : out std_logic_vector(1 DOWNTO 0);
@@ -118,6 +115,7 @@ architecture RTL of TOP_Lvl_xilinx is
 			storeMode_idex_i	     : in  store_mode;			
 			PCWrite_idex_i           : in  std_logic;
 			compare_idex_i		 	 : in  std_logic;
+			signed_idex_i			 : in  std_logic;
 		
 			memToReg_idex_i          : in  std_logic; --WB
 			regWrite_idex_i          : in  std_logic;
@@ -143,6 +141,7 @@ architecture RTL of TOP_Lvl_xilinx is
 			storeMode_idex_o	 	 : out store_mode;			
 			PCWrite_idex_o           : out std_logic;
 			compare_idex_o 		 	 : out std_logic;
+			signed_idex_o			 : out std_logic;
 
 			memToReg_idex_o          : out std_logic; --WB
 			regWrite_idex_o          : out std_logic;
@@ -155,7 +154,7 @@ architecture RTL of TOP_Lvl_xilinx is
 			clk_i              : in  std_logic;
 			rst_i              : in  std_logic;
 			enable_i           : in  std_logic;
-			PC_exmem_i         : in  std_logic_vector(31 downto 0);
+			--PC_exmem_i         : in  std_logic_vector(31 downto 0);
 			ALU_result_exmem_i : in  std_logic_vector(31 downto 0);
 			A_data_exmem_i     : in  std_logic_vector(31 downto 0);
 			B_data_exmem_i     : in  std_logic_vector(31 downto 0);
@@ -176,7 +175,7 @@ architecture RTL of TOP_Lvl_xilinx is
 			regWrite_exmem_i   : in  std_logic;
 			branchCond_exmem_i : in  branch_condition;
 
-			PC_exmem_o         : out std_logic_vector(31 downto 0);
+			--PC_exmem_o         : out std_logic_vector(31 downto 0);
 			ALU_result_exmem_o : out std_logic_vector(31 downto 0);
 			A_data_exmem_o     : out std_logic_vector(31 downto 0);
 			B_data_exmem_o     : out std_logic_vector(31 downto 0);
@@ -210,7 +209,6 @@ architecture RTL of TOP_Lvl_xilinx is
 			memToReg_memwb_i       : in  std_logic; --WB
 			regWrite_memwb_i       : in  std_logic;
 
-			memoryReadData_memwb_o : out std_logic_vector(31 downto 0);
 			ALU_result_memwb_o     : out std_logic_vector(31 downto 0);
 			dataAddr_memwb_o       : out std_logic_vector(4 downto 0);
 
@@ -264,6 +262,7 @@ architecture RTL of TOP_Lvl_xilinx is
 	component signExtend is
 		port(
 			address_i : in  std_logic_vector(15 downto 0);
+			signed_i  : in  std_logic;
 
 			address_o : out std_logic_vector(31 downto 0)
 		);
@@ -329,7 +328,6 @@ architecture RTL of TOP_Lvl_xilinx is
 		port(
 			clk_i 		: in std_logic;
 			rst_i 		: in std_logic;
-			enable_i 	: in std_logic;
 			jump_flag_i : in std_logic;
 			memWrite_i  : in std_logic; --3 cycles
 			regWrite_i  : in std_logic; --3 cycles
@@ -344,7 +342,7 @@ architecture RTL of TOP_Lvl_xilinx is
 	signal clock  : std_logic;
 	signal enable : std_logic;
 
-	--TODO: rename
+
 	--exmem --> pc --beide nicht angekommen
 	signal neg_exmem_pc     : std_logic; --fuer branch
 	signal zero_exmem_pc    : std_logic; --fuer branch
@@ -353,7 +351,6 @@ architecture RTL of TOP_Lvl_xilinx is
 	
 
 	--exmem --> memwb
-	signal PC_exmem_memwb       : std_logic_vector(31 downto 0);
 	signal memToReg_exmem_memwb : std_logic;
 
 
@@ -428,7 +425,7 @@ architecture RTL of TOP_Lvl_xilinx is
 	signal ALUSrcA_idex_os : std_logic;
 	signal ALUSrcB_idex_os : std_logic_vector(1 downto 0);
 
-	--TODO: dataAddr_memwb_o: sinnvoll machen, oder vielleicht nicht gebraucht? DOCH	
+	--memwb --> rf	
 	signal dataAddr_memwb_rf : std_logic_vector(4 downto 0);
 
 	--ctrl --> idex
@@ -445,14 +442,14 @@ architecture RTL of TOP_Lvl_xilinx is
 	signal loadMode_ctrl_idex 	: load_mode;
 	signal storeMode_ctrl_idex	: store_mode;
 	signal compare_ctrl_idex	: std_logic;
+	signal signed_ctrl_idex		: std_logic;
 
 	--ctrl --> regDstSelect
 	signal regDst_ctrl_rds : std_logic_vector(1 downto 0);
 
-	--crtl --> pc --TODO: pc ueberlegen fuer andere befehlstypen
-	signal PCWriteCond_ctrl_pc : std_logic;
+	--crtl --> pc
 	signal PCWrite_ctrl_idex     : std_logic;
-	signal IorD_ctrl_pc        : std_logic;
+
 
 	--ifid --> idex
 	signal PC_ifid_idex : std_logic_vector(31 downto 0);
@@ -472,7 +469,8 @@ architecture RTL of TOP_Lvl_xilinx is
 	--idex --> signExtend
 	signal signExtAddr_idex_se          : std_logic_vector(9 downto 0);
 	signal signExtAddr_complete_idex_se : std_logic_vector(15 downto 0);
-
+	signal signed_idex_se 				: std_logic;
+	
 	--memwb --> ds		
 	signal memToReg_memwb_ds : std_logic;
 
@@ -504,6 +502,8 @@ architecture RTL of TOP_Lvl_xilinx is
 	--mrl --> pc 
 	signal jump_flag_mrl_pc : std_logic;
 	
+
+	
 	
 
 begin
@@ -512,6 +512,7 @@ begin
 	clock  <= clk_i;
 	reset  <= rst_i;
 	enable <= enable_i;
+	
 	Led(7 downto 0) <= ALU_result_memwb_ds(7 downto 0);
 
 	--nice to have: make it clearer
@@ -529,7 +530,7 @@ begin
 		port map(clk_i       => clock,
 			     rst_i       => reset,
 			     enable_i    => enable,
-			     jump_flag_i => '0',--jump_flag_mrl_pc
+			     jump_flag_i => jump_flag_mrl_pc,
 			     jump_addr_i => jumpAddress_jas_pc,
 			     PC_o        => address_pc_ifid);
 
@@ -597,6 +598,7 @@ begin
 				 storeMode_idex_i		  => storeMode_ctrl_idex,
 			     PCWrite_idex_i           => PCWrite_ctrl_idex,
 				 compare_idex_i			  => compare_ctrl_idex,
+				 signed_idex_i			  => signed_ctrl_idex,
 			     memToReg_idex_i          => memToReg_ctrl_idex,
 			     regWrite_idex_i          => regWrite_ctrl_idex,
 			     branchCond_idex_i        => branchCond_ctrl_idex,
@@ -618,6 +620,7 @@ begin
 				 storeMode_idex_o		  => storeMode_idex_exmem,
 			     PCWrite_idex_o           => PCWrite_idex_exmem,
 				 compare_idex_o 		  => compare_idex_alu,
+				 signed_idex_o			  => signed_idex_se,
 			     memToReg_idex_o          => memToReg_idex_exmem,
 			     regWrite_idex_o          => regWrite_idex_exmem,
 			     branchCond_idex_o        => branchCond_idex_exmem);
@@ -629,12 +632,10 @@ begin
 			     instruction_o       => dst_Addr_rds_rf);
 
 	ctrl : Control
-		port map(rst_i         => reset,
+		port map(
 			     op_i          => data_ifid_rf(31 downto 26),
 			     funct_i       => data_ifid_rf(5 downto 0),
-			     PCWriteCond_o => open, --PCWriteCond_ctrl_pc,
 			     PCWrite_o     => PCWrite_ctrl_idex,
-			     IorD_o        => open, --IorD_ctrl_pc,
 			     branch_o      => branch_ctrl_idex,
 			     MemRead_o     => memRead_ctrl_idex,
 			     MemWrite_o    => memWrite_ctrl_idex,
@@ -645,6 +646,7 @@ begin
 				 loadMode_o    => loadMode_ctrl_idex,
 				 storeMode_o   => storeMode_ctrl_idex,
 				 compare_o 	   => compare_ctrl_idex,
+				 signed_o	   => signed_ctrl_idex,
 			     PCSource_o    => PCSource_ctrl_idex,
 			     ALUSrcB_o     => ALUSrcB_ctrl_idex,
 			     ALUSrcA_o     => ALUSrcA_ctrl_idex,
@@ -665,7 +667,7 @@ begin
 		port map(clk_i              => clock,
 			     rst_i              => reset,
 			     enable_i           => enable,
-			     PC_exmem_i         => PC_idex_exmem,
+			     --PC_exmem_i         => PC_idex_exmem,
 			     PCSource_exmem_i   => PCSrc_idex_exmem,
 			     jumpAddr_exmem_i   => pc_jac_exmem,
 			     ALU_result_exmem_i => C_alu_exmem,
@@ -683,7 +685,7 @@ begin
 			     memToReg_exmem_i   => memToReg_idex_exmem,
 			     regWrite_exmem_i   => regWrite_idex_exmem,
 			     branchCond_exmem_i => branchCond_idex_exmem,
-			     PC_exmem_o         => PC_exmem_memwb,
+			     --PC_exmem_o         => PC_exmem_memwb,
 			     ALU_result_exmem_o => ALU_result_exmem_dm,
 			     A_data_exmem_o     => A_data_exmem_jas,
 			     B_data_exmem_o     => B_data_exmem_dm,
@@ -703,7 +705,7 @@ begin
 			     branchCond_exmem_o => branchCond_exmem_bcc);
 
 	ac : ALU_Control
-		port map(rst_i          => reset,
+		port map(
 			     ALU_Op_i       => alu_op_idex_ac,
 			     functioncode_i => functioncode_idex_ac,
 			     op_i           => op_idex_ac,
@@ -723,6 +725,7 @@ begin
 
 	se : signExtend
 		port map(address_i => signExtAddr_complete_idex_se,
+				 signed_i  => signed_idex_se,
 			     address_o => signExtend_se_os);
 
 	os : operandSelect
@@ -749,8 +752,7 @@ begin
 	mrl : MemRegLock
 		port map(clk_i 			=> clock,
 				rst_i 			=> reset,
-				enable_i 		=> enable,
-				jump_flag_i 	=> jump_flag_bcc_mrl, --jump_flag_bcc_mrl
+				jump_flag_i 	=> jump_flag_bcc_mrl,
 				memWrite_i 		=> memWrite_exmem_mrl,
 				regWrite_i 		=> regWrite_exmem_mrl,
 				jump_flag_o  	=> jump_flag_mrl_pc,

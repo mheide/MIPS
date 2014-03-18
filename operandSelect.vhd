@@ -19,9 +19,7 @@ entity operandSelect is
 end entity operandSelect;
 
 architecture behaviour of operandSelect is
-	signal signext_b : std_logic_vector(31 downto 0);
 begin
-	signext_b <= SignExt_B_i;
 	
 	A_o <= RF_A_i when ALUSrcA_i = '1' ELSE 
 	                 PC_A_i when ALUSrcA_i = '0' ELSE 

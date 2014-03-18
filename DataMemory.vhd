@@ -35,8 +35,6 @@ architecture behaviour of DataMemory is
 			"00000000","00000000","00000000","00000000",
 			"00000000","00000000","00000000","00000000"
 	);
-	signal aluresult : std_logic_vector(31 downto 0);
-	--signal tempread : std_logic_vector(31 downto 0);
 	signal readout : std_logic_vector(31 downto 0);
 	signal loadWordRaw : std_logic_vector(31 downto 0);
 	signal loadHalfRaw : std_logic_vector(31 downto 0);
@@ -46,10 +44,6 @@ architecture behaviour of DataMemory is
 	
 	begin
 
-	--readout <= tempread when memRead_i = '1' else 
-	--			(others => '-') when memRead_i = '0' else
-	--			(others => 'X');
-	
 	--determines how much bytes are loaded
 	loadWordRaw <= dataMem(TO_INTEGER(UNSIGNED(alu_result_i))) &
 				dataMem(TO_INTEGER(UNSIGNED(alu_result_i)) + 1) &
@@ -77,14 +71,6 @@ architecture behaviour of DataMemory is
 				loadByteRaw 		when loadMode_i = ld_lbu ELSE
 				loadByteSigned; 
 	
-	
-
-	
-	--tempread(31 downto 24) <= dataMem(TO_INTEGER(UNSIGNED(alu_result_i))) when memRead_i = '1';
-	--tempread(23 downto 16) <= dataMem(TO_INTEGER(UNSIGNED(alu_result_i)) + 1) when memRead_i = '1';
-	--tempread(15 downto 8) <= dataMem(TO_INTEGER(UNSIGNED(alu_result_i)) + 2) when memRead_i = '1';
-	--tempread(7 downto 0) <= dataMem(TO_INTEGER(UNSIGNED(alu_result_i)) + 3) when memRead_i = '1';						
-
 	dataMem_process : process(clk_i, rst_i) is
 	begin
 		if rst_i = '1' then
@@ -103,8 +89,6 @@ architecture behaviour of DataMemory is
 				else	--store byte
 					dataMem(TO_INTEGER(UNSIGNED(alu_result_i))) <= writeData_i(7 DOWNTO 0);
 					end if;
-			else
-				aluresult <= alu_result_i;
 			end if;
 		end if;
 	end process dataMem_process;				
