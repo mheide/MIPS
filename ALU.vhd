@@ -45,12 +45,12 @@ begin
 				when c_alu_or   => C_temp <= A_i or B_i;
 				when c_alu_nor  => C_temp <= A_i nor B_i;
 				when c_alu_xor  => C_temp <= A_i xor B_i;	
-				when c_alu_sllv => C_temp <= std_logic_vector(shift_left(unsigned(A_i), to_integer(unsigned(B_i(4 downto 0)))));
-				when c_alu_srlv => C_temp <= std_logic_vector(shift_right(unsigned(A_i), to_integer(unsigned(B_i(4 downto 0)))));
+				when c_alu_sllv => C_temp <= std_logic_vector(shift_left(unsigned(B_i), to_integer(unsigned(A_i(4 downto 0)))));
+				when c_alu_srlv => C_temp <= std_logic_vector(shift_right(unsigned(B_i), to_integer(unsigned(A_i(4 downto 0)))));
 				when c_alu_sll  => C_temp <= std_logic_vector(shift_left(unsigned(B_i), to_integer(unsigned(shamt_i))));
 				when c_alu_srl  => C_temp <= std_logic_vector(shift_right(unsigned(B_i), to_integer(unsigned(shamt_i))));
-				when c_alu_sra  => C_temp <= std_logic_vector(shift_right(signed(A_i), to_integer(unsigned(B_i(4 downto 0)))));
-				when c_alu_srav => C_temp <= std_logic_vector(shift_right(signed(B_i), to_integer(unsigned(shamt_i))));
+				when c_alu_sra  => C_temp <= std_logic_vector(shift_right(signed(B_i), to_integer(unsigned(shamt_i))));
+				when c_alu_srav => C_temp <= std_logic_vector(shift_right(signed(B_i), to_integer(unsigned(A_i(4 downto 0)))));
 				when others => C_temp <= c_alu_error;
 			end case;
 		end if;
