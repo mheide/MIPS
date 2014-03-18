@@ -347,7 +347,7 @@ architecture RTL of TOP_Lvl is
 	signal clock  : std_logic;
 	signal enable : std_logic;
 
-	--TODO: rename
+
 	--exmem --> pc --beide nicht angekommen
 	signal neg_exmem_pc     : std_logic; --fuer branch
 	signal zero_exmem_pc    : std_logic; --fuer branch
@@ -453,10 +453,9 @@ architecture RTL of TOP_Lvl is
 	--ctrl --> regDstSelect
 	signal regDst_ctrl_rds : std_logic_vector(1 downto 0);
 
-	--crtl --> pc --TODO: pc ueberlegen fuer andere befehlstypen
-	signal PCWriteCond_ctrl_pc : std_logic;
+	--crtl --> pc
 	signal PCWrite_ctrl_idex     : std_logic;
-	signal IorD_ctrl_pc        : std_logic;
+
 
 	--ifid --> idex
 	signal PC_ifid_idex : std_logic_vector(31 downto 0);
@@ -509,8 +508,7 @@ architecture RTL of TOP_Lvl is
 	--mrl --> pc 
 	signal jump_flag_mrl_pc : std_logic;
 	
-	--ctrl --> se
-	signal signed_ctrl_se : std_logic;
+
 	
 	
 
