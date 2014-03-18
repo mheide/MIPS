@@ -55,13 +55,10 @@ architecture RTL of TOP_Lvl is
 
 	component Control
 		port(
-			rst_i         : in  std_logic;
 			op_i          : in  std_logic_vector(5 DOWNTO 0);
 			funct_i       : in  std_logic_vector(5 downto 0);
 
-			PCWriteCond_o : out std_logic;
 			PCWrite_o     : out std_logic;
-			IorD_o        : out std_logic;
 
 			branch_o      : out std_logic;
 			MemRead_o     : out std_logic;
@@ -73,6 +70,7 @@ architecture RTL of TOP_Lvl is
 			loadMode_o 	  : out load_mode;
 			storeMode_o   : out store_mode;
 			compare_o     : out std_logic;
+			signed_o	  : out std_logic;
 			
 			PCSource_o    : out std_logic_vector(1 downto 0);
 			ALUSrcB_o     : out std_logic_vector(1 DOWNTO 0);
@@ -263,6 +261,7 @@ architecture RTL of TOP_Lvl is
 	component signExtend is
 		port(
 			address_i : in  std_logic_vector(15 downto 0);
+			signed_i  : in  std_logic;
 
 			address_o : out std_logic_vector(31 downto 0)
 		);
@@ -503,6 +502,9 @@ architecture RTL of TOP_Lvl is
 	--mrl --> pc 
 	signal jump_flag_mrl_pc : std_logic;
 	
+	--ctrl --> se
+	signal signed_ctrl_se : std_logic;
+	
 	
 
 begin
@@ -627,12 +629,10 @@ begin
 			     instruction_o       => dst_Addr_rds_rf);
 
 	ctrl : Control
-		port map(rst_i         => reset,
+		port map(
 			     op_i          => data_ifid_rf(31 downto 26),
 			     funct_i       => data_ifid_rf(5 downto 0),
-			     PCWriteCond_o => open, --PCWriteCond_ctrl_pc,
 			     PCWrite_o     => PCWrite_ctrl_idex,
-			     IorD_o        => open, --IorD_ctrl_pc,
 			     branch_o      => branch_ctrl_idex,
 			     MemRead_o     => memRead_ctrl_idex,
 			     MemWrite_o    => memWrite_ctrl_idex,
@@ -643,6 +643,7 @@ begin
 				 loadMode_o    => loadMode_ctrl_idex,
 				 storeMode_o   => storeMode_ctrl_idex,
 				 compare_o 	   => compare_ctrl_idex,
+				 signed_o	   => signed_ctrl_se,
 			     PCSource_o    => PCSource_ctrl_idex,
 			     ALUSrcB_o     => ALUSrcB_ctrl_idex,
 			     ALUSrcA_o     => ALUSrcA_ctrl_idex,
@@ -721,6 +722,7 @@ begin
 
 	se : signExtend
 		port map(address_i => signExtAddr_complete_idex_se,
+				 signed_i  => signed_ctrl_se,
 			     address_o => signExtend_se_os);
 
 	os : operandSelect

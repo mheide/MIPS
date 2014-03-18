@@ -4,13 +4,10 @@ use work.Instructions_pack.all;
 
 entity Control is
 	port(
-		rst_i         : in  std_logic;
 		op_i          : in  std_logic_vector(5 DOWNTO 0);
 		funct_i       : in  std_logic_vector(5 downto 0);
 
-		PCWriteCond_o : out std_logic;
 		PCWrite_o     : out std_logic;
-		IorD_o        : out std_logic;
 
 		branch_o      : out std_logic;	
 		MemRead_o     : out std_logic;
@@ -22,6 +19,7 @@ entity Control is
 		loadMode_o 	  : out load_mode;
 		storeMode_o   : out store_mode;
 		compare_o     : out std_logic;
+		signed_o	  : out std_logic;
 
 		--IRWrite_o     : out std_logic;
 		--IRWrite ist jetzt RegWrite
@@ -263,7 +261,10 @@ begin
 					'1' when op = c_slti else
 					'1' when op = c_sltiu else
 					'0';
-				
+	
+	signed_o <= 	'1' when op = "000000" 	and ((funct = c_addi)
+											or	(funct = c_slti)) else
+					'0';
 						
 	
 end architecture;
