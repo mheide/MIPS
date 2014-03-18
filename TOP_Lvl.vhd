@@ -55,10 +55,13 @@ architecture RTL of TOP_Lvl is
 
 	component Control
 		port(
+			rst_i         : in  std_logic;
 			op_i          : in  std_logic_vector(5 DOWNTO 0);
 			funct_i       : in  std_logic_vector(5 downto 0);
 
+			PCWriteCond_o : out std_logic;
 			PCWrite_o     : out std_logic;
+			IorD_o        : out std_logic;
 
 			branch_o      : out std_logic;
 			MemRead_o     : out std_logic;
@@ -115,6 +118,7 @@ architecture RTL of TOP_Lvl is
 			storeMode_idex_i	     : in  store_mode;			
 			PCWrite_idex_i           : in  std_logic;
 			compare_idex_i		 	 : in  std_logic;
+			signed_idex_i			 : in  std_logic;
 		
 			memToReg_idex_i          : in  std_logic; --WB
 			regWrite_idex_i          : in  std_logic;
@@ -140,6 +144,7 @@ architecture RTL of TOP_Lvl is
 			storeMode_idex_o	 	 : out store_mode;			
 			PCWrite_idex_o           : out std_logic;
 			compare_idex_o 		 	 : out std_logic;
+			signed_idex_o			 : out std_logic;
 
 			memToReg_idex_o          : out std_logic; --WB
 			regWrite_idex_o          : out std_logic;
@@ -342,6 +347,7 @@ architecture RTL of TOP_Lvl is
 	signal clock  : std_logic;
 	signal enable : std_logic;
 
+	--TODO: rename
 	--exmem --> pc --beide nicht angekommen
 	signal neg_exmem_pc     : std_logic; --fuer branch
 	signal zero_exmem_pc    : std_logic; --fuer branch
@@ -442,12 +448,15 @@ architecture RTL of TOP_Lvl is
 	signal loadMode_ctrl_idex 	: load_mode;
 	signal storeMode_ctrl_idex	: store_mode;
 	signal compare_ctrl_idex	: std_logic;
+	signal signed_ctrl_idex		: std_logic;
 
 	--ctrl --> regDstSelect
 	signal regDst_ctrl_rds : std_logic_vector(1 downto 0);
 
-	--crtl --> pc
+	--crtl --> pc --TODO: pc ueberlegen fuer andere befehlstypen
+	signal PCWriteCond_ctrl_pc : std_logic;
 	signal PCWrite_ctrl_idex     : std_logic;
+	signal IorD_ctrl_pc        : std_logic;
 
 	--ifid --> idex
 	signal PC_ifid_idex : std_logic_vector(31 downto 0);
@@ -467,7 +476,8 @@ architecture RTL of TOP_Lvl is
 	--idex --> signExtend
 	signal signExtAddr_idex_se          : std_logic_vector(9 downto 0);
 	signal signExtAddr_complete_idex_se : std_logic_vector(15 downto 0);
-
+	signal signed_idex_se 				: std_logic;
+	
 	--memwb --> ds		
 	signal memToReg_memwb_ds : std_logic;
 
@@ -594,6 +604,7 @@ begin
 				 storeMode_idex_i		  => storeMode_ctrl_idex,
 			     PCWrite_idex_i           => PCWrite_ctrl_idex,
 				 compare_idex_i			  => compare_ctrl_idex,
+				 signed_idex_i			  => signed_ctrl_idex,
 			     memToReg_idex_i          => memToReg_ctrl_idex,
 			     regWrite_idex_i          => regWrite_ctrl_idex,
 			     branchCond_idex_i        => branchCond_ctrl_idex,
@@ -615,6 +626,7 @@ begin
 				 storeMode_idex_o		  => storeMode_idex_exmem,
 			     PCWrite_idex_o           => PCWrite_idex_exmem,
 				 compare_idex_o 		  => compare_idex_alu,
+				 signed_idex_o			  => signed_idex_se,
 			     memToReg_idex_o          => memToReg_idex_exmem,
 			     regWrite_idex_o          => regWrite_idex_exmem,
 			     branchCond_idex_o        => branchCond_idex_exmem);
@@ -626,10 +638,12 @@ begin
 			     instruction_o       => dst_Addr_rds_rf);
 
 	ctrl : Control
-		port map(
+		port map(rst_i         => reset,
 			     op_i          => data_ifid_rf(31 downto 26),
 			     funct_i       => data_ifid_rf(5 downto 0),
+			     PCWriteCond_o => open, --PCWriteCond_ctrl_pc,
 			     PCWrite_o     => PCWrite_ctrl_idex,
+			     IorD_o        => open, --IorD_ctrl_pc,
 			     branch_o      => branch_ctrl_idex,
 			     MemRead_o     => memRead_ctrl_idex,
 			     MemWrite_o    => memWrite_ctrl_idex,
@@ -640,7 +654,7 @@ begin
 				 loadMode_o    => loadMode_ctrl_idex,
 				 storeMode_o   => storeMode_ctrl_idex,
 				 compare_o 	   => compare_ctrl_idex,
-				 signed_o	   => signed_ctrl_se,
+				 signed_o	   => signed_ctrl_idex,
 			     PCSource_o    => PCSource_ctrl_idex,
 			     ALUSrcB_o     => ALUSrcB_ctrl_idex,
 			     ALUSrcA_o     => ALUSrcA_ctrl_idex,
@@ -719,7 +733,7 @@ begin
 
 	se : signExtend
 		port map(address_i => signExtAddr_complete_idex_se,
-				 signed_i  => signed_ctrl_se,
+				 signed_i  => signed_idex_se,
 			     address_o => signExtend_se_os);
 
 	os : operandSelect

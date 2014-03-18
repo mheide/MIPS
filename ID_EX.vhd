@@ -28,6 +28,7 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		storeMode_idex_i	 : in  store_mode;
 		PCWrite_idex_i       : in  std_logic;
 		compare_idex_i		 : in  std_logic;
+		signed_idex_i		 : in  std_logic;
 
 		memToReg_idex_i      : in  std_logic; --WB
 		regWrite_idex_i      : in  std_logic;
@@ -53,6 +54,7 @@ entity ID_EX is                         --first pipeline stage with instruction_
 		storeMode_idex_o	 : out store_mode;
 		PCWrite_idex_o       : out std_logic;
 		compare_idex_o 		 : out std_logic;
+		signed_idex_o 		 : out std_logic;
 
 		memToReg_idex_o      : out std_logic; --WB
 		regWrite_idex_o      : out std_logic;
@@ -83,6 +85,7 @@ architecture behaviour of ID_EX is
 	signal loadM 	: load_mode;
 	signal storeM	: store_mode;
 	signal compare	: std_logic;
+	signal signedT  : std_logic;
 
 begin
 	ID_EX_reg : process(clk_i, rst_i) is
@@ -110,6 +113,7 @@ begin
 			loadM	 <= ld_lw;
 			storeM	 <= st_sw;
 			compare  <= '0';
+			signedT  <= '0';
 
 		elsif rising_edge(clk_i) then
 			if enable_i = '1' then
@@ -135,6 +139,7 @@ begin
 				regWrite <= regWrite_idex_i;
 				branchC  <= branchCond_idex_i;
 				compare  <= compare_idex_i;
+				signedT  <= signed_idex_i;
 
 			end if;
 		end if;
@@ -163,5 +168,6 @@ begin
 	regWrite_idex_o <= regWrite;
 	branchCond_idex_o <= branchC;
 	compare_idex_o <= compare;
+	signed_idex_o  <= signedT;
 
 end architecture;
