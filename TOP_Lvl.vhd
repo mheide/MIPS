@@ -342,7 +342,6 @@ architecture RTL of TOP_Lvl is
 	signal clock  : std_logic;
 	signal enable : std_logic;
 
-	--TODO: rename
 	--exmem --> pc --beide nicht angekommen
 	signal neg_exmem_pc     : std_logic; --fuer branch
 	signal zero_exmem_pc    : std_logic; --fuer branch
@@ -426,7 +425,7 @@ architecture RTL of TOP_Lvl is
 	signal ALUSrcA_idex_os : std_logic;
 	signal ALUSrcB_idex_os : std_logic_vector(1 downto 0);
 
-	--TODO: dataAddr_memwb_o: sinnvoll machen, oder vielleicht nicht gebraucht? DOCH	
+	--memwb --> rf	
 	signal dataAddr_memwb_rf : std_logic_vector(4 downto 0);
 
 	--ctrl --> idex
@@ -447,10 +446,8 @@ architecture RTL of TOP_Lvl is
 	--ctrl --> regDstSelect
 	signal regDst_ctrl_rds : std_logic_vector(1 downto 0);
 
-	--crtl --> pc --TODO: pc ueberlegen fuer andere befehlstypen
-	signal PCWriteCond_ctrl_pc : std_logic;
+	--crtl --> pc
 	signal PCWrite_ctrl_idex     : std_logic;
-	signal IorD_ctrl_pc        : std_logic;
 
 	--ifid --> idex
 	signal PC_ifid_idex : std_logic_vector(31 downto 0);
